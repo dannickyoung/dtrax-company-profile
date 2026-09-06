@@ -13,6 +13,8 @@ interface DestinationCardProps extends React.HTMLAttributes<HTMLDivElement> {
   ctaLabel?: string;
   hideCta?: boolean;
   active?: boolean;
+  /** "contain" shows the whole image on a white ground (documents, certificates). */
+  imageFit?: "cover" | "contain";
 }
 
 const DestinationCard = React.forwardRef<HTMLDivElement, DestinationCardProps>(
@@ -29,6 +31,7 @@ const DestinationCard = React.forwardRef<HTMLDivElement, DestinationCardProps>(
       ctaLabel = "Explore Now",
       hideCta = false,
       active = false,
+      imageFit = "cover",
       ...props
     },
     ref
@@ -58,9 +61,10 @@ const DestinationCard = React.forwardRef<HTMLDivElement, DestinationCardProps>(
         >
           <div
             className={cn(
-              "absolute inset-0 bg-cover bg-center transition-transform duration-500 ease-in-out",
-              active && "scale-110",
-              !active && "group-hover:scale-110"
+              "absolute inset-0 transition-transform duration-500 ease-in-out",
+              imageFit === "cover" ? "bg-cover bg-center" : "bg-white bg-contain bg-top bg-no-repeat",
+              active && (imageFit === "cover" ? "scale-110" : "scale-[1.04]"),
+              !active && (imageFit === "cover" ? "group-hover:scale-110" : "group-hover:scale-[1.04]")
             )}
             style={{ backgroundImage: `url("${encodeURI(imageUrl)}")` }}
           />

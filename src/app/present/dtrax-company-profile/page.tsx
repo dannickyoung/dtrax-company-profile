@@ -10,6 +10,7 @@ import { AnimatedTestimonials, type AnimatedTestimonial } from "@/components/ui/
 import { AnimatedTooltip } from "@/components/ui/animated-tooltip";
 import { AvatarGroup } from "@/components/ui/avatar-group";
 import DisplayCards from "@/components/ui/display-cards";
+import { DestinationCard } from "@/components/ui/card-21";
 import { ExpandableTabs } from "@/components/ui/expandable-tabs";
 import { GlareCard } from "@/components/ui/glare-card";
 import { OrbitingCircles, Ripple } from "@/components/ui/orbiting-circles";
@@ -136,8 +137,8 @@ const SHOTS: Record<string, string[]> = {
 };
 const RENDER = { sumitomoA: asset("/assets/projects/sumitomo-chemical/a.jpg"), sumitomoB: asset("/assets/projects/sumitomo-chemical/b.jpg") };
 const OFFICE = [asset("/assets/office/office-1.jpg"), asset("/assets/office/office-2.jpg"), asset("/assets/office/office-3.jpg")];
-const TEAM = { ronald: asset("/assets/team/ronald.jpg"), jayne: asset("/assets/team/jayne.jpg"), founders: [asset("/assets/team/founders-1.jpg"), asset("/assets/team/founders-2.jpg"), asset("/assets/team/founders-3.jpg")] };
-const CERT = { sida: asset("/assets/certs/cert-a.png"), isoBizsafe: asset("/assets/certs/cert-b.png") };
+const TEAM = { ronald: asset("/assets/team/ronald-portrait.jpg"), jayne: asset("/assets/team/jayne.jpg"), founders: [asset("/assets/team/founders-1.jpg"), asset("/assets/team/founders-2.jpg"), asset("/assets/team/founders-3.jpg")] };
+const CERT = { sida: asset("/assets/certs/cert-a.png"), iso: asset("/assets/certs/cert-iso.png"), bizsafe: asset("/assets/certs/cert-bizsafe.png") };
 const LOGO: Record<string, string> = {
   "Alibaba": asset("/assets/logos/alibaba.png"), "Aramco Trading": asset("/assets/logos/aramco.png"), "Digital Edge": asset("/assets/logos/digital-edge.webp"), "Edelman": asset("/assets/logos/edelman.png"),
   "Embecta": asset("/assets/logos/embecta.png"), "Extreme Networks": asset("/assets/logos/extreme-networks.png"), "FIJI Water": asset("/assets/logos/fiji-water.webp"), "Grohe": asset("/assets/logos/grohe.png"),
@@ -161,6 +162,39 @@ function Photo({ src, alt, className, position = "50% 50%", caption, placeholder
       <img src={src} alt={alt} className="absolute inset-0 h-full w-full object-cover" style={{ objectPosition: position, transform: zoom === 1 ? undefined : `scale(${zoom})` }} draggable={false} />
       {caption ? <span className="absolute bottom-4 left-4 rounded-full bg-white/92 px-3 py-1 text-[11px] font-medium text-[#151515]">{caption}</span> : null}
       {placeholder ? <span className="absolute right-3 top-3 rounded-full bg-[#151515]/75 px-2 py-0.5 text-[9px] font-medium uppercase tracking-[0.12em] text-white">Placeholder</span> : null}
+    </div>
+  );
+}
+
+/** Crossfading slideshow for project photography. */
+function Slideshow({ images, alt, className, caption, intervalMs = 3400 }: { images: string[]; alt: string; className?: string; caption?: ReactNode; intervalMs?: number }) {
+  const [index, setIndex] = useState(0);
+  useEffect(() => {
+    if (images.length < 2) return;
+    const timer = window.setInterval(() => setIndex((current) => (current + 1) % images.length), intervalMs);
+    return () => window.clearInterval(timer);
+  }, [images.length, intervalMs]);
+  return (
+    <div className={cn("relative overflow-hidden rounded-2xl bg-[#e6e6e2]", className)}>
+      <AnimatePresence initial={false}>
+        <motion.img
+          key={images[index]}
+          src={images[index]}
+          alt={alt}
+          initial={{ opacity: 0, scale: 1.06 }}
+          animate={{ opacity: 1, scale: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 1.1, ease: [0.22, 1, 0.36, 1] }}
+          className="absolute inset-0 h-full w-full object-cover"
+          draggable={false}
+        />
+      </AnimatePresence>
+      {caption ? <span className="absolute bottom-4 left-4 rounded-full bg-white/92 px-3 py-1 text-[11px] font-medium text-[#151515]">{caption}</span> : null}
+      {images.length > 1 ? (
+        <span className="absolute bottom-5 right-4 flex gap-1.5">
+          {images.map((image, i) => <span key={image} className={cn("h-1.5 rounded-full bg-white transition-all duration-300", i === index ? "w-6" : "w-1.5 opacity-60")} />)}
+        </span>
+      ) : null}
     </div>
   );
 }
@@ -204,8 +238,8 @@ function RotatingBadge({ text, className, size = 128, dark = false }: { text: st
       <motion.svg viewBox="0 0 100 100" className="h-full w-full" animate={{ rotate: 360 }} transition={{ duration: 18, repeat: Infinity, ease: "linear" }}>
         <defs><path id={id} d="M50,50 m-38,0 a38,38 0 1,1 76,0 a38,38 0 1,1 -76,0" /></defs>
         <circle cx="50" cy="50" r="18" fill={dark ? "#DDFF97" : INK} />
-        <text fill={dark ? "#ffffff" : INK} fontSize="9.5" fontWeight="700" letterSpacing="1.6" className={sans.className}>
-          <textPath href={`#${id}`}>{text}</textPath>
+        <text fill={dark ? "#ffffff" : INK} fontSize="8" fontWeight="700" letterSpacing="1.2" className={sans.className}>
+          <textPath href={`#${id}`} textLength="236" lengthAdjust="spacingAndGlyphs">{text}</textPath>
         </text>
       </motion.svg>
     </motion.div>
@@ -285,7 +319,7 @@ const clientLogos = [
 ];
 
 const leaders: ProfileCardItem[] = [
-  { name: "Ronald Goh", role: "Managing Director", photo: TEAM.ronald, photoPosition: "68% 42%", experience: "25+ years in corporate interior fit-out", specialism: "Translating clients' commercial objectives into fit-out decisions; long-term client relationships built across repeat engagements", projects: ["Group-IB", "Sony Pictures", "Mitsui Chemicals", "FIJI Water", "Edelman"], projectLogos: [LOGO["Group-IB"], LOGO["Sony Pictures"], LOGO["Mitsui Chemicals"], LOGO["FIJI Water"], LOGO["Edelman"]] },
+  { name: "Ronald Goh", role: "Managing Director", photo: TEAM.ronald, photoPosition: "50% 30%", experience: "25+ years in corporate interior fit-out", specialism: "Translating clients' commercial objectives into fit-out decisions; long-term client relationships built across repeat engagements", projects: ["Group-IB", "Sony Pictures", "Mitsui Chemicals", "FIJI Water", "Edelman"], projectLogos: [LOGO["Group-IB"], LOGO["Sony Pictures"], LOGO["Mitsui Chemicals"], LOGO["FIJI Water"], LOGO["Edelman"]] },
   { name: "Jayne Ong", role: "Head of Costing & Operation", photo: TEAM.jayne, photoPosition: "50% 18%", experience: <ToConfirm>Years and background</ToConfirm>, specialism: <ToConfirm>Costing and operations profile</ToConfirm>, projects: [], projectsLabel: "Featured projects (to confirm)" },
   { name: "Esther Choo", role: "Design Director", experience: "24+ years of professional practice", qualifications: "Diploma in Interior Design, Nanyang Academy of Fine Arts", specialism: "Pre-leasing feasibility and workspace strategy through detailed, buildable design; corporate, hospitality and retail interiors", projects: ["Standard Chartered", "Spotify", "Singtel", "Traveloka", "Singapore Pools"], projectLogos: [LOGO["Standard Chartered"], LOGO["Spotify"], LOGO["Singtel"], LOGO["Traveloka"], LOGO["Singapore Pools"]] },
   { name: "Sandrey Lim", role: "Project Director", experience: "26+ years in design-and-build workplace delivery", qualifications: "Specialist Diploma in Construction Productivity (BCA); Diploma in Personnel Management; bizSAFE Level 2", specialism: "End-to-end delivery of complex workplace transformations, coordinating design, cost and construction through to handover", projects: ["Alibaba", "Grohe", "The World Bank", "SOTA", "Shiseido"], projectLogos: [LOGO["Alibaba"], LOGO["Grohe"], LOGO["The World Bank"], LOGO["SOTA"], LOGO["Shiseido"]] },
@@ -372,12 +406,12 @@ function CoverSlide() {
           <Sticker tone="blue" rotate={-5}>Company profile · 2026</Sticker>
         </motion.div>
         <RotatingBadge text="D'TRAX DESIGN · SINCE 2003 · SINGAPORE · " className="absolute right-12 top-4" />
-        <h1 className="text-[9.5vw] font-bold leading-[0.86] tracking-[-0.04em] text-[#151515]">
+        <h1 className="text-[9.5vw] font-bold leading-[0.98] tracking-[-0.04em] text-[#151515]">
           <motion.span variants={fadeUp} className="block">Imagine.</motion.span>
           <motion.span variants={fadeUp} className="flex items-center gap-[2vw]">
-            <span className="relative h-[8vw] w-[40vw] shrink-0 overflow-hidden rounded-[1.4vw] [mask-image:linear-gradient(to_right,transparent,black_8%,black_92%,transparent)]">
+            <span className="relative h-[6.6vw] w-[40vw] shrink-0 overflow-hidden rounded-[1.4vw] [mask-image:linear-gradient(to_right,transparent,black_8%,black_92%,transparent)]">
               <Marquee className="h-full p-0 [--duration:36s] [--gap:0.6vw]">
-                {strip.map((src) => <Photo key={src} src={src} alt="D'trax workplace" className="h-[8vw] w-[12vw] shrink-0 rounded-[1vw]" />)}
+                {strip.map((src) => <Photo key={src} src={src} alt="D'trax workplace" className="h-[6.6vw] w-[10.5vw] shrink-0 rounded-[1vw]" />)}
               </Marquee>
             </span>
             <span>Design.</span>
@@ -477,42 +511,54 @@ function PillarsSlide() {
 
 
 function MarketNode({ label, fill }: { label: string; fill: Tone }) {
-  return <span className={cn("flex h-full w-full items-center justify-center rounded-full px-1 text-center text-[10px] font-semibold uppercase leading-tight tracking-[0.1em] shadow-[0_12px_30px_rgba(21,21,21,0.22)]", fillClass[fill])}>{label}</span>;
+  return (
+    <span className={cn("flex h-full w-full items-center justify-center rounded-full border-[3px] border-white px-1 text-center text-[10px] font-bold uppercase leading-tight tracking-[0.08em] shadow-[0_18px_40px_rgba(21,21,21,0.28),inset_0_-8px_14px_rgba(21,21,21,0.10)]", fillClass[fill])}>
+      {label}
+    </span>
+  );
 }
 
 function MarketsSlide() {
   const markets = ["Singapore", "China", "Hong Kong", "Malaysia", "Thailand"];
   return (
     <Sheet label="Where we work">
-      <div className={cn("relative w-full overflow-hidden", SLIDE)}>
-        <WarpGrid center="64% 56%" />
-        <Stars count={18} />
-        <div className="relative z-10 px-12 pt-10">
-          <Display size="md" className="max-w-2xl"><NumberTicker value={100} suffix="+" className="tabular-nums" /> offices across <Em tone="blue">five markets</Em>.</Display>
-          <motion.div variants={stagger} className="mt-5 flex flex-wrap gap-2">
+      <div className={cn("relative grid w-full grid-cols-1 items-center gap-8 overflow-hidden px-12 pt-8 md:grid-cols-[0.9fr_1.1fr]", SLIDE)}>
+        <WarpGrid center="68% 52%" />
+        <Stars count={22} />
+        <div className="relative">
+          <Display size="md"><NumberTicker value={100} suffix="+" className="tabular-nums" /> offices across <span className="whitespace-nowrap"><Em tone="blue">five markets</Em>.</span></Display>
+          <motion.p variants={fadeUp} className="mt-5 max-w-sm text-[13px] leading-relaxed text-[#151515]/65">Headquartered in Singapore, delivering commercial workplaces across the region since 2003.</motion.p>
+          <motion.div variants={stagger} className="mt-6 flex flex-wrap gap-2">
             {markets.map((market, index) => (
               <Sticker key={market} tone={(["ink", "pink", "blue", "lime", "pink"] as Fill[])[index]} rotate={[-4, 3, -2, 4, -3][index]}>{market}{index === 0 ? " · HQ" : ""}</Sticker>
             ))}
           </motion.div>
         </div>
-        <div className="absolute inset-0 flex items-center justify-center md:justify-end md:pr-[8%]">
-          <div className="relative flex h-[26rem] w-[26rem] items-center justify-center">
-            <Ripple color={INK} mainCircleSize={140} numCircles={5} mainCircleOpacity={0.22} />
-            <div className="relative z-10 flex h-24 w-24 flex-col items-center justify-center rounded-full bg-[#151515] text-white shadow-[0_0_0_12px_rgba(21,21,21,0.06)]">
+        <motion.div variants={scaleIn} className="relative flex items-center justify-center">
+          <div className="relative flex h-[30rem] w-[30rem] items-center justify-center">
+            <div aria-hidden="true" className="absolute inset-0 rounded-full bg-[#9DD6FF]/20 blur-3xl" />
+            <Ripple color={INK} mainCircleSize={150} numCircles={4} mainCircleOpacity={0.2} />
+            <motion.div aria-hidden="true" className="absolute h-36 w-36 rounded-full border-2 border-[#DDFF97]" animate={{ scale: [1, 1.5], opacity: [0.9, 0] }} transition={{ duration: 2.6, repeat: Infinity, ease: "easeOut" }} />
+            <div className="relative z-10 flex h-28 w-28 flex-col items-center justify-center rounded-full bg-[#151515] text-white shadow-[0_24px_60px_rgba(21,21,21,0.35),0_0_0_10px_rgba(255,255,255,0.7)]">
               <MapPin className="h-4 w-4 text-[#DDFF97]" />
-              <span className="mt-1 text-[12px] font-semibold leading-none">Singapore</span>
+              <span className="mt-1 text-[13px] font-semibold leading-none">Singapore</span>
+              <span className="mt-1 text-[9px] uppercase tracking-[0.18em] text-white/60">HQ</span>
             </div>
-            <OrbitingCircles radius={105} iconSize={64} duration={26}>
+            <OrbitingCircles radius={112} iconSize={68} duration={24}>
               <MarketNode label="China" fill="pink" />
               <MarketNode label="Hong Kong" fill="blue" />
             </OrbitingCircles>
-            <OrbitingCircles radius={172} iconSize={64} duration={40} reverse>
+            <OrbitingCircles radius={178} iconSize={68} duration={38} reverse>
               <MarketNode label="Malaysia" fill="lime" />
               <MarketNode label="Thailand" fill="pink" />
             </OrbitingCircles>
+            <OrbitingCircles radius={224} iconSize={10} duration={52} path={false}>
+              <span className="h-2.5 w-2.5 rounded-full bg-[#151515]" />
+              <span className="h-2 w-2 rounded-full bg-[#9DD6FF] ring-2 ring-white" />
+              <span className="h-2 w-2 rounded-full bg-[#FFB6B6] ring-2 ring-white" />
+            </OrbitingCircles>
           </div>
-        </div>
-        <RotatingBadge text="HEADQUARTERED IN SINGAPORE · SINCE 2003 · " className="absolute bottom-6 right-12" size={112} />
+        </motion.div>
       </div>
     </Sheet>
   );
@@ -590,51 +636,53 @@ function ApproachSlide() {
     return () => window.clearInterval(timer);
   }, [paused]);
   const stage = stages[active];
-  const icons = [Sparkles, PenTool, Calculator, HardHat, Users, ShieldCheck];
-  const Icon = icons[active];
+  const tones: Tone[] = ["pink", "blue", "lime", "pink", "blue", "lime"];
   return (
     <Sheet label="Our delivery approach">
-      <div className={cn("grid w-full grid-cols-1 gap-8 px-12 pt-10 md:grid-cols-[1.15fr_0.85fr]", SLIDE)} onMouseEnter={() => setPaused(true)} onMouseLeave={() => setPaused(false)}>
-        <div className="flex flex-col justify-between pb-6">
-          <div>
-            <Display size="md">Six stages. One <Em tone="pink">accountable</Em> team.</Display>
-            <motion.p variants={fadeUp} className="mt-5 max-w-md text-[13px] leading-relaxed text-[#151515]/65">Buddy-system continuity keeps your project moving, with one point of contact from brief to handover.</motion.p>
-          </div>
-          <div>
-            <motion.ol variants={fadeUp} className="grid grid-cols-6 gap-3">
-              {stages.map((item, index) => {
-                const current = index === active;
-                return (
-                  <li key={item.title}>
-                    <button type="button" onClick={() => setActive(index)} className="w-full text-left">
-                      <span className={cn("block h-[2px] w-full rounded-full transition-colors duration-300", index <= active ? "bg-[#151515]" : "bg-[#151515]/15")} />
-                      <span className={cn("mt-2 block text-[12px] leading-snug transition-colors", current ? "font-semibold text-[#151515]" : "text-[#151515]/50")}>{item.title}</span>
-                    </button>
-                  </li>
-                );
-              })}
-            </motion.ol>
-            <div className="mt-6 flex items-start gap-6">
-              <div className="relative h-[6.5rem] w-[6.5rem] shrink-0 overflow-hidden">
-                <AnimatePresence mode="wait">
-                  <motion.span
-                    key={active}
-                    initial={{ y: "110%", opacity: 0 }}
-                    animate={{ y: "0%", opacity: 1 }}
-                    exit={{ y: "-110%", opacity: 0 }}
-                    transition={{ duration: 0.28, ease }}
-                    className="absolute inset-0 flex items-center text-[6.5rem] font-black leading-none tracking-[-0.08em] text-[#FFB6B6]"
+      <div className={cn("grid w-full grid-cols-1 gap-8 px-12 pt-10 md:grid-cols-[1.1fr_0.9fr]", SLIDE)} onMouseEnter={() => setPaused(true)} onMouseLeave={() => setPaused(false)}>
+        <div className="flex flex-col pb-6">
+          <Display size="md">Six stages. One <Em tone="pink">accountable</Em> team.</Display>
+          <motion.p variants={fadeUp} className="mt-4 max-w-md text-[13px] leading-relaxed text-[#151515]/65">Buddy-system continuity keeps your project moving, with one point of contact from brief to handover.</motion.p>
+          <motion.ol variants={stagger} className="mt-6 grid grid-cols-3 gap-3">
+            {stages.map((item, index) => {
+              const current = index === active;
+              return (
+                <motion.li key={item.title} variants={fadeUp}>
+                  <motion.button
+                    type="button"
+                    onClick={() => setActive(index)}
+                    animate={{ y: current ? -4 : 0, scale: current ? 1.02 : 1 }}
+                    transition={{ duration: 0.4, ease }}
+                    className={cn("flex w-full items-center gap-3 rounded-2xl border px-3.5 py-3 text-left transition-colors duration-300", current ? cn("border-transparent shadow-[0_16px_40px_rgba(21,21,21,0.12)]", fillClass[tones[index]]) : "border-[#151515]/10 bg-white text-[#151515]")}
                   >
-                    {active + 1}
-                  </motion.span>
-                </AnimatePresence>
-              </div>
-              <motion.div key={`text-${active}`} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.35, ease }} className="max-w-lg pt-3">
-                <p className="flex items-center gap-2 text-2xl font-semibold tracking-tight text-[#151515]"><Icon className="h-5 w-5" /> {stage.title}</p>
-                <p className="mt-2 text-[13px] leading-relaxed text-[#151515]/70">{stage.body}</p>
-                {stage.extra ? <p className="mt-2 text-[12px] leading-relaxed text-[#151515]/60">{stage.extra}</p> : null}
-              </motion.div>
+                    <span className={cn("flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-[13px] font-bold", current ? "bg-[#151515] text-white" : fillClass[tones[index]])}>{index + 1}</span>
+                    <span className="text-[13px] font-semibold leading-tight">{item.title}</span>
+                  </motion.button>
+                </motion.li>
+              );
+            })}
+          </motion.ol>
+          <div className="mt-6 flex flex-1 items-start gap-6 border-t border-[#151515]/15 pt-6">
+            <div className="relative h-[7rem] w-[6.5rem] shrink-0 overflow-hidden">
+              <AnimatePresence mode="wait">
+                <motion.span
+                  key={active}
+                  initial={{ y: "110%", opacity: 0 }}
+                  animate={{ y: "0%", opacity: 1 }}
+                  exit={{ y: "-110%", opacity: 0 }}
+                  transition={{ duration: 0.28, ease }}
+                  className="absolute inset-0 flex items-center text-[7rem] font-black leading-none tracking-[-0.08em]"
+                  style={{ color: hex[tones[active]] }}
+                >
+                  {active + 1}
+                </motion.span>
+              </AnimatePresence>
             </div>
+            <motion.div key={`text-${active}`} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.35, ease }} className="max-w-lg pt-3">
+              <p className="text-2xl font-semibold tracking-tight text-[#151515]">{stage.title}</p>
+              <p className="mt-2 text-[13px] leading-relaxed text-[#151515]/70">{stage.body}</p>
+              {stage.extra ? <p className="mt-2 text-[12px] leading-relaxed text-[#151515]/60">{stage.extra}</p> : null}
+            </motion.div>
           </div>
         </div>
         <motion.div variants={scaleIn} className="mb-6">
@@ -719,40 +767,65 @@ function TeamSlide() {
 }
 
 function OrgChartSlide() {
+  const founders = [
+    { name: "Ronald Goh", role: "Managing Director", photo: TEAM.ronald, position: "50% 25%" },
+    { name: "Jayne Ong", role: "Head of Costing & Operation", photo: TEAM.jayne, position: "50% 18%" },
+  ];
+  const panelFill: Record<Tone, string> = { pink: "bg-[#FFB6B6]/55", blue: "bg-[#9DD6FF]/55", lime: "bg-[#DDFF97]/60" };
   return (
     <Sheet label="Organisation chart">
-      <div className={cn("relative flex w-full flex-col overflow-hidden px-12 pt-10", SLIDE)}>
-        <WarpGrid center="50% 40%" />
+      <div className={cn("relative flex w-full flex-col overflow-hidden px-12 pt-8", SLIDE)}>
+        <WarpGrid center="50% 30%" />
+        <Stars count={8} />
         <div className="relative flex items-end justify-between gap-8">
           <Display size="sm">One team, <Em>five</Em> disciplines.</Display>
           <Sticker tone="lime" rotate={3}>Buddy-system approach on every project</Sticker>
         </div>
-        <motion.div variants={fadeUp} className="relative mt-6 flex justify-center gap-4">
-          {[{ name: "Ronald Goh", role: "Managing Director", photo: TEAM.ronald, position: "62% 30%" }, { name: "Jayne Ong", role: "Head of Costing & Operation", photo: TEAM.jayne, position: "50% 18%" }].map((person) => (
-            <div key={person.name} className="flex items-center gap-3 rounded-full bg-[#151515] py-1.5 pl-1.5 pr-5 text-white shadow-[0_14px_40px_rgba(21,21,21,0.2)]">
-              <img src={person.photo} alt={person.name} className="h-12 w-12 rounded-full object-cover" style={{ objectPosition: person.position }} />
-              <div><p className="text-[13px] font-semibold leading-tight">{person.name}</p><p className="text-[11px] text-white/60">{person.role}</p></div>
-            </div>
-          ))}
-        </motion.div>
-        <div className="relative mx-auto mt-3 h-6 w-px bg-[#151515]/25" />
-        <div className="relative mx-[10%] h-px bg-[#151515]/25" />
-        <motion.div variants={stagger} className="relative mt-0 grid grid-cols-5 gap-3">
-          {orgTeams.map((team) => (
-            <motion.div key={team.name} variants={fadeUp} className="flex flex-col items-center">
-              <span className="h-5 w-px bg-[#151515]/25" />
-              <span className={cn("w-full rounded-full px-3 py-1.5 text-center text-[11px] font-semibold", fillClass[team.fill])}>{team.name}</span>
-              <ul className="mt-2 flex w-full flex-col gap-1.5">
-                {team.members.map((member) => (
-                  <li key={member.name} className="rounded-xl bg-white px-3 py-2 shadow-[0_6px_18px_rgba(21,21,21,0.06)]">
-                    <p className="text-[12px] font-semibold leading-tight text-[#151515]">{member.name}</p>
-                    <p className="text-[10px] leading-tight text-[#151515]/55">{member.role}</p>
-                  </li>
-                ))}
-              </ul>
+        <motion.div variants={fadeUp} className="relative mt-5 flex justify-center gap-4">
+          {founders.map((person, index) => (
+            <motion.div key={person.name} animate={{ y: [0, -4, 0] }} transition={{ duration: 5, repeat: Infinity, ease: "easeInOut", delay: index * 0.8 }} className="flex items-center gap-3 rounded-full bg-white py-1.5 pl-1.5 pr-6 text-[#151515] shadow-[0_18px_44px_rgba(21,21,21,0.14)]">
+              <img src={person.photo} alt={person.name} className="h-14 w-14 rounded-full object-cover ring-2 ring-[#DDFF97]" style={{ objectPosition: person.position }} />
+              <div><p className="text-[14px] font-semibold leading-tight">{person.name}</p><p className="text-[11px] text-[#151515]/55">{person.role}</p></div>
             </motion.div>
           ))}
         </motion.div>
+        <div className="relative mx-auto mt-3 h-5 w-px bg-[#151515]/30" />
+        <div className="relative mx-[10%] h-px bg-[#151515]/30" />
+        <motion.div variants={stagger} className="relative mb-6 mt-0 grid flex-1 grid-cols-5 gap-3">
+          {orgTeams.map((team, index) => (
+            <motion.div key={team.name} variants={fadeUp} className="flex h-full flex-col items-center">
+              <span className="h-5 w-px bg-[#151515]/30" />
+              <div className={cn("flex w-full flex-1 flex-col rounded-2xl p-2.5", panelFill[(["pink", "blue", "lime", "blue", "pink"] as Tone[])[index]])}>
+                <div className="flex items-center justify-between px-1 pb-2 pt-1">
+                  <span className="text-[12px] font-bold text-[#151515]">{team.name}</span>
+                  <span className="rounded-full bg-[#151515] px-2 py-0.5 text-[10px] font-semibold text-white">{team.members.length}</span>
+                </div>
+                <ul className="flex flex-col gap-2">
+                  {team.members.map((member) => (
+                    <li key={member.name} className="rounded-xl bg-white px-3 py-2.5 shadow-[0_6px_18px_rgba(21,21,21,0.06)]">
+                      <p className="text-[12px] font-semibold leading-tight text-[#151515]">{member.name}</p>
+                      <p className="text-[10px] leading-tight text-[#151515]/55">{member.role}</p>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </motion.div>
+          ))}
+        </motion.div>
+      </div>
+    </Sheet>
+  );
+}
+
+function FoundersSlide() {
+  return (
+    <Sheet label="The founders">
+      <div className={cn("flex w-full flex-col justify-center px-12 pt-10", SLIDE)}>
+        <div className="mb-6 flex items-end justify-between gap-8">
+          <Display size="sm">The <Em tone="pink">founders</Em>.</Display>
+          <motion.p variants={fadeUp} className="max-w-sm text-right text-[13px] leading-relaxed text-[#151515]/65">Ronald Goh and Jayne Ong have run D&apos;trax from the front since 2003.</motion.p>
+        </div>
+        <motion.div variants={scaleIn}><ExpandingProfileCards people={leaders.slice(0, 2)} nameClassName="font-semibold tracking-tight" className="h-[clamp(20rem,60vh,30rem)]" photoWidth="20rem" activeGrow={2.2} intervalMs={5200} /></motion.div>
       </div>
     </Sheet>
   );
@@ -762,8 +835,11 @@ function LeadersSlide() {
   return (
     <Sheet label="Key leaders">
       <div className={cn("flex w-full flex-col justify-center px-12 pt-10", SLIDE)}>
-        <Display size="sm" className="mb-6">Key leaders.</Display>
-        <motion.div variants={scaleIn}><ExpandingProfileCards people={leaders} nameClassName="font-semibold tracking-tight" className="h-[clamp(20rem,58vh,29rem)]" /></motion.div>
+        <div className="mb-6 flex items-end justify-between gap-8">
+          <Display size="sm">Key leaders.</Display>
+          <motion.p variants={fadeUp} className="max-w-sm text-right text-[13px] leading-relaxed text-[#151515]/65">Design, delivery and costing, led in-house.</motion.p>
+        </div>
+        <motion.div variants={scaleIn}><ExpandingProfileCards people={leaders.slice(2)} nameClassName="font-semibold tracking-tight" className="h-[clamp(20rem,60vh,30rem)]" /></motion.div>
       </div>
     </Sheet>
   );
@@ -858,9 +934,10 @@ function ProjectMeta({ project, dark = false }: { project: Project; dark?: boole
 function ProjectSlide({ project, index, variant = "split", reverse = false }: { project: Project; index: number; variant?: ProjectVariant; reverse?: boolean }) {
   const shots = SHOTS[project.name] ?? [];
   const hero = shots[0];
-  const thumbs = shots.slice(1, 3);
+  const reel = shots.slice(0, 4);
+  const thumbs = shots.slice(4, 6);
   const label = `Featured projects · ${index} of 8`;
-  const Hero = ({ className }: { className?: string }) => hero ? <Photo src={hero} alt={project.name} className={className} /> : <Pending label={`${project.name} · project photos pending`} className={className} />;
+  const Hero = ({ className, caption }: { className?: string; caption?: ReactNode }) => hero ? <Slideshow images={reel} alt={project.name} className={className} caption={caption} /> : <Pending label={`${project.name} · project photos pending`} className={className} />;
 
   if (variant === "full") {
     return (
@@ -915,7 +992,7 @@ function ProjectSlide({ project, index, variant = "split", reverse = false }: { 
       <div className={cn("grid w-full grid-cols-1 gap-8 px-12 pt-10 md:grid-cols-[1.15fr_0.85fr]", SLIDE, reverse && "md:[&>*:first-child]:order-2")}>
         <motion.div variants={scaleIn} className="mb-6 h-[calc(100dvh-12rem)]">
           <WobbleCard containerClassName="h-full rounded-2xl bg-transparent" className="h-full">
-            {hero ? <Photo src={hero} alt={project.name} className="h-full w-full" caption={project.name} /> : <Pending label={`${project.name} · project photos pending`} className="h-full w-full" />}
+            <Hero className="h-full w-full" caption={project.name} />
           </WobbleCard>
         </motion.div>
         <div className="flex flex-col justify-center pb-6">
@@ -928,7 +1005,7 @@ function ProjectSlide({ project, index, variant = "split", reverse = false }: { 
           <motion.div variants={fadeUp} className="mt-5 border-t border-[#151515]/15 pt-4"><ProjectMeta project={project} /></motion.div>
           {thumbs.length ? (
             <motion.div variants={fadeUp} className="mt-5 grid grid-cols-2 gap-3">
-              {thumbs.map((src, i) => <Photo key={i} src={src} alt={`${project.name} detail`} className="h-[clamp(5rem,13vh,7.5rem)] w-full" />)}
+              {thumbs.map((src, i) => <Photo key={i} src={src} alt={`${project.name} detail`} className="h-[clamp(8rem,22vh,12rem)] w-full" />)}
             </motion.div>
           ) : null}
         </div>
@@ -952,42 +1029,28 @@ function TestimonialsSlide() {
   );
 }
 
-function Scan({ src, side, position = "50% 50%", className }: { src: string; side?: "left" | "right"; position?: string; className?: string }) {
-  return (
-    <div className={cn("relative overflow-hidden bg-white", className)}>
-      <img src={src} alt="Certificate" className={cn("absolute top-0 h-full object-cover", side ? "w-[200%] max-w-none" : "w-full")} style={{ objectPosition: position, ...(side ? { left: side === "left" ? 0 : "-100%" } : {}) }} draggable={false} />
-    </div>
-  );
-}
-
 function CertificationsSlide() {
-  const items: { title: string; sub: string; body: string; scan: string; side?: "left" | "right"; position?: string }[] = [
-    { title: "ISO 45001:2018", sub: "Occupational Health and Safety Management System", body: "Interior design, addition and alteration, and renovation works. Certified February 2024.", scan: CERT.isoBizsafe, side: "left" as const, position: "50% 30%" },
-    { title: "bizSAFE Star", sub: "Workplace Safety and Health Council", body: "The highest bizSAFE level. Valid to February 2027.", scan: CERT.isoBizsafe, side: "right" as const, position: "50% 30%" },
-    { title: "SIDA 2023 Bronze", sub: "Best in Workspace Design", body: "Singapore Interior Design Awards, Completed Category, for the Group-IB office.", scan: CERT.sida, position: "50% 8%" },
+  const [active, setActive] = useState(0);
+  useEffect(() => {
+    const timer = window.setInterval(() => setActive((current) => (current + 1) % 3), 2400);
+    return () => window.clearInterval(timer);
+  }, []);
+  const cards = [
+    { title: "ISO 45001:2018", stats: "Occupational Health & Safety", body: "Interior design, addition and alteration, and renovation works. Certified February 2024.", image: CERT.iso, theme: "205 100% 81%" },
+    { title: "bizSAFE Star", stats: "Workplace Safety and Health Council", body: "The highest bizSAFE level. Valid to February 2027.", image: CERT.bizsafe, theme: "79 100% 80%" },
+    { title: "SIDA 2023 Bronze", stats: "Best in Workspace Design", body: "Singapore Interior Design Awards, Completed Category, for the Group-IB office.", image: CERT.sida, theme: "0 100% 86%" },
   ];
   return (
     <Sheet label="Certifications & awards">
       <div className={cn("relative flex w-full flex-col justify-center overflow-hidden px-12 pt-10", SLIDE)}>
-        <WarpGrid center="50% 65%" />
-        <Stars count={10} />
-        <div className="relative grid grid-cols-1 items-end gap-8 md:grid-cols-[1fr_auto]">
+        <Stars count={8} />
+        <div className="relative flex items-end justify-between gap-8">
           <Display size="md" className="max-w-4xl">Certified for safety and quality. <Em>Recognised</Em> for design.</Display>
-          <Sticker tone="pink" rotate={-4} className="md:justify-self-end">Move your pointer over a certificate</Sticker>
         </div>
-        <motion.div variants={stagger} className="relative mt-8 grid grid-cols-1 gap-4 md:grid-cols-3">
-          {items.map((item) => (
-            <motion.div key={item.title} variants={scaleIn} className="h-[clamp(15rem,44vh,21rem)]">
-              <GlareCard containerClassName="h-full w-full" className="bg-white">
-                <div className="flex h-full flex-col">
-                  <Scan src={item.scan} side={item.side} position={item.position} className="min-h-0 flex-1" />
-                  <div className="border-t border-[#151515]/10 p-4">
-                    <p className="text-lg font-semibold leading-none tracking-tight text-[#151515]">{item.title}</p>
-                    <p className="mt-1 text-[11px] text-[#151515]/55">{item.sub}</p>
-                    <p className="mt-1.5 text-[11px] leading-snug text-[#151515]/70">{item.body}</p>
-                  </div>
-                </div>
-              </GlareCard>
+        <motion.div variants={stagger} className="relative mt-6 grid grid-cols-1 gap-5 md:grid-cols-3">
+          {cards.map((card, index) => (
+            <motion.div key={card.title} variants={scaleIn} className="h-[clamp(18rem,54vh,28rem)]">
+              <DestinationCard imageUrl={card.image} imageFit="contain" location={card.title} flag="" stats={card.stats} href="#" themeColor={card.theme} description={card.body} hideCta active={index === active} />
             </motion.div>
           ))}
         </motion.div>
@@ -1054,6 +1117,7 @@ const slides: PresentationSlide[] = [
   slide("reality-capture", <RealityCaptureSlide />),
   slide("team", <TeamSlide />),
   slide("org-chart", <OrgChartSlide />),
+  slide("founders", <FoundersSlide />),
   slide("leaders", <LeadersSlide />),
   slide("track-record", <TrackRecordSlide />),
   slide("recent-projects", <RecentProjectsSlide />),

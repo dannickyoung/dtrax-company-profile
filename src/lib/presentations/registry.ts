@@ -17,7 +17,7 @@ export const presentations: PresentationEntry[] = [
     year: 2026,
     dateRangeStart: "2026-09-07",
     dateRangeEnd: "2026-09-07",
-    slideCount: 23,
+    slideCount: 24,
     status: "draft",
   },
 ];

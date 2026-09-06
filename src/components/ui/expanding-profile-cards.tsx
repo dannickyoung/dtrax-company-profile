@@ -23,12 +23,15 @@ interface ExpandingProfileCardsProps {
   intervalMs?: number;
   className?: string;
   nameClassName?: string;
+  /** Width of the photo column when a card is open. */
+  photoWidth?: string;
+  activeGrow?: number;
 }
 
 const fills = ["bg-[#FFB6B6]", "bg-[#9DD6FF]", "bg-[#DDFF97]"];
 
 /** Expanding profile cards: the active card grows and opens an ink detail panel. */
-export function ExpandingProfileCards({ people, intervalMs = 4200, className, nameClassName }: ExpandingProfileCardsProps) {
+export function ExpandingProfileCards({ people, intervalMs = 4200, className, nameClassName, photoWidth = "13.5rem", activeGrow = 3.4 }: ExpandingProfileCardsProps) {
   const [active, setActive] = useState(0);
   const [paused, setPaused] = useState(false);
 
@@ -46,7 +49,7 @@ export function ExpandingProfileCards({ people, intervalMs = 4200, className, na
           <motion.div
             key={person.name}
             layout
-            animate={{ flexGrow: isActive ? 3.4 : 1 }}
+            animate={{ flexGrow: isActive ? activeGrow : 1 }}
             transition={{ type: "spring", stiffness: 160, damping: 26 }}
             onMouseEnter={() => {
               setPaused(true);
@@ -58,7 +61,7 @@ export function ExpandingProfileCards({ people, intervalMs = 4200, className, na
               isActive ? "shadow-[0_28px_70px_rgba(21,21,21,0.30)]" : "shadow-[0_10px_30px_rgba(21,21,21,0.12)]"
             )}
           >
-            <div className={cn("relative h-full shrink-0 overflow-hidden text-[#151515] transition-[width] duration-500", fills[index % fills.length], isActive ? "w-[13.5rem]" : "w-full")}>
+            <div className={cn("relative h-full shrink-0 overflow-hidden text-[#151515] transition-[width] duration-500", fills[index % fills.length], !isActive && "w-full")} style={isActive ? { width: photoWidth } : undefined}>
               {person.photo ? (
                 <img src={person.photo} alt={person.name} className="absolute inset-0 h-full w-full object-cover" style={{ objectPosition: person.photoPosition ?? "50% 20%" }} draggable={false} />
               ) : (
@@ -67,9 +70,9 @@ export function ExpandingProfileCards({ people, intervalMs = 4200, className, na
                   <span className="absolute left-4 top-4 text-[10px] font-medium uppercase tracking-[0.18em] opacity-60">{person.photoLabel ?? "Portrait · to add"}</span>
                 </>
               )}
-              <div className={cn("absolute inset-x-0 bottom-0 p-4", person.photo && "bg-white/92 text-[#151515]")}>
+              <div className={cn("absolute inset-x-0 bottom-0 p-4", person.photo && "bg-gradient-to-t from-black/85 via-black/45 to-transparent pt-20 text-white")}>
                 <p className={cn("text-[1.45rem] leading-none", nameClassName)}>{person.name}</p>
-                <p className="mt-1.5 text-[11px] font-medium uppercase tracking-[0.16em] opacity-60">{person.role}</p>
+                <p className={cn("mt-1.5 text-[11px] font-medium uppercase tracking-[0.16em]", person.photo ? "text-white/75" : "opacity-60")}>{person.role}</p>
               </div>
             </div>
 

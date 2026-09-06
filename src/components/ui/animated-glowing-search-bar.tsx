@@ -39,8 +39,8 @@ export default function AnimatedGlowingSearchBar({
           timeout = window.setTimeout(() => {
             hasCompletedRef.current = true;
             onSequenceComplete?.();
-          }, 320);
-        }, 340);
+          }, 1100);
+        }, 600);
         return;
       }
 
@@ -95,9 +95,9 @@ export default function AnimatedGlowingSearchBar({
             animate={
               iconPressed
                 ? {
-                    scale: [1, 0.94, 0.985],
-                    y: [0, 1.2, 0.2],
-                    opacity: [1, 0.94, 1],
+                    scale: [1, 0.82, 1.08, 1],
+                    y: [0, 3, -1, 0],
+                    opacity: [1, 0.9, 1, 1],
                     backgroundColor: [
                       "rgba(221, 255, 151, 0.5)",
                       "rgba(221, 255, 151, 1)",
@@ -117,7 +117,7 @@ export default function AnimatedGlowingSearchBar({
                     borderColor: "rgba(21, 21, 21, 0.12)",
                   }
             }
-            transition={{ duration: 0.3, times: [0, 0.52, 1], ease: [0.22, 1, 0.36, 1] }}
+            transition={{ duration: 0.7, times: [0, 0.3, 0.7, 1], ease: [0.22, 1, 0.36, 1] }}
             className="ml-6 flex h-14 w-14 shrink-0 items-center justify-center rounded-[1rem] border border-black/10 bg-[#DDFF97] shadow-[0_0_22px_rgba(221,255,151,0.5)]"
           >
             <Search className="h-6 w-6 text-[#151515]" strokeWidth={1.8} />
