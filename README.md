@@ -1,0 +1,1 @@
+# D'trax · Company Profile\n\nStatic Next.js deck. `npm install`, then `npm run dev` and open `/present/dtrax-company-profile/`.\n\nDeployed to GitHub Pages from `main` by `.github/workflows/deploy.yml`.\n

@@ -1,0 +1,190 @@
+@import "tailwindcss";
+
+@theme {
+  /* Primary accent — electric violet */
+  --color-neon-cyan: #151515;
+  /* Secondary accent — blood orange */
+  --color-neon-orange: #151515;
+  /* Tertiary — dimmer warm tone */
+  --color-neon-magenta: #888888;
+  /* Tertiary accent — kept for status badges */
+  --color-neon-lime: #a855f7;
+
+  /* Surfaces — true black base like reference */
+  --color-surface-deepest: #f4f4f2;
+  --color-surface-base: #fbfbfa;
+  --color-surface-raised: #ffffff;
+
+  /* Borders — subtle wireframe */
+  --color-wire-subtle: #e4e4e0;
+  --color-wire-emphasis: #d0d0cc;
+
+  /* Text */
+  --color-text-primary: #151515;
+  --color-text-secondary: #55555c;
+  --color-text-muted: #9b9ba1;
+
+  /* Spacing extras */
+  --spacing-18: 4.5rem;
+  --spacing-22: 5.5rem;
+
+  /* Font size: 2xs */
+  --font-size-2xs: 10px;
+  --font-size-2xs--line-height: 14px;
+
+  /* Shimmer animation */
+  --animate-shimmer: shimmer 1.5s ease-in-out infinite;
+
+  /* Marquee (21st.dev / magicui style) */
+  --animate-marquee: marquee var(--duration) linear infinite;
+  --animate-marquee-vertical: marquee-vertical var(--duration) linear infinite;
+
+  /* Aceternity / Magic UI effects used by the company deck */
+  --animate-spotlight: spotlight 2s ease 0.4s 1 forwards;
+  --animate-meteor: meteor 5s linear infinite;
+  --animate-ripple: ripple 3.4s ease-in-out infinite;
+  --animate-scroll: scroll var(--animation-duration, 40s) var(--animation-direction, forwards) linear infinite;
+  --animate-idle-tilt: idle-tilt 9s ease-in-out infinite;
+  --animate-scanline: scanline 6s linear infinite;
+}
+
+@utility animate-orbit {
+  animation: orbit calc(var(--duration) * 1s) linear infinite;
+}
+
+@keyframes spotlight {
+  0% { opacity: 0; transform: translate(-72%, -62%) scale(0.5); }
+  100% { opacity: 1; transform: translate(-50%, -40%) scale(1); }
+}
+
+@keyframes meteor {
+  0% { transform: rotate(215deg) translateX(0); opacity: 1; }
+  70% { opacity: 1; }
+  100% { transform: rotate(215deg) translateX(-900px); opacity: 0; }
+}
+
+@keyframes orbit {
+  0% {
+    transform: rotate(calc(var(--angle) * 1deg)) translateY(calc(var(--radius) * 1px)) rotate(calc(var(--angle) * -1deg));
+  }
+  100% {
+    transform: rotate(calc(var(--angle) * 1deg + 360deg)) translateY(calc(var(--radius) * 1px)) rotate(calc((var(--angle) * -1deg) - 360deg));
+  }
+}
+
+@keyframes ripple {
+  0%, 100% { transform: translate(-50%, -50%) scale(1); }
+  50% { transform: translate(-50%, -50%) scale(0.9); }
+}
+
+@keyframes scroll {
+  to { transform: translate(calc(-50% - 0.625rem)); }
+}
+
+@keyframes idle-tilt {
+  0%, 100% { transform: rotateY(-6deg) rotateX(4deg); }
+  50% { transform: rotateY(6deg) rotateX(-4deg); }
+}
+
+@keyframes scanline {
+  0% { transform: translateY(-100%); }
+  100% { transform: translateY(100%); }
+}
+
+@keyframes marquee {
+  from { transform: translateX(0); }
+  to { transform: translateX(calc(-100% - var(--gap))); }
+}
+
+@keyframes marquee-vertical {
+  from { transform: translateY(0); }
+  to { transform: translateY(calc(-100% - var(--gap))); }
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+@property --gradient-angle {
+  syntax: "<angle>";
+  initial-value: 0deg;
+  inherits: false;
+}
+
+@keyframes gradient-rotate {
+  from {
+    --gradient-angle: 0deg;
+  }
+  to {
+    --gradient-angle: 360deg;
+  }
+}
+
+.gradient-border-component {
+  position: relative;
+}
+
+.gradient-border-auto {
+  animation: gradient-rotate var(--animation-duration, 5s) linear infinite;
+}
+
+.gradient-border-hover {
+  animation: none;
+}
+
+.gradient-border-hover:hover {
+  animation: gradient-rotate var(--animation-duration, 5s) linear infinite;
+}
+
+.gradient-border-stop-hover {
+  animation: gradient-rotate var(--animation-duration, 5s) linear infinite;
+}
+
+.gradient-border-stop-hover:hover {
+  animation-play-state: paused;
+}
+
+@layer base {
+  html {
+    color-scheme: dark;
+  }
+
+  body {
+    background: var(--color-surface-deepest);
+    color: var(--color-text-primary);
+    font-family:
+      -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue",
+      Arial, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    min-height: 100dvh;
+  }
+
+  ::selection {
+    background: rgba(168, 85, 247, 0.3);
+    color: var(--color-text-primary);
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-neon-cyan);
+    outline-offset: 2px;
+  }
+
+  input,
+  textarea,
+  select {
+    font-size: 16px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
