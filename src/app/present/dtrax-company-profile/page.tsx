@@ -1,12 +1,13 @@
 "use client";
 
-import { useEffect, useState, type ReactNode } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
 import { DM_Sans, Instrument_Serif } from "next/font/google";
 import { AnimatePresence, motion } from "framer-motion";
-import { ArrowUpRight, Award, Briefcase, Calculator, ClipboardList, GitFork, HardHat, MapPin, PenTool, Phone, ShieldCheck, Sparkles, Users } from "lucide-react";
+import { ArrowUpRight, Award, Briefcase, Calculator, Check, ClipboardList, Eye, GitFork, HardHat, Key, MapPin, PenTool, Phone, ShieldCheck, Sparkles, Users } from "lucide-react";
 import { SlideShell } from "@/components/slides/SlideShell";
 import AnimatedGlowingSearchBar from "@/components/ui/animated-glowing-search-bar";
 import { AnimatedTestimonials, type AnimatedTestimonial } from "@/components/ui/animated-testimonials";
+import { AnimatedBeam } from "@/components/ui/animated-beam";
 import { AnimatedTooltip } from "@/components/ui/animated-tooltip";
 import { AvatarGroup } from "@/components/ui/avatar-group";
 import DisplayCards from "@/components/ui/display-cards";
@@ -136,7 +137,7 @@ const SHOTS: Record<string, string[]> = {
 };
 const RENDER = { sumitomoA: asset("/assets/projects/sumitomo-chemical/a.jpg"), sumitomoB: asset("/assets/projects/sumitomo-chemical/b.jpg") };
 const OFFICE = [asset("/assets/office/office-1.jpg"), asset("/assets/office/office-2.jpg"), asset("/assets/office/office-3.jpg")];
-const TEAM = { ronald: asset("/assets/team/ronald-portrait.jpg"), jayne: asset("/assets/team/jayne.jpg"), founders: [asset("/assets/team/founders-1.jpg"), asset("/assets/team/founders-2.jpg"), asset("/assets/team/founders-3.jpg")] };
+const TEAM = { ronald: asset("/assets/team/ronald-head.jpg"), jayne: asset("/assets/team/jayne.jpg"), founders: [asset("/assets/team/founders-1.jpg"), asset("/assets/team/founders-2.jpg"), asset("/assets/team/founders-3.jpg")] };
 const CERT = { sida: asset("/assets/certs/cert-a.png"), iso: asset("/assets/certs/cert-iso.png"), bizsafe: asset("/assets/certs/cert-bizsafe.png") };
 const LOGO: Record<string, string> = {
   "Alibaba": asset("/assets/logos/alibaba.png"), "Aramco Trading": asset("/assets/logos/aramco.png"), "Digital Edge": asset("/assets/logos/digital-edge.webp"), "Edelman": asset("/assets/logos/edelman.png"),
@@ -318,7 +319,7 @@ const clientLogos = [
 ];
 
 const leaders: ProfileCardItem[] = [
-  { name: "Ronald Goh", role: "Managing Director", photo: TEAM.ronald, photoPosition: "50% 30%", experience: "25+ years in corporate interior fit-out", specialism: "Translating clients' commercial objectives into fit-out decisions; long-term client relationships built across repeat engagements", projects: ["Group-IB", "Sony Pictures", "Mitsui Chemicals", "FIJI Water", "Edelman"], projectLogos: [LOGO["Group-IB"], LOGO["Sony Pictures"], LOGO["Mitsui Chemicals"], LOGO["FIJI Water"], LOGO["Edelman"]] },
+  { name: "Ronald Goh", role: "Managing Director", photo: TEAM.ronald, photoPosition: "50% 20%", experience: "25+ years in corporate interior fit-out", specialism: "Translating clients' commercial objectives into fit-out decisions; long-term client relationships built across repeat engagements", projects: ["Group-IB", "Sony Pictures", "Mitsui Chemicals", "FIJI Water", "Edelman"], projectLogos: [LOGO["Group-IB"], LOGO["Sony Pictures"], LOGO["Mitsui Chemicals"], LOGO["FIJI Water"], LOGO["Edelman"]] },
   { name: "Jayne Ong", role: "Head of Costing & Operation", photo: TEAM.jayne, photoPosition: "50% 18%", experience: <ToConfirm>Years and background</ToConfirm>, specialism: <ToConfirm>Costing and operations profile</ToConfirm>, projects: [], projectsLabel: "Featured projects (to confirm)" },
   { name: "Esther Choo", role: "Design Director", experience: "24+ years of professional practice", qualifications: "Diploma in Interior Design, Nanyang Academy of Fine Arts", specialism: "Pre-leasing feasibility and workspace strategy through detailed, buildable design; corporate, hospitality and retail interiors", projects: ["Standard Chartered", "Spotify", "Singtel", "Traveloka", "Singapore Pools"], projectLogos: [LOGO["Standard Chartered"], LOGO["Spotify"], LOGO["Singtel"], LOGO["Traveloka"], LOGO["Singapore Pools"]] },
   { name: "Sandrey Lim", role: "Project Director", experience: "26+ years in design-and-build workplace delivery", qualifications: "Specialist Diploma in Construction Productivity (BCA); Diploma in Personnel Management; bizSAFE Level 2", specialism: "End-to-end delivery of complex workplace transformations, coordinating design, cost and construction through to handover", projects: ["Alibaba", "Grohe", "The World Bank", "SOTA", "Shiseido"], projectLogos: [LOGO["Alibaba"], LOGO["Grohe"], LOGO["The World Bank"], LOGO["SOTA"], LOGO["Shiseido"]] },
@@ -345,8 +346,8 @@ const orgTeams: { name: string; fill: Fill; members: { name: string; role: strin
 
 const testimonials: AnimatedTestimonial[] = [
   { quote: "The team was able to meet and deliver our needs in a timely manner despite the challenging Covid-19 situation as well as time constraints, and we are extremely satisfied with their efforts.", name: "Sergey Nikitin", designation: "CEO, Group-IB", initials: "SN", logo: LOGO["Group-IB"] },
-  { quote: "We would like to thank you for your assistance in completing our office renovation on time and within budget. Your team was well-organised, capable, and displayed flexibility catering to our requests. D'trax's expertise, commitment and follow-through throughout the entire project was exceptional.", name: "Thomas Lin", designation: "Senior Manager, IT and Admin, Mitsui Chemicals", initials: "TL", logo: LOGO["Mitsui Chemicals"], logoClassName: "w-[88%] max-h-40" },
-  { quote: "The team provided their full commitment and dedication throughout the process, overcame challenges along the way, completed the project on time, and continued with further support on any adjustments we requested.", name: "Brett D. Hogg", designation: "Executive Vice President and Managing Director, Sony Pictures", initials: "BH", logo: LOGO["Sony Pictures"], logoClassName: "w-[80%] max-h-44" },
+  { quote: "We would like to thank you for your assistance in completing our office renovation on time and within budget. Your team was well-organised, capable, and displayed flexibility catering to our requests. D'trax's expertise, commitment and follow-through throughout the entire project was exceptional.", name: "Thomas Lin", designation: "Senior Manager, IT and Admin, Mitsui Chemicals", initials: "TL", logo: LOGO["Mitsui Chemicals"], logoClassName: "w-[96%] max-h-56 scale-[1.15]" },
+  { quote: "The team provided their full commitment and dedication throughout the process, overcame challenges along the way, completed the project on time, and continued with further support on any adjustments we requested.", name: "Brett D. Hogg", designation: "Executive Vice President and Managing Director, Sony Pictures", initials: "BH", logo: LOGO["Sony Pictures"], logoClassName: "w-[92%] max-h-64 scale-[1.15]" },
 ];
 
 interface Project { name: string; sector: string; location: string; area: string; type: string; award?: string; tagline: ReactNode; points: string[]; photosNote: string; fill: Tone }
@@ -645,66 +646,88 @@ function ServicesSlide() {
    06 · Delivery approach: a plain six-stage timeline
    ──────────────────────────────────────────────────────────────── */
 
+function StagePipeline({ active }: { active: number }) {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const r0 = useRef<HTMLDivElement>(null), r1 = useRef<HTMLDivElement>(null), r2 = useRef<HTMLDivElement>(null), r3 = useRef<HTMLDivElement>(null), r4 = useRef<HTMLDivElement>(null), r5 = useRef<HTMLDivElement>(null);
+  const refs = [r0, r1, r2, r3, r4, r5];
+  const icons = [Eye, PenTool, Calculator, HardHat, Key, Sparkles];
+  const tones: Tone[] = ["pink", "blue", "lime", "pink", "blue", "lime"];
+  const positions = [
+    { left: "12%", top: "22%" }, { left: "50%", top: "22%" }, { left: "88%", top: "22%" },
+    { left: "88%", top: "74%" }, { left: "50%", top: "74%" }, { left: "12%", top: "74%" },
+  ];
+  const links: [number, number, number][] = [[0, 1, -40], [1, 2, -40], [2, 3, 0], [3, 4, 40], [4, 5, 40]];
+  return (
+    <div ref={containerRef} className="relative h-full w-full">
+      {links.map(([from, to, curvature]) => (
+        <AnimatedBeam key={`${from}-${to}`} containerRef={containerRef} fromRef={refs[from]} toRef={refs[to]} curvature={curvature} pathColor={INK} pathOpacity={0.15} pathWidth={2.5} gradientStartColor={hex[tones[from]]} gradientStopColor={INK} duration={3.4} delay={from * 0.5} reverse={from >= 3} />
+      ))}
+      {positions.map((position, index) => {
+        const Icon = icons[index];
+        const isActive = index === active;
+        const isDone = index < active;
+        return (
+          <div key={index} ref={refs[index]} className="absolute -translate-x-1/2 -translate-y-1/2" style={position}>
+            <motion.div animate={{ scale: isActive ? 1.12 : 1 }} transition={{ duration: 0.4, ease }} className="relative flex flex-col items-center">
+              {isActive ? <motion.span aria-hidden="true" className="absolute top-0 h-[4.5rem] w-[4.5rem] rounded-full border-2" style={{ borderColor: hex[tones[index]] }} animate={{ scale: [1, 1.7], opacity: [0.9, 0] }} transition={{ duration: 1.6, repeat: Infinity, ease: "easeOut" }} /> : null}
+              <span className={cn("relative z-10 flex h-[4.5rem] w-[4.5rem] items-center justify-center rounded-full border-[3px] border-white shadow-[0_16px_40px_rgba(21,21,21,0.18)] transition-colors duration-500", isActive ? "bg-[#151515] text-white" : isDone ? cn(fillClass[tones[index]]) : "bg-white text-[#151515]/60")}>
+                {isDone ? <Check className="h-6 w-6" /> : <Icon className="h-6 w-6" />}
+              </span>
+              <span className={cn("mt-2 whitespace-nowrap rounded-full px-2.5 py-1 text-[11px] font-semibold transition-colors", isActive ? "bg-[#151515] text-white" : "bg-white/80 text-[#151515]/70")}>{index + 1}. {stages[index].title}</span>
+            </motion.div>
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
 function ApproachSlide() {
   const [active, setActive] = useState(0);
   const [paused, setPaused] = useState(false);
   useEffect(() => {
     if (paused) return;
-    const timer = window.setInterval(() => setActive((current) => (current + 1) % stages.length), 3800);
+    const timer = window.setInterval(() => setActive((current) => (current + 1) % stages.length), 3600);
     return () => window.clearInterval(timer);
   }, [paused]);
-  const stage = stages[active];
   const tones: Tone[] = ["pink", "blue", "lime", "pink", "blue", "lime"];
   return (
     <Sheet label="Our delivery approach">
-      <div className={cn("grid w-full grid-cols-1 gap-8 px-12 pt-10 md:grid-cols-[1.1fr_0.9fr]", SLIDE)} onMouseEnter={() => setPaused(true)} onMouseLeave={() => setPaused(false)}>
-        <div className="flex flex-col pb-6">
+      <div className={cn("relative grid w-full grid-cols-1 gap-10 overflow-hidden px-12 pt-10 md:grid-cols-[0.85fr_1.15fr]", SLIDE)} onMouseEnter={() => setPaused(true)} onMouseLeave={() => setPaused(false)}>
+        <WarpGrid center="72% 55%" />
+        <Stars count={10} />
+        <div className="relative flex flex-col pb-6">
           <Display size="md">Six stages. One <Em tone="pink">accountable</Em> team.</Display>
           <motion.p variants={fadeUp} className="mt-4 max-w-md text-[13px] leading-relaxed text-[#151515]/65">Buddy-system continuity keeps your project moving, with one point of contact from brief to handover.</motion.p>
-          <motion.ol variants={stagger} className="mt-6 grid grid-cols-3 gap-3">
+          <motion.ol variants={stagger} className="mt-6 flex flex-col gap-1.5">
             {stages.map((item, index) => {
               const current = index === active;
+              const done = index < active;
               return (
-                <motion.li key={item.title} variants={fadeUp}>
-                  <motion.button
-                    type="button"
-                    onClick={() => setActive(index)}
-                    animate={{ y: current ? -4 : 0, scale: current ? 1.02 : 1 }}
-                    transition={{ duration: 0.4, ease }}
-                    className={cn("flex w-full items-center gap-3 rounded-2xl border px-3.5 py-3 text-left transition-colors duration-300", current ? cn("border-transparent shadow-[0_16px_40px_rgba(21,21,21,0.12)]", fillClass[tones[index]]) : "border-[#151515]/10 bg-white text-[#151515]")}
-                  >
-                    <span className={cn("flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-[13px] font-bold", current ? "bg-[#151515] text-white" : fillClass[tones[index]])}>{index + 1}</span>
-                    <span className="text-[13px] font-semibold leading-tight">{item.title}</span>
-                  </motion.button>
+                <motion.li key={item.title} variants={fadeUp} layout>
+                  <button type="button" onClick={() => setActive(index)} className={cn("flex w-full items-start gap-3 rounded-2xl px-3 py-2.5 text-left transition-colors duration-300", current ? "bg-white shadow-[0_14px_36px_rgba(21,21,21,0.10)]" : "hover:bg-white/60")}>
+                    <motion.span animate={{ scale: current ? 1.1 : 1 }} className={cn("mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-[12px] font-bold transition-colors duration-300", current ? "bg-[#151515] text-white" : done ? cn(fillClass[tones[index]]) : "border border-[#151515]/20 text-[#151515]/50")}>
+                      {done ? <Check className="h-3.5 w-3.5" /> : index + 1}
+                    </motion.span>
+                    <span className="min-w-0 flex-1">
+                      <span className={cn("block text-[14px] font-semibold leading-tight", current ? "text-[#151515]" : done ? "text-[#151515]/70 line-through decoration-[#151515]/30" : "text-[#151515]/60")}>{item.title}</span>
+                      <AnimatePresence initial={false}>
+                        {current ? (
+                          <motion.span key="body" initial={{ height: 0, opacity: 0 }} animate={{ height: "auto", opacity: 1 }} exit={{ height: 0, opacity: 0 }} transition={{ duration: 0.35, ease }} className="block overflow-hidden">
+                            <span className="mt-1.5 block text-[12px] leading-relaxed text-[#151515]/70">{item.body}</span>
+                            {item.extra ? <span className="mt-1 block text-[11px] leading-relaxed text-[#151515]/60">{item.extra}</span> : null}
+                          </motion.span>
+                        ) : null}
+                      </AnimatePresence>
+                    </span>
+                  </button>
                 </motion.li>
               );
             })}
           </motion.ol>
-          <div className="mt-6 flex flex-1 items-start gap-6 border-t border-[#151515]/15 pt-6">
-            <div className="relative h-[7rem] w-[6.5rem] shrink-0 overflow-hidden">
-              <AnimatePresence mode="wait">
-                <motion.span
-                  key={active}
-                  initial={{ y: "110%", opacity: 0 }}
-                  animate={{ y: "0%", opacity: 1 }}
-                  exit={{ y: "-110%", opacity: 0 }}
-                  transition={{ duration: 0.28, ease }}
-                  className="absolute inset-0 flex items-center text-[7rem] font-black leading-none tracking-[-0.08em]"
-                  style={{ color: hex[tones[active]] }}
-                >
-                  {active + 1}
-                </motion.span>
-              </AnimatePresence>
-            </div>
-            <motion.div key={`text-${active}`} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.35, ease }} className="max-w-lg pt-3">
-              <p className="text-2xl font-semibold tracking-tight text-[#151515]">{stage.title}</p>
-              <p className="mt-2 text-[13px] leading-relaxed text-[#151515]/70">{stage.body}</p>
-              {stage.extra ? <p className="mt-2 text-[12px] leading-relaxed text-[#151515]/60">{stage.extra}</p> : null}
-            </motion.div>
-          </div>
         </div>
-        <motion.div variants={scaleIn} className="mb-6">
-          <Photo src={TEAM.founders[0]} alt="Ronald Goh and Jayne Ong reviewing materials" className="h-full min-h-[24rem] w-full" caption="Material selection, D'trax studio" position="50% 35%" />
+        <motion.div variants={scaleIn} className="relative mb-6 h-[calc(100dvh-12rem)] min-h-[22rem]">
+          <StagePipeline active={active} />
         </motion.div>
       </div>
     </Sheet>
@@ -784,6 +807,25 @@ function TeamSlide() {
   );
 }
 
+/** Soft grey connector with a travelling gradient highlight. */
+function FlowLine({ d, index = 0, color = INK, delay = 0 }: { d: string; index?: number; color?: string; delay?: number }) {
+  const id = `flow-${index}-${color.replace("#", "")}`;
+  return (
+    <g>
+      <motion.path d={d} fill="none" stroke={INK} strokeOpacity="0.14" strokeWidth="2" strokeLinecap="round" initial={{ pathLength: 0 }} animate={{ pathLength: 1 }} transition={{ duration: 0.9, delay: 0.2 + index * 0.03, ease }} />
+      <path d={d} fill="none" stroke={`url(#${id})`} strokeWidth="2.5" strokeLinecap="round" />
+      <defs>
+        <motion.linearGradient id={id} gradientUnits="userSpaceOnUse" initial={{ x1: "0%", x2: "0%", y1: "0%", y2: "0%" }} animate={{ x1: ["-20%", "120%"], x2: ["0%", "140%"], y1: ["0%", "0%"], y2: ["0%", "0%"] }} transition={{ duration: 3.2, repeat: Infinity, ease: "linear", delay: delay + index * 0.12 }}>
+          <stop stopColor={color} stopOpacity="0" />
+          <stop offset="40%" stopColor={color} />
+          <stop offset="60%" stopColor={INK} />
+          <stop offset="100%" stopColor={INK} stopOpacity="0" />
+        </motion.linearGradient>
+      </defs>
+    </g>
+  );
+}
+
 /* n8n-style workflow canvas for the organisation chart */
 const FLOW_W = 1240;
 const FLOW_H = 600;
@@ -811,8 +853,8 @@ function flowLayout() {
     });
     y += groupH + groupGap;
   });
-  nodes.push({ id: "ronald", x: 0, y: FLOW_H / 2 - 100, w: 240, h: 68, kind: "person", title: "Ronald Goh", sub: "Managing Director", photo: TEAM.ronald, photoPosition: "50% 25%" });
-  nodes.push({ id: "jayne", x: 0, y: FLOW_H / 2 + 32, w: 240, h: 68, kind: "person", title: "Jayne Ong", sub: "Head of Costing & Operation", photo: TEAM.jayne, photoPosition: "50% 18%" });
+  nodes.push({ id: "ronald", x: 0, y: FLOW_H / 2 - 118, w: 250, h: 96, kind: "person", title: "Ronald Goh", sub: "Managing Director", photo: TEAM.ronald, photoPosition: "50% 20%" });
+  nodes.push({ id: "jayne", x: 0, y: FLOW_H / 2 + 22, w: 250, h: 96, kind: "person", title: "Jayne Ong", sub: "Head of Costing & Operation", photo: TEAM.jayne, photoPosition: "50% 12%" });
   nodes.push({ id: "router", x: 320, y: FLOW_H / 2 - 36, w: 190, h: 72, kind: "router", title: "Buddy system", sub: "one accountable contact", icon: <GitFork className="h-4 w-4" /> });
   edges.push(["ronald", "router"], ["jayne", "router"]);
   return { nodes, edges };
@@ -829,7 +871,7 @@ function OrgChartSlide() {
   const chip: Record<Tone, string> = { pink: "bg-[#FFB6B6]", blue: "bg-[#9DD6FF]", lime: "bg-[#DDFF97]" };
   return (
     <Sheet label="Organisation chart">
-      <div className={cn("relative flex w-full flex-col overflow-hidden px-12 pt-8", SLIDE)}>
+      <div className={cn("relative flex w-full flex-col px-12 pb-8 pt-8", SLIDE)}>
         <WarpGrid center="50% 50%" />
         <div className="relative flex items-center gap-6">
           <Display size="sm">One team, <Em>five</Em> disciplines.</Display>
@@ -839,12 +881,8 @@ function OrgChartSlide() {
           <svg viewBox={`0 0 ${FLOW_W} ${FLOW_H}`} preserveAspectRatio="none" className="absolute inset-0 h-full w-full overflow-visible">
             {edges.map(([from, to], index) => {
               const d = path(byId[from], byId[to]);
-              return (
-                <g key={`${from}-${to}`}>
-                  <motion.path d={d} fill="none" stroke={INK} strokeOpacity="0.18" strokeWidth="2" initial={{ pathLength: 0 }} animate={{ pathLength: 1 }} transition={{ duration: 0.9, delay: 0.2 + index * 0.03, ease }} />
-                  <motion.path d={d} fill="none" stroke={INK} strokeWidth="2" strokeLinecap="round" strokeDasharray="6 14" initial={{ strokeDashoffset: 0, opacity: 0 }} animate={{ strokeDashoffset: -80, opacity: 0.7 }} transition={{ strokeDashoffset: { duration: 2.2, repeat: Infinity, ease: "linear" }, opacity: { delay: 1 + index * 0.03 } }} />
-                </g>
-              );
+              const tone = byId[to].tone ?? byId[from].tone;
+              return <FlowLine key={`${from}-${to}`} d={d} index={index} color={tone ? hex[tone] : LIME} />;
             })}
           </svg>
           {nodes.map((node, index) => (
@@ -858,7 +896,7 @@ function OrgChartSlide() {
             >
               {node.kind === "person" ? (
                 <div className="flex h-full items-center gap-3 rounded-2xl border border-[#151515]/10 bg-white px-2.5 shadow-[0_14px_36px_rgba(21,21,21,0.12)]">
-                  <img src={node.photo} alt={node.title} className="h-11 w-11 shrink-0 rounded-xl object-cover" style={{ objectPosition: node.photoPosition }} />
+                  <img src={node.photo} alt={node.title} className="h-[4.5rem] w-[4.5rem] shrink-0 rounded-xl object-cover" style={{ objectPosition: node.photoPosition }} />
                   <div className="min-w-0"><p className="truncate text-[13px] font-semibold leading-tight text-[#151515]">{node.title}</p><p className="truncate text-[10px] text-[#151515]/55">{node.sub}</p></div>
                   <span className="absolute -right-1.5 top-1/2 h-3 w-3 -translate-y-1/2 rounded-full border-2 border-white bg-[#151515]" />
                 </div>
@@ -893,14 +931,46 @@ function OrgChartSlide() {
 }
 
 function FoundersSlide() {
+  const founders = leaders.slice(0, 2);
+  const tones: Tone[] = ["lime", "pink"];
   return (
     <Sheet label="The founders">
-      <div className={cn("flex w-full flex-col justify-center px-12 pt-10", SLIDE)}>
-        <div className="mb-6 flex items-end justify-between gap-8">
+      <div className={cn("relative flex w-full flex-col overflow-hidden px-12 pt-10", SLIDE)}>
+        <WarpGrid center="50% 60%" />
+        <Stars count={8} />
+        <div className="relative flex items-center gap-6">
           <Display size="sm">The <Em tone="pink">founders</Em>.</Display>
-          <motion.p variants={fadeUp} className="max-w-sm text-right text-[13px] leading-relaxed text-[#151515]/65">Ronald Goh and Jayne Ong have run D&apos;trax from the front since 2003.</motion.p>
+          <Sticker tone="lime" rotate={-3}>From the front, since 2003</Sticker>
         </div>
-        <motion.div variants={scaleIn}><ExpandingProfileCards people={leaders.slice(0, 2)} nameClassName="font-semibold tracking-tight" className="h-[clamp(20rem,60vh,30rem)]" photoWidth="20rem" activeGrow={2.2} intervalMs={5200} /></motion.div>
+        <motion.div variants={stagger} className="relative mt-6 grid flex-1 grid-cols-1 gap-6 pb-6 md:grid-cols-2">
+          {founders.map((person, index) => (
+            <motion.div key={person.name} variants={scaleIn} className="grid h-full grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)] overflow-hidden rounded-[1.75rem] bg-white shadow-[0_24px_60px_rgba(21,21,21,0.12)]">
+              <div className="relative min-h-[18rem]">
+                <img src={person.photo} alt={person.name} className="absolute inset-0 h-full w-full object-cover" style={{ objectPosition: person.photoPosition }} draggable={false} />
+                <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/85 via-black/40 to-transparent p-4 pt-20 text-white">
+                  <p className="text-[1.5rem] font-semibold leading-none tracking-tight">{person.name}</p>
+                  <p className="mt-1.5 text-[11px] font-medium uppercase tracking-[0.16em] text-white/75">{person.role}</p>
+                </div>
+              </div>
+              <div className="flex flex-col justify-center gap-4 p-6">
+                <span className={cn("w-max rounded-full px-3 py-1 text-[11px] font-semibold", fillClass[tones[index]])}>{index === 0 ? "Co-founder · Managing Director" : "Co-founder · Costing & Operation"}</span>
+                <div><p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[#151515]/50">Experience</p><div className="mt-1 text-[13px] leading-relaxed text-[#151515]/80">{person.experience}</div></div>
+                <div><p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[#151515]/50">Specialism</p><div className="mt-1 text-[13px] leading-relaxed text-[#151515]/80">{person.specialism}</div></div>
+                <div>
+                  <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[#151515]/50">{person.projectsLabel ?? "Featured projects"}</p>
+                  {person.projects.length ? (
+                    <div className="mt-2 flex flex-wrap gap-2">
+                      {person.projects.map((project, projectIndex) => {
+                        const logo = person.projectLogos?.[projectIndex];
+                        return logo ? <span key={project} className="flex h-11 items-center rounded-lg border border-[#151515]/10 bg-[#f4f4f2] px-3" title={project}><img src={logo} alt={project} className="h-7 max-w-[6rem] object-contain" /></span> : <span key={project} className="rounded-full border border-[#151515]/20 px-2.5 py-1 text-[11px]">{project}</span>;
+                      })}
+                    </div>
+                  ) : <p className="mt-1 text-[12px] text-[#151515]/50">To be confirmed with Jayne.</p>}
+                </div>
+              </div>
+            </motion.div>
+          ))}
+        </motion.div>
       </div>
     </Sheet>
   );
@@ -925,37 +995,37 @@ function LeadersSlide() {
    ──────────────────────────────────────────────────────────────── */
 
 function TrackRecordSlide() {
-  return (
-    <Sheet label="Track record">
-      <div className={cn("relative flex w-full flex-col justify-center overflow-hidden pt-10", SLIDE)}>
-        <div className="grid grid-cols-1 items-end gap-8 px-12 md:grid-cols-[1fr_1fr]">
-          <Display size="md">A selection from <Em>100+</Em> offices delivered since 2003.</Display>
-          <motion.p variants={fadeUp} className="max-w-sm text-[13px] leading-relaxed text-[#151515]/65 md:justify-self-end">Floor areas and delivery type for six recent handovers.</motion.p>
+  type Tile = { src?: string; name: string; meta: string };
+  const tiles: Tile[] = [];
+  featuredProjects.forEach((project) => {
+    const shots = SHOTS[project.name] ?? [];
+    const meta = `${project.area.toLocaleString("en-US")} sq ft`;
+    if (shots.length) shots.slice(0, 5).forEach((src) => tiles.push({ src, name: project.name, meta }));
+    else tiles.push({ name: project.name, meta });
+  });
+  const rows: Tile[][] = [[], [], [], []];
+  tiles.forEach((tile, index) => rows[index % 4].push(tile));
+  const Row = ({ items, reverse, duration }: { items: Tile[]; reverse?: boolean; duration: string }) => (
+    <Marquee reverse={reverse} className={cn("py-0 [--gap:0.75rem]", duration)}>
+      {items.map((tile, index) => (
+        <div key={`${tile.name}-${index}`} className="relative h-[6.5rem] w-[14rem] shrink-0 overflow-hidden rounded-2xl bg-[#151515] shadow-[0_10px_30px_rgba(21,21,21,0.10)]">
+          {tile.src ? <img src={tile.src} alt={tile.name} className="absolute inset-0 h-full w-full object-cover" draggable={false} /> : <span className="absolute left-4 top-4 text-[10px] font-medium uppercase tracking-[0.14em] text-white/50">Photos pending</span>}
+          <span className="absolute bottom-3 left-3 flex items-center gap-2 rounded-full bg-white/92 px-2.5 py-1 text-[10px] font-semibold text-[#151515]"><span>{tile.name}</span><span className="text-[#151515]/50">{tile.meta}</span></span>
         </div>
-        <motion.div variants={scaleIn} className="mt-6 w-full">
-          <InfiniteMovingCards
-            speed="slow"
-            items={featuredProjects.map((project) => {
-              const shot = SHOTS[project.name]?.[0];
-              return {
-                key: project.name,
-                content: (
-                  <div className="w-[21rem] overflow-hidden rounded-2xl bg-white shadow-[0_10px_40px_rgba(21,21,21,0.06)]">
-                    {shot ? <Photo src={shot} alt={project.name} className="h-[10rem] w-full rounded-none" /> : <Pending label="Photos pending" className="h-[10rem] w-full rounded-none" />}
-                    <div className="flex items-end justify-between gap-3 p-4">
-                      <div>
-                        <p className="text-[15px] font-semibold tracking-tight text-[#151515]">{project.name}</p>
-                        <p className="text-[11px] text-[#151515]/55">{project.address}</p>
-                        <p className="mt-1 text-[11px] text-[#151515]/55">{project.type}{project.year ? ` · ${project.year}` : ""}{project.award ? ` · ${project.award}` : ""}</p>
-                      </div>
-                      <p className="whitespace-nowrap text-2xl font-bold tracking-tight text-[#151515]">{project.area.toLocaleString("en-US")}<span className="ml-1 text-[11px] font-medium text-[#151515]/50">sq ft</span></p>
-                    </div>
-                  </div>
-                ),
-              };
-            })}
-          />
-        </motion.div>
+      ))}
+    </Marquee>
+  );
+  return (
+    <Sheet>
+      <div className={cn("relative flex w-full flex-col justify-center gap-3 overflow-hidden pb-14 pt-2", SLIDE)}>
+        <Row items={rows[0]} duration="[--duration:70s]" />
+        <Row items={rows[1]} reverse duration="[--duration:82s]" />
+        <div className="relative z-10 -my-1 flex items-center justify-center py-3">
+          <div className="absolute inset-x-0 top-1/2 h-[9rem] -translate-y-1/2 bg-[#f4f4f2]/80 backdrop-blur-md" />
+          <Display size="md" className="relative max-w-4xl text-center">A selection from <Em>100+</Em> offices delivered since 2003.</Display>
+        </div>
+        <Row items={rows[2]} duration="[--duration:76s]" />
+        <Row items={rows[3]} reverse duration="[--duration:88s]" />
       </div>
     </Sheet>
   );
@@ -984,17 +1054,11 @@ function RecentProjectsSlide() {
           <svg viewBox={`0 0 ${W} ${H}`} preserveAspectRatio="none" className="absolute inset-0 h-full w-full overflow-visible">
             {rows.map((row, index) => {
               const d = curve(300, row.y + rowH / 2, hub.x, hub.y + hub.h / 2);
-              const color = strokes[index % strokes.length];
-              return (
-                <g key={row.name}>
-                  <motion.path d={d} fill="none" stroke={color} strokeWidth="2.5" strokeOpacity="0.9" initial={{ pathLength: 0 }} animate={{ pathLength: 1 }} transition={{ duration: 1.1, delay: 0.15 + index * 0.05, ease }} />
-                  <motion.path d={d} fill="none" stroke={INK} strokeWidth="2.5" strokeLinecap="round" strokeDasharray="28 600" initial={{ strokeDashoffset: 628, opacity: 0 }} animate={{ strokeDashoffset: 0, opacity: 0.8 }} transition={{ strokeDashoffset: { duration: 3.2, repeat: Infinity, ease: "linear", delay: index * 0.2 }, opacity: { delay: 1.2 } }} />
-                </g>
-              );
+              return <FlowLine key={row.name} d={d} index={index} color={strokes[index % strokes.length]} delay={index * 0.1} />;
             })}
             {outputs.map((output, index) => {
               const d = curve(hub.x + hub.w, hub.y + hub.h / 2, output.x, output.y + output.h / 2);
-              return <motion.path key={output.type} d={d} fill="none" stroke={INK} strokeOpacity="0.35" strokeWidth="2" strokeDasharray="6 10" initial={{ pathLength: 0 }} animate={{ pathLength: 1, strokeDashoffset: -64 }} transition={{ pathLength: { duration: 0.8, delay: 1 + index * 0.1 }, strokeDashoffset: { duration: 2.4, repeat: Infinity, ease: "linear" } }} />;
+              return <FlowLine key={output.type} d={d} index={100 + index} color={LIME} delay={1 + index * 0.3} />;
             })}
           </svg>
           {rows.map((row, index) => (
@@ -1173,7 +1237,7 @@ function ClosingSlide() {
     return () => window.clearInterval(timer);
   }, []);
   const caption = activeAvatar === 0 ? "10 Anson Road, #30-13 International Plaza, Singapore 079903" : "+65 6224 9242 · www.dtrax.com.sg";
-  const line = (text: string) => Array.from({ length: 4 }, (_, index) => <span key={index} className="mx-6 inline-flex items-center whitespace-nowrap">{text} <span className="mx-8 inline-block h-4 w-4 rounded-full bg-[#151515]/35" /></span>);
+  const line = (text: string) => Array.from({ length: 4 }, (_, index) => <span key={index} className="mx-4 inline-flex items-center whitespace-nowrap">{text} <span className="mx-5 inline-block h-6 w-6 rounded-full bg-[#151515]" /></span>);
   return (
     <Sheet>
       <div className={cn("relative flex w-full flex-col justify-center overflow-hidden", SLIDE)}>
