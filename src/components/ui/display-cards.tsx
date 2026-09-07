@@ -43,9 +43,9 @@ function DisplayCard({
         >
           {icon}
         </span>
-        <p className={cn("text-lg font-medium", titleClassName)}>{title}</p>
+        <p className={cn("text-base font-semibold", titleClassName)}>{title}</p>
       </div>
-      <p className="relative z-10 whitespace-nowrap text-lg text-text-primary">{description}</p>
+      <p className="relative z-10 truncate text-[13px] text-text-primary">{description}</p>
       {date ? <p className="relative z-10 text-text-secondary">{date}</p> : null}
     </div>
   );

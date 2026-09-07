@@ -498,9 +498,9 @@ function AboutSlide() {
 
 function PillarsSlide() {
   const cards = [
-    { icon: <Users className="size-4 text-[#151515]" />, title: "One team.", description: "Brief to handover, in-house", backgroundClassName: "bg-[#DDFF97]/75 backdrop-blur-md", className: "[grid-area:stack] -translate-x-28 -translate-y-28 after:hidden" },
+    { icon: <Users className="size-4 text-[#151515]" />, title: "One team.", description: "Brief to handover, in-house", backgroundClassName: "bg-[#DDFF97]/75 backdrop-blur-md", className: "[grid-area:stack] -translate-x-24 -translate-y-24 after:hidden" },
     { icon: <ShieldCheck className="size-4 text-[#151515]" />, title: "Certified.", description: "ISO 45001:2018 · bizSAFE Star", backgroundClassName: "bg-[#9DD6FF]/75 backdrop-blur-md", className: "[grid-area:stack] after:hidden" },
-    { icon: <Award className="size-4 text-[#151515]" />, title: "Award-winning.", description: "SIDA 2023 Bronze, Best in Workspace Design", backgroundClassName: "bg-[#FFB6B6]/75 backdrop-blur-md", className: "[grid-area:stack] translate-x-28 translate-y-28 after:hidden" },
+    { icon: <Award className="size-4 text-[#151515]" />, title: "Award-winning.", description: "SIDA 2023 Bronze, Best in Workspace Design", backgroundClassName: "bg-[#FFB6B6]/75 backdrop-blur-md", className: "[grid-area:stack] translate-x-24 translate-y-24 after:hidden" },
   ];
   return (
     <Sheet label="About D'trax">
