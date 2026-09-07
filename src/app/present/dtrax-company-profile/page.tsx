@@ -138,6 +138,11 @@ const SHOTS: Record<string, string[]> = {
 const RENDER = { sumitomoA: asset("/assets/projects/sumitomo-chemical/a.jpg"), sumitomoB: asset("/assets/projects/sumitomo-chemical/b.jpg") };
 const OFFICE = [asset("/assets/office/office-1.jpg"), asset("/assets/office/office-2.jpg"), asset("/assets/office/office-3.jpg")];
 const TEAM = { ronald: asset("/assets/team/ronald-head.jpg"), jayne: asset("/assets/team/jayne.jpg"), founders: [asset("/assets/team/founders-1.jpg"), asset("/assets/team/founders-2.jpg"), asset("/assets/team/founders-3.jpg")] };
+const HEADSHOT: Record<string, string> = {
+  "Adrian Yen": asset("/assets/headshots/adrian-yen.jpg"), "Danny Chua": asset("/assets/headshots/danny-chua.jpg"), "Esther Choo": asset("/assets/headshots/esther-choo.jpg"),
+  "Lim Fu Liang": asset("/assets/headshots/lim-fu-liang.jpg"), "Mi Mi Nay Win": asset("/assets/headshots/mi-mi-nay-win.jpg"), "Sandrey Lim": asset("/assets/headshots/sandrey-lim.jpg"),
+  "Sapp Cheng": asset("/assets/headshots/sapp-cheng.jpg"), "Tan Swee Lan": asset("/assets/headshots/tan-swee-lan.jpg"), "Yong Yee Yee": asset("/assets/headshots/yong-yee-yee.jpg"),
+};
 const CERT = { sida: asset("/assets/certs/cert-a.png"), iso: asset("/assets/certs/cert-iso.png"), bizsafe: asset("/assets/certs/cert-bizsafe.png") };
 const LOGO: Record<string, string> = {
   "Alibaba": asset("/assets/logos/alibaba.png"), "Aramco Trading": asset("/assets/logos/aramco.png"), "Digital Edge": asset("/assets/logos/digital-edge.webp"), "Edelman": asset("/assets/logos/edelman.png"),
@@ -162,6 +167,33 @@ function Photo({ src, alt, className, position = "50% 50%", caption, placeholder
       <img src={src} alt={alt} className="absolute inset-0 h-full w-full object-cover" style={{ objectPosition: position, transform: zoom === 1 ? undefined : `scale(${zoom})` }} draggable={false} />
       {caption ? <span className="absolute bottom-4 left-4 rounded-full bg-white/92 px-3 py-1 text-[11px] font-medium text-[#151515]">{caption}</span> : null}
       {placeholder ? <span className="absolute right-3 top-3 rounded-full bg-[#151515]/75 px-2 py-0.5 text-[9px] font-medium uppercase tracking-[0.12em] text-white">Placeholder</span> : null}
+    </div>
+  );
+}
+
+/** JS-driven looping belt: measures its content and scrolls it seamlessly, left or right. */
+function Belt({ children, reverse = false, speed = 40, className }: { children: ReactNode; reverse?: boolean; speed?: number; className?: string }) {
+  const ref = useRef<HTMLDivElement>(null);
+  const [width, setWidth] = useState(0);
+  useEffect(() => {
+    if (!ref.current) return;
+    const measure = () => setWidth(ref.current?.scrollWidth ?? 0);
+    measure();
+    const observer = new ResizeObserver(measure);
+    observer.observe(ref.current);
+    return () => observer.disconnect();
+  }, []);
+  const distance = width + 12;
+  return (
+    <div className={cn("flex w-full overflow-hidden", className)}>
+      <motion.div
+        className="flex shrink-0 gap-3 pr-3"
+        animate={width ? { x: reverse ? [-distance, 0] : [0, -distance] } : undefined}
+        transition={{ duration: Math.max(20, distance / speed), repeat: Infinity, ease: "linear" }}
+      >
+        <div ref={ref} className="flex shrink-0 gap-3">{children}</div>
+        <div className="flex shrink-0 gap-3" aria-hidden="true">{children}</div>
+      </motion.div>
     </div>
   );
 }
@@ -321,10 +353,10 @@ const clientLogos = [
 const leaders: ProfileCardItem[] = [
   { name: "Ronald Goh", role: "Managing Director", photo: TEAM.ronald, photoPosition: "50% 20%", experience: "25+ years in corporate interior fit-out", specialism: "Translating clients' commercial objectives into fit-out decisions; long-term client relationships built across repeat engagements", projects: ["Group-IB", "Sony Pictures", "Mitsui Chemicals", "FIJI Water", "Edelman"], projectLogos: [LOGO["Group-IB"], LOGO["Sony Pictures"], LOGO["Mitsui Chemicals"], LOGO["FIJI Water"], LOGO["Edelman"]] },
   { name: "Jayne Ong", role: "Head of Costing & Operation", photo: TEAM.jayne, photoPosition: "50% 18%", experience: <ToConfirm>Years and background</ToConfirm>, specialism: <ToConfirm>Costing and operations profile</ToConfirm>, projects: [], projectsLabel: "Featured projects (to confirm)" },
-  { name: "Esther Choo", role: "Design Director", experience: "24+ years of professional practice", qualifications: "Diploma in Interior Design, Nanyang Academy of Fine Arts", specialism: "Pre-leasing feasibility and workspace strategy through detailed, buildable design; corporate, hospitality and retail interiors", projects: ["Standard Chartered", "Spotify", "Singtel", "Traveloka", "Singapore Pools"], projectLogos: [LOGO["Standard Chartered"], LOGO["Spotify"], LOGO["Singtel"], LOGO["Traveloka"], LOGO["Singapore Pools"]] },
-  { name: "Sandrey Lim", role: "Project Director", experience: "26+ years in design-and-build workplace delivery", qualifications: "Specialist Diploma in Construction Productivity (BCA); Diploma in Personnel Management; bizSAFE Level 2", specialism: "End-to-end delivery of complex workplace transformations, coordinating design, cost and construction through to handover", projects: ["Alibaba", "Grohe", "The World Bank", "SOTA", "Shiseido"], projectLogos: [LOGO["Alibaba"], LOGO["Grohe"], LOGO["The World Bank"], LOGO["SOTA"], LOGO["Shiseido"]] },
+  { name: "Esther Choo", role: "Design Director", photo: HEADSHOT["Esther Choo"], photoPosition: "50% 15%", experience: "24+ years of professional practice", qualifications: "Diploma in Interior Design, Nanyang Academy of Fine Arts", specialism: "Pre-leasing feasibility and workspace strategy through detailed, buildable design; corporate, hospitality and retail interiors", projects: ["Standard Chartered", "Spotify", "Singtel", "Traveloka", "Singapore Pools"], projectLogos: [LOGO["Standard Chartered"], LOGO["Spotify"], LOGO["Singtel"], LOGO["Traveloka"], LOGO["Singapore Pools"]] },
+  { name: "Sandrey Lim", role: "Project Director", photo: HEADSHOT["Sandrey Lim"], photoPosition: "50% 15%", experience: "26+ years in design-and-build workplace delivery", qualifications: "Specialist Diploma in Construction Productivity (BCA); Diploma in Personnel Management; bizSAFE Level 2", specialism: "End-to-end delivery of complex workplace transformations, coordinating design, cost and construction through to handover", projects: ["Alibaba", "Grohe", "The World Bank", "SOTA", "Shiseido"], projectLogos: [LOGO["Alibaba"], LOGO["Grohe"], LOGO["The World Bank"], LOGO["SOTA"], LOGO["Shiseido"]] },
   { name: "Steve Tan", role: "Senior Project Manager", experience: (<><ToConfirm>X+ years</ToConfirm> in project management and fit-out delivery</>), qualifications: <ToConfirm>Qualifications</ToConfirm>, specialism: <ToConfirm>e.g. large-floorplate fit-outs, live-environment works, tight-programme delivery</ToConfirm>, projects: ["Project 1", "Project 2", "Project 3", "Project 4", "Project 5"], projectsLabel: "Featured projects (5, to confirm)" },
-  { name: "Danny Chua", role: "Senior Quantity Surveyor", experience: (<><ToConfirm>X+ years</ToConfirm> in quantity surveying and cost management</>), qualifications: <ToConfirm>QS qualification and accreditation</ToConfirm>, specialism: <ToConfirm>e.g. fit-out budgeting, value engineering, cost control through delivery</ToConfirm>, projects: ["Project 1", "Project 2", "Project 3", "Project 4", "Project 5"], projectsLabel: "Selected projects (5, to confirm)" },
+  { name: "Danny Chua", role: "Senior Quantity Surveyor", photo: HEADSHOT["Danny Chua"], photoPosition: "50% 15%", experience: (<><ToConfirm>X+ years</ToConfirm> in quantity surveying and cost management</>), qualifications: <ToConfirm>QS qualification and accreditation</ToConfirm>, specialism: <ToConfirm>e.g. fit-out budgeting, value engineering, cost control through delivery</ToConfirm>, projects: ["Project 1", "Project 2", "Project 3", "Project 4", "Project 5"], projectsLabel: "Selected projects (5, to confirm)" },
 ];
 
 const stages: { title: string; body: string; extra: ReactNode }[] = [
@@ -399,7 +431,7 @@ function CoverSlide() {
   const strip = [OFFICE[1], SHOTS["Group-IB"][0], SHOTS["Singapore Pools"][0], SHOTS["OMS ROC"][0], SHOTS["Digital Edge"][0], SHOTS["Sumitomo Chemical Asia"][0], SHOTS["FIJI Water"][0]];
   return (
     <Sheet>
-      <div className={cn("relative flex w-full flex-col justify-center overflow-hidden px-20", SLIDE)}>
+      <div className={cn("relative flex w-full flex-col justify-center px-20", SLIDE)}>
         <Stars count={10} />
         <motion.div variants={fadeUp} className="absolute left-20 top-4 flex items-center gap-4">
           <img src={asset("/logo/dtrax-logo.png")} alt="D'trax logo" className="h-auto w-[5.5rem] object-contain" />
@@ -498,19 +530,19 @@ function AboutSlide() {
 
 function PillarsSlide() {
   const cards = [
-    { icon: <Users className="size-4 text-[#151515]" />, title: "One team.", description: "Brief to handover, in-house", backgroundClassName: "bg-[#DDFF97]/75 backdrop-blur-md", className: "[grid-area:stack] -translate-x-24 -translate-y-24 after:hidden" },
-    { icon: <ShieldCheck className="size-4 text-[#151515]" />, title: "Certified.", description: "ISO 45001:2018 · bizSAFE Star", backgroundClassName: "bg-[#9DD6FF]/75 backdrop-blur-md", className: "[grid-area:stack] after:hidden" },
-    { icon: <Award className="size-4 text-[#151515]" />, title: "Award-winning.", description: "SIDA 2023 Bronze, Best in Workspace Design", backgroundClassName: "bg-[#FFB6B6]/75 backdrop-blur-md", className: "[grid-area:stack] translate-x-24 translate-y-24 after:hidden" },
+    { icon: <Users className="size-4 text-[#151515]" />, title: "One team.", description: "Brief to handover, in-house", backgroundClassName: "bg-[#DDFF97]/55", className: "[grid-area:stack] -translate-x-44 -translate-y-24 after:hidden" },
+    { icon: <ShieldCheck className="size-4 text-[#151515]" />, title: "Certified.", description: "ISO 45001:2018 · bizSAFE Star", backgroundClassName: "bg-[#9DD6FF]/55", className: "[grid-area:stack] after:hidden" },
+    { icon: <Award className="size-4 text-[#151515]" />, title: "Award-winning.", description: "SIDA 2023 Bronze, Best in Workspace Design", backgroundClassName: "bg-[#FFB6B6]/55", className: "[grid-area:stack] translate-x-44 translate-y-24 after:hidden" },
   ];
   return (
     <Sheet label="About D'trax">
-      <div className={cn("relative grid w-full grid-cols-1 items-center gap-10 overflow-hidden px-20 pt-10 md:grid-cols-[0.85fr_1.15fr]", SLIDE)}>
+      <div className={cn("relative grid w-full grid-cols-1 items-center gap-10 px-20 pt-10 md:grid-cols-[0.85fr_1.15fr]", SLIDE)}>
         <WarpGrid center="70% 55%" />
         <Stars count={10} />
         <div className="relative">
           <Display size="md">What stays <Em>true</Em> on every project.</Display>
           <motion.p variants={fadeUp} className="mt-6 max-w-sm text-[14px] leading-relaxed text-[#151515]/65">One team from brief to handover, independently certified, and recognised for design. The people who start your project finish it.</motion.p>
-          <motion.div variants={fadeUp} className="mt-7 flex items-center gap-4">
+          <motion.div variants={fadeUp} className="mt-20 flex items-center gap-4">
             <AnimatedTooltip size={44} items={leaders.slice(0, 4).map((leader, index) => ({ id: index + 1, name: leader.name, designation: leader.role, initials: leader.name.split(" ").map((part) => part[0]).join("") }))} />
             <Sticker tone="lime" rotate={3}>Buddy system</Sticker>
           </motion.div>
@@ -531,7 +563,10 @@ function PillarsSlide() {
 
 function MarketNode({ label, fill }: { label: string; fill: Tone }) {
   return (
-    <span className={cn("flex h-full w-full items-center justify-center rounded-full border-[3px] border-white/90 px-1 text-center text-[10px] font-bold uppercase leading-tight tracking-[0.08em] shadow-[inset_0_-8px_14px_rgba(21,21,21,0.12)]", fillClass[fill])} style={{ boxShadow: `0 0 34px ${hex[fill]}99, inset 0 -8px 14px rgba(21,21,21,0.12)` }}>
+    <span
+      className="flex h-full w-full items-center justify-center rounded-full px-2 text-center text-[11px] font-bold uppercase leading-tight tracking-[0.08em] text-white"
+      style={{ background: "radial-gradient(circle at 32% 28%, #3d3d3d 0%, #151515 58%, #050505 100%)", boxShadow: `0 0 40px ${hex[fill]}80, 0 24px 50px rgba(0,0,0,0.6)` }}
+    >
       {label}
     </span>
   );
@@ -557,26 +592,26 @@ function MarketsSlide() {
             </motion.div>
           </div>
           <motion.div variants={scaleIn} className="relative flex items-center justify-center">
-            <div className="relative flex h-[32rem] w-[32rem] items-center justify-center">
-              <Ripple color="#ffffff" mainCircleSize={160} numCircles={4} mainCircleOpacity={0.25} />
-              <motion.div aria-hidden="true" className="absolute h-36 w-36 rounded-full border-2 border-[#DDFF97]" animate={{ scale: [1, 1.6], opacity: [0.9, 0] }} transition={{ duration: 2.6, repeat: Infinity, ease: "easeOut" }} />
-              <div className="relative z-10 flex h-28 w-28 flex-col items-center justify-center rounded-full bg-[#DDFF97] text-[#151515] shadow-[0_0_60px_rgba(221,255,151,0.6),0_0_0_12px_rgba(221,255,151,0.15)]">
-                <MapPin className="h-4 w-4" />
-                <span className="mt-1 text-[13px] font-semibold leading-none">Singapore</span>
+            <div className="relative flex h-[min(44rem,88vh)] w-[min(44rem,88vh)] items-center justify-center">
+              <div aria-hidden="true" className="absolute rounded-full border border-white/12" style={{ width: "min(24rem,48vh)", height: "min(24rem,48vh)" }} />
+              <div aria-hidden="true" className="absolute rounded-full border border-white/10" style={{ width: "min(38rem,76vh)", height: "min(38rem,76vh)" }} />
+              <motion.div aria-hidden="true" className="absolute h-44 w-44 rounded-full border border-[#DDFF97]/60" animate={{ scale: [1, 1.5], opacity: [0.7, 0] }} transition={{ duration: 3, repeat: Infinity, ease: "easeOut" }} />
+              <div className="relative z-10 flex h-36 w-36 flex-col items-center justify-center rounded-full text-[#151515]" style={{ background: "radial-gradient(circle at 35% 30%, #f3ffcf 0%, #DDFF97 45%, #b9e65a 100%)", boxShadow: "0 0 90px rgba(221,255,151,0.55), 0 0 0 14px rgba(221,255,151,0.10)" }}>
+                <MapPin className="h-5 w-5" />
+                <span className="mt-1 text-[15px] font-semibold leading-none">Singapore</span>
                 <span className="mt-1 text-[9px] uppercase tracking-[0.18em] text-[#151515]/60">HQ</span>
               </div>
-              <OrbitingCircles radius={116} iconSize={68} duration={24} className="[&_svg]:stroke-white/25">
+              <OrbitingCircles radius={Math.min(192, typeof window === "undefined" ? 192 : window.innerHeight * 0.24)} iconSize={84} duration={30} path={false}>
                 <MarketNode label="China" fill="pink" />
                 <MarketNode label="Hong Kong" fill="blue" />
               </OrbitingCircles>
-              <OrbitingCircles radius={184} iconSize={68} duration={38} reverse>
+              <OrbitingCircles radius={Math.min(304, typeof window === "undefined" ? 304 : window.innerHeight * 0.38)} iconSize={84} duration={48} reverse path={false}>
                 <MarketNode label="Malaysia" fill="lime" />
                 <MarketNode label="Thailand" fill="pink" />
               </OrbitingCircles>
-              <OrbitingCircles radius={236} iconSize={10} duration={52} path={false}>
+              <OrbitingCircles radius={Math.min(304, typeof window === "undefined" ? 304 : window.innerHeight * 0.38)} iconSize={10} duration={64} path={false}>
                 <span className="h-2.5 w-2.5 rounded-full bg-white shadow-[0_0_12px_rgba(255,255,255,0.9)]" />
                 <span className="h-2 w-2 rounded-full bg-[#9DD6FF] shadow-[0_0_12px_rgba(157,214,255,0.9)]" />
-                <span className="h-2 w-2 rounded-full bg-[#FFB6B6] shadow-[0_0_12px_rgba(255,182,182,0.9)]" />
               </OrbitingCircles>
             </div>
           </motion.div>
@@ -608,7 +643,7 @@ function ServicesSlide() {
   ];
   return (
     <Sheet label="Services & capabilities">
-      <div className={cn("relative flex w-full flex-col justify-center overflow-hidden px-20 pt-10", SLIDE)}>
+      <div className={cn("relative flex w-full flex-col justify-center px-20 pt-10", SLIDE)}>
         <WarpGrid center="50% 70%" />
         <div className="relative grid grid-cols-1 items-end gap-8 pb-8 md:grid-cols-[1fr_auto]">
           <Display size="md">Full turnkey delivery from a <Em>single</Em> in-house team.</Display>
@@ -696,7 +731,7 @@ function ApproachSlide() {
   const tones: Tone[] = ["pink", "blue", "lime", "pink", "blue", "lime"];
   return (
     <Sheet label="Our delivery approach">
-      <div className={cn("relative grid w-full grid-cols-1 items-center gap-10 overflow-hidden px-20 pt-6 md:grid-cols-[0.85fr_1.15fr]", SLIDE)} onMouseEnter={() => setPaused(true)} onMouseLeave={() => setPaused(false)}>
+      <div className={cn("relative grid w-full grid-cols-1 items-center gap-10 px-20 pt-6 md:grid-cols-[0.85fr_1.15fr]", SLIDE)} onMouseEnter={() => setPaused(true)} onMouseLeave={() => setPaused(false)}>
         <WarpGrid center="72% 55%" />
         <Stars count={10} />
         <div className="relative flex flex-col justify-center pb-6">
@@ -781,7 +816,7 @@ function RealityCaptureSlide() {
 function TeamSlide() {
   return (
     <Sheet label="Our team">
-      <div className={cn("relative grid w-full grid-cols-1 items-center gap-10 overflow-hidden px-20 pt-10 md:grid-cols-[0.8fr_1.2fr]", SLIDE)}>
+      <div className={cn("relative grid w-full grid-cols-1 items-center gap-10 px-20 pt-10 md:grid-cols-[0.8fr_1.2fr]", SLIDE)}>
         <WarpGrid center="70% 50%" />
         <Stars count={8} />
         <div className="relative">
@@ -838,7 +873,7 @@ type FlowNode = { id: string; x: number; y: number; w: number; h: number; kind: 
 function flowLayout() {
   const nodes: FlowNode[] = [];
   const edges: [string, string][] = [];
-  const memberH = 34, memberGap = 8, groupGap = 22;
+  const memberH = 38, memberGap = 7, groupGap = 18;
   const teamIcons = [<ClipboardList key="p" className="h-4 w-4" />, <Briefcase key="b" className="h-4 w-4" />, <PenTool key="d" className="h-4 w-4" />, <Users key="h" className="h-4 w-4" />, <Calculator key="c" className="h-4 w-4" />];
   const tones: Tone[] = ["pink", "lime", "blue", "lime", "pink"];
   const totalMembers = orgTeams.reduce((sum, team) => sum + team.members.length, 0);
@@ -861,6 +896,39 @@ function flowLayout() {
   nodes.push({ id: "router", x: 320, y: FLOW_H / 2 - 36, w: 190, h: 72, kind: "router", title: "Buddy system", sub: "one accountable contact", icon: <GitFork className="h-4 w-4" /> });
   edges.push(["ronald", "router"], ["jayne", "router"]);
   return { nodes, edges };
+}
+
+function MemberNode({ node, chip }: { node: FlowNode; chip: string }) {
+  const [hovered, setHovered] = useState(false);
+  const photo = HEADSHOT[node.title];
+  return (
+    <div className="relative h-full" onMouseEnter={() => setHovered(true)} onMouseLeave={() => setHovered(false)}>
+      <div className={cn("flex h-full items-center gap-2.5 rounded-xl border border-[#151515]/10 bg-white pl-1.5 pr-3 shadow-[0_8px_20px_rgba(21,21,21,0.07)] transition-shadow duration-300", hovered && "shadow-[0_16px_40px_rgba(21,21,21,0.16)]")}>
+        {photo ? (
+          <img src={photo} alt={node.title} className="h-7 w-7 shrink-0 rounded-full object-cover ring-2 ring-white" style={{ objectPosition: "50% 15%" }} draggable={false} />
+        ) : (
+          <span className={cn("ml-1.5 h-2.5 w-2.5 shrink-0 rounded-full", chip)} />
+        )}
+        <p className="truncate text-[12px] font-semibold text-[#151515]">{node.title}</p>
+        <p className="ml-auto truncate text-[10px] text-[#151515]/55">{node.sub}</p>
+        <span className="absolute -left-1.5 top-1/2 h-2.5 w-2.5 -translate-y-1/2 rounded-full border-2 border-white bg-[#151515]" />
+      </div>
+      <AnimatePresence>
+        {hovered && photo ? (
+          <motion.div
+            initial={{ opacity: 0, x: 12, scale: 0.9 }}
+            animate={{ opacity: 1, x: 0, scale: 1 }}
+            exit={{ opacity: 0, x: 8, scale: 0.94 }}
+            transition={{ type: "spring", stiffness: 260, damping: 22 }}
+            className="pointer-events-none absolute right-full top-1/2 z-50 mr-4 w-[11rem] -translate-y-1/2 overflow-hidden rounded-2xl bg-white p-1.5 shadow-[0_24px_60px_rgba(21,21,21,0.28)]"
+          >
+            <img src={photo} alt={node.title} className="h-[13rem] w-full rounded-xl object-cover" style={{ objectPosition: "50% 12%" }} draggable={false} />
+            <div className="px-2 pb-1.5 pt-2"><p className="text-[12px] font-semibold text-[#151515]">{node.title}</p><p className="text-[10px] text-[#151515]/55">{node.sub}</p></div>
+          </motion.div>
+        ) : null}
+      </AnimatePresence>
+    </div>
+  );
 }
 
 function OrgChartSlide() {
@@ -918,12 +986,7 @@ function OrgChartSlide() {
                   <span className="absolute -right-1.5 top-1/2 h-3 w-3 -translate-y-1/2 rounded-full border-2 border-white bg-[#151515]" />
                 </div>
               ) : (
-                <div className="flex h-full items-center gap-2.5 rounded-xl border border-[#151515]/10 bg-white px-3 shadow-[0_8px_20px_rgba(21,21,21,0.07)]">
-                  <span className={cn("h-2.5 w-2.5 shrink-0 rounded-full", chip[node.tone ?? "pink"])} />
-                  <p className="truncate text-[12px] font-semibold text-[#151515]">{node.title}</p>
-                  <p className="ml-auto truncate text-[10px] text-[#151515]/55">{node.sub}</p>
-                  <span className="absolute -left-1.5 top-1/2 h-2.5 w-2.5 -translate-y-1/2 rounded-full border-2 border-white bg-[#151515]" />
-                </div>
+                <MemberNode node={node} chip={chip[node.tone ?? "pink"]} />
               )}
             </motion.div>
           ))}
@@ -933,44 +996,78 @@ function OrgChartSlide() {
   );
 }
 
+type Spotlight = { name: string; role: string; photo?: string; photoPosition?: string; tone: Tone; facts: string[]; logos?: string[]; caption?: ReactNode; toConfirm?: boolean };
+
+function PersonArch({ person, active, size = "lg", index = 0 }: { person: Spotlight; active: boolean; size?: "lg" | "md"; index?: number }) {
+  const dims = size === "lg" ? "h-[24rem] w-[19rem]" : "h-[17rem] w-[13.5rem]";
+  const spots = [
+    { left: "-14%", top: "8%", rotate: -8 }, { right: "-16%", top: "22%", rotate: 6 }, { left: "-10%", top: "52%", rotate: 4 }, { right: "-12%", top: "64%", rotate: -5 },
+  ];
+  const ring: Record<Tone, string> = { pink: "ring-[#FFB6B6]", blue: "ring-[#9DD6FF]", lime: "ring-[#DDFF97]" };
+  return (
+    <div className="relative flex flex-col items-center">
+      <motion.div animate={{ scale: active ? 1.04 : 1, y: active ? -6 : 0 }} transition={{ duration: 0.6, ease }} className={cn("relative overflow-hidden rounded-t-full rounded-b-[2rem] bg-[#151515] ring-8 shadow-[0_30px_70px_rgba(21,21,21,0.22)]", dims, ring[person.tone])}>
+        {person.photo ? (
+          <img src={person.photo} alt={person.name} className="absolute inset-0 h-full w-full object-cover" style={{ objectPosition: person.photoPosition ?? "50% 15%" }} draggable={false} />
+        ) : (
+          <div className={cn("absolute inset-0 flex items-center justify-center text-6xl font-bold", fillClass[person.tone])}>{person.name.split(" ").map((part) => part[0]).join("")}</div>
+        )}
+      </motion.div>
+      <AnimatePresence>
+        {active ? person.facts.map((fact, factIndex) => (
+          <motion.span
+            key={fact}
+            initial={{ opacity: 0, scale: 0.4, rotate: spots[factIndex % spots.length].rotate - 10 }}
+            animate={{ opacity: 1, scale: 1, rotate: spots[factIndex % spots.length].rotate, y: [0, -6, 0] }}
+            exit={{ opacity: 0, scale: 0.5 }}
+            transition={{ opacity: { duration: 0.3, delay: 0.15 + factIndex * 0.12 }, scale: { type: "spring", stiffness: 300, damping: 18, delay: 0.15 + factIndex * 0.12 }, y: { duration: 4, repeat: Infinity, ease: "easeInOut", delay: factIndex * 0.4 } }}
+            className={cn("absolute z-20 whitespace-nowrap rounded-full px-3.5 py-1.5 text-[12px] font-semibold shadow-[0_10px_26px_rgba(21,21,21,0.16)]", fillClass[(["pink", "blue", "lime"] as Tone[])[(factIndex + index) % 3]])}
+            style={spots[factIndex % spots.length]}
+          >
+            {fact}
+          </motion.span>
+        )) : null}
+      </AnimatePresence>
+      <div className="relative -mt-8 z-10 text-center">
+        <p className="text-[2.4rem] font-bold leading-none tracking-tight text-[#151515]" style={{ textShadow: "0 2px 0 #f4f4f2, 0 -2px 0 #f4f4f2, 2px 0 0 #f4f4f2, -2px 0 0 #f4f4f2" }}>{person.name}</p>
+        <Sticker tone={person.tone} rotate={index % 2 ? 3 : -3} className="mt-2">{person.role}</Sticker>
+      </div>
+      {person.logos?.length ? (
+        <div className="mt-4 flex items-center justify-center">
+          {person.logos.map((logo, logoIndex) => (
+            <motion.span key={logo} animate={{ rotate: active ? (logoIndex % 2 ? 6 : -6) : 0, y: active ? (logoIndex % 2 ? 2 : -2) : 0 }} transition={{ duration: 0.5 }} className="-ml-2 flex h-11 w-16 items-center justify-center rounded-lg border border-[#151515]/10 bg-white px-2 shadow-[0_8px_20px_rgba(21,21,21,0.10)] first:ml-0">
+              <img src={logo} alt="Client" className="max-h-6 w-full object-contain" />
+            </motion.span>
+          ))}
+        </div>
+      ) : null}
+    </div>
+  );
+}
+
 function FoundersSlide() {
-  const founders = leaders.slice(0, 2);
-  const tones: Tone[] = ["lime", "pink"];
+  const [active, setActive] = useState(0);
+  useEffect(() => {
+    const timer = window.setInterval(() => setActive((current) => (current + 1) % 2), 4200);
+    return () => window.clearInterval(timer);
+  }, []);
+  const people: Spotlight[] = [
+    { name: "Ronald Goh", role: "Managing Director", photo: TEAM.ronald, photoPosition: "50% 20%", tone: "lime", facts: ["25+ years in fit-out", "Co-founder, 2003", "Repeat-client relationships", "Commercial objectives first"], logos: [LOGO["Group-IB"], LOGO["Sony Pictures"], LOGO["Mitsui Chemicals"], LOGO["FIJI Water"], LOGO["Edelman"]] },
+    { name: "Jayne Ong", role: "Head of Costing & Operation", photo: TEAM.jayne, photoPosition: "50% 12%", tone: "pink", facts: ["Co-founder, 2003", "Costing owned in-house", "Operations", "Profile to confirm"] },
+  ];
   return (
     <Sheet label="The founders">
-      <div className={cn("relative flex w-full flex-col overflow-hidden px-20 pt-10", SLIDE)}>
-        <WarpGrid center="50% 60%" />
-        <Stars count={8} />
+      <div className={cn("relative flex w-full flex-col items-center justify-center px-20 pb-10 pt-10", SLIDE)}>
+        <WarpGrid center="50% 55%" />
+        <Stars count={12} />
         <div className="relative flex items-center gap-6">
           <Display size="sm">The <Em tone="pink">founders</Em>.</Display>
-          <Sticker tone="lime" rotate={-3}>From the front, since 2003</Sticker>
+          <RotatingBadge text="FROM THE FRONT · SINCE 2003 · " size={96} />
         </div>
-        <motion.div variants={stagger} className="relative mt-6 grid flex-1 grid-cols-1 gap-6 pb-6 md:grid-cols-2">
-          {founders.map((person, index) => (
-            <motion.div key={person.name} variants={scaleIn} className="grid h-full grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)] overflow-hidden rounded-[1.75rem] bg-white shadow-[0_24px_60px_rgba(21,21,21,0.12)]">
-              <div className="relative min-h-[18rem]">
-                <img src={person.photo} alt={person.name} className="absolute inset-0 h-full w-full object-cover" style={{ objectPosition: person.photoPosition }} draggable={false} />
-                <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/85 via-black/40 to-transparent p-4 pt-20 text-white">
-                  <p className="text-[1.5rem] font-semibold leading-none tracking-tight">{person.name}</p>
-                  <p className="mt-1.5 text-[11px] font-medium uppercase tracking-[0.16em] text-white/75">{person.role}</p>
-                </div>
-              </div>
-              <div className="flex flex-col justify-center gap-4 p-6">
-                <span className={cn("w-max rounded-full px-3 py-1 text-[11px] font-semibold", fillClass[tones[index]])}>{index === 0 ? "Co-founder · Managing Director" : "Co-founder · Costing & Operation"}</span>
-                <div><p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[#151515]/50">Experience</p><div className="mt-1 text-[13px] leading-relaxed text-[#151515]/80">{person.experience}</div></div>
-                <div><p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[#151515]/50">Specialism</p><div className="mt-1 text-[13px] leading-relaxed text-[#151515]/80">{person.specialism}</div></div>
-                <div>
-                  <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[#151515]/50">{person.projectsLabel ?? "Featured projects"}</p>
-                  {person.projects.length ? (
-                    <div className="mt-2 flex flex-wrap gap-2">
-                      {person.projects.map((project, projectIndex) => {
-                        const logo = person.projectLogos?.[projectIndex];
-                        return logo ? <span key={project} className="flex h-11 items-center rounded-lg border border-[#151515]/10 bg-[#f4f4f2] px-3" title={project}><img src={logo} alt={project} className="h-7 max-w-[6rem] object-contain" /></span> : <span key={project} className="rounded-full border border-[#151515]/20 px-2.5 py-1 text-[11px]">{project}</span>;
-                      })}
-                    </div>
-                  ) : <p className="mt-1 text-[12px] text-[#151515]/50">To be confirmed with Jayne.</p>}
-                </div>
-              </div>
+        <motion.div variants={stagger} className="relative mt-6 flex items-start justify-center gap-24">
+          {people.map((person, index) => (
+            <motion.div key={person.name} variants={scaleIn} onMouseEnter={() => setActive(index)}>
+              <PersonArch person={person} active={active === index} index={index} />
             </motion.div>
           ))}
         </motion.div>
@@ -980,14 +1077,33 @@ function FoundersSlide() {
 }
 
 function LeadersSlide() {
+  const [active, setActive] = useState(0);
+  useEffect(() => {
+    const timer = window.setInterval(() => setActive((current) => (current + 1) % 4), 3600);
+    return () => window.clearInterval(timer);
+  }, []);
+  const people: Spotlight[] = [
+    { name: "Esther Choo", role: "Design Director", photo: HEADSHOT["Esther Choo"], tone: "lime", facts: ["24+ years", "NAFA, Interior Design", "Workspace strategy"], logos: [LOGO["Standard Chartered"], LOGO["Spotify"], LOGO["Singtel"], LOGO["Traveloka"], LOGO["Singapore Pools"]] },
+    { name: "Sandrey Lim", role: "Project Director", photo: HEADSHOT["Sandrey Lim"], tone: "blue", facts: ["26+ years", "BCA Specialist Diploma", "bizSAFE Level 2"], logos: [LOGO["Alibaba"], LOGO["Grohe"], LOGO["The World Bank"], LOGO["SOTA"], LOGO["Shiseido"]] },
+    { name: "Steve Tan", role: "Senior Project Manager", tone: "pink", facts: ["Project management", "Fit-out delivery", "Profile to confirm"] },
+    { name: "Danny Chua", role: "Senior Quantity Surveyor", photo: HEADSHOT["Danny Chua"], tone: "lime", facts: ["Quantity surveying", "Cost management", "Profile to confirm"] },
+  ];
   return (
     <Sheet label="Key leaders">
-      <div className={cn("flex w-full flex-col justify-center px-20 pt-10", SLIDE)}>
-        <div className="mb-6 flex items-end justify-between gap-8">
-          <Display size="sm">Key leaders.</Display>
-          <motion.p variants={fadeUp} className="max-w-sm text-right text-[13px] leading-relaxed text-[#151515]/65">Design, delivery and costing, led in-house.</motion.p>
+      <div className={cn("relative flex w-full flex-col items-center justify-center px-20 pb-10 pt-10", SLIDE)}>
+        <WarpGrid center="50% 55%" />
+        <Stars count={12} />
+        <div className="relative flex items-center gap-6">
+          <Display size="sm">Key <Em>leaders</Em>.</Display>
+          <Sticker tone="blue" rotate={-3}>Design, delivery and costing, in-house</Sticker>
         </div>
-        <motion.div variants={scaleIn}><ExpandingProfileCards people={leaders.slice(2)} nameClassName="font-semibold tracking-tight" className="h-[clamp(20rem,60vh,30rem)]" /></motion.div>
+        <motion.div variants={stagger} className="relative mt-8 flex items-start justify-center gap-14">
+          {people.map((person, index) => (
+            <motion.div key={person.name} variants={scaleIn} onMouseEnter={() => setActive(index)}>
+              <PersonArch person={person} active={active === index} size="md" index={index} />
+            </motion.div>
+          ))}
+        </motion.div>
       </div>
     </Sheet>
   );
@@ -1003,32 +1119,32 @@ function TrackRecordSlide() {
   featuredProjects.forEach((project) => {
     const shots = SHOTS[project.name] ?? [];
     const meta = `${project.area.toLocaleString("en-US")} sq ft`;
-    if (shots.length) shots.slice(0, 5).forEach((src) => tiles.push({ src, name: project.name, meta }));
+    if (shots.length) shots.slice(0, 8).forEach((src) => tiles.push({ src, name: project.name, meta }));
     else tiles.push({ name: project.name, meta });
   });
-  const rows: Tile[][] = [[], [], [], []];
-  tiles.forEach((tile, index) => rows[index % 4].push(tile));
-  const Row = ({ items, reverse, duration }: { items: Tile[]; reverse?: boolean; duration: string }) => (
-    <Marquee reverse={reverse} className={cn("py-0 [--gap:0.75rem]", duration)}>
+  const rowCount = 6;
+  const rows: Tile[][] = Array.from({ length: rowCount }, () => []);
+  tiles.forEach((tile, index) => rows[index % rowCount].push(tile));
+  const Row = ({ items, reverse, speed }: { items: Tile[]; reverse?: boolean; speed: number }) => (
+    <Belt reverse={reverse} speed={speed}>
       {items.map((tile, index) => (
-        <div key={`${tile.name}-${index}`} className="relative h-[6.5rem] w-[14rem] shrink-0 overflow-hidden rounded-2xl bg-[#151515] shadow-[0_10px_30px_rgba(21,21,21,0.10)]">
-          {tile.src ? <img src={tile.src} alt={tile.name} className="absolute inset-0 h-full w-full object-cover" draggable={false} /> : <span className="absolute left-4 top-4 text-[10px] font-medium uppercase tracking-[0.14em] text-white/50">Photos pending</span>}
-          <span className="absolute bottom-3 left-3 flex items-center gap-2 rounded-full bg-white/92 px-2.5 py-1 text-[10px] font-semibold text-[#151515]"><span>{tile.name}</span><span className="text-[#151515]/50">{tile.meta}</span></span>
+        <div key={`${tile.name}-${index}`} className="relative h-[6rem] w-[13rem] shrink-0 overflow-hidden rounded-xl bg-[#2a2a2a]">
+          {tile.src ? <img src={tile.src} alt={tile.name} className="absolute inset-0 h-full w-full object-cover" draggable={false} /> : <span className="absolute left-3 top-3 text-[10px] font-medium uppercase tracking-[0.14em] text-white/50">Photos pending</span>}
+          <span className="absolute bottom-2 left-2 flex max-w-[calc(100%-1rem)] items-center gap-1.5 whitespace-nowrap rounded-full bg-white/92 px-2.5 py-1 text-[9.5px] font-semibold text-[#151515]"><span className="truncate">{tile.name}</span><span className="shrink-0 text-[#151515]/50">{tile.meta}</span></span>
         </div>
       ))}
-    </Marquee>
+    </Belt>
   );
   return (
     <Sheet>
-      <div className={cn("relative flex w-full flex-col justify-center gap-3 overflow-hidden pb-14 pt-2", SLIDE)}>
-        <Row items={rows[0]} duration="[--duration:70s]" />
-        <Row items={rows[1]} reverse duration="[--duration:82s]" />
-        <div className="relative z-10 -my-1 flex items-center justify-center py-3">
-          <div className="absolute inset-x-0 top-1/2 h-[9rem] -translate-y-1/2 bg-[#f4f4f2]/80 backdrop-blur-md" />
-          <Display size="md" className="relative max-w-4xl text-center">A selection from <Em>100+</Em> offices delivered since 2003.</Display>
+      <div className="relative -mb-16 -mt-14 flex h-[100dvh] w-full flex-col justify-center gap-3 overflow-hidden bg-[#151515]">
+        <Stars count={24} dark />
+        {rows.slice(0, 3).map((items, index) => <Row key={index} items={items} reverse={index % 2 === 1} speed={34 + index * 6} />)}
+        <div className="relative z-10 flex items-center justify-center py-2">
+          <div className="absolute inset-x-0 top-1/2 h-[11rem] -translate-y-1/2 bg-[#151515]/80 backdrop-blur-md" />
+          <Display size="md" className="relative max-w-4xl text-center text-white">A selection from <Em>100+</Em> offices delivered since 2003.</Display>
         </div>
-        <Row items={rows[2]} duration="[--duration:76s]" />
-        <Row items={rows[3]} reverse duration="[--duration:88s]" />
+        {rows.slice(3).map((items, index) => <Row key={index + 3} items={items} reverse={index % 2 === 0} speed={36 + index * 6} />)}
       </div>
     </Sheet>
   );
@@ -1046,7 +1162,7 @@ function RecentProjectsSlide() {
   const pct = (value: number, total: number) => `${(value / total) * 100}%`;
   return (
     <Sheet label="Recent projects">
-      <div className={cn("relative flex w-full flex-col overflow-hidden px-20 pt-8", SLIDE)}>
+      <div className={cn("relative flex w-full flex-col px-20 pt-8", SLIDE)}>
         <WarpGrid center="55% 50%" />
         <Stars count={10} />
         <div className="relative flex items-center gap-6">
@@ -1216,7 +1332,7 @@ function CertificationsSlide() {
   ];
   return (
     <Sheet label="Certifications & awards">
-      <div className={cn("relative flex w-full flex-col justify-center overflow-hidden px-20 pt-10", SLIDE)}>
+      <div className={cn("relative flex w-full flex-col justify-center px-20 pt-10", SLIDE)}>
         <Stars count={8} />
         <div className="relative flex items-end justify-between gap-8">
           <Display size="md" className="max-w-4xl">Certified for safety and quality. <Em>Recognised</Em> for design.</Display>
@@ -1240,10 +1356,10 @@ function ClosingSlide() {
     return () => window.clearInterval(timer);
   }, []);
   const caption = activeAvatar === 0 ? "10 Anson Road, #30-13 International Plaza, Singapore 079903" : "+65 6224 9242 · www.dtrax.com.sg";
-  const line = (text: string) => Array.from({ length: 4 }, (_, index) => <span key={index} className="mx-4 inline-flex items-center whitespace-nowrap">{text} <span className="mx-5 inline-block h-6 w-6 rounded-full bg-[#151515]" /></span>);
+  const line = (text: string) => Array.from({ length: 4 }, (_, index) => <span key={index} className="mx-1 inline-flex items-center whitespace-nowrap">{text} <span className="mx-3 inline-block h-6 w-6 rounded-full bg-[#151515]" /></span>);
   return (
     <Sheet>
-      <div className={cn("relative flex w-full flex-col justify-center overflow-hidden", SLIDE)}>
+      <div className={cn("relative flex w-full flex-col justify-center", SLIDE)}>
         <WarpGrid center="50% 80%" />
         <Stars count={12} />
         <motion.div variants={scaleIn} className="relative -rotate-2">
@@ -1305,5 +1421,5 @@ const slides: PresentationSlide[] = [
 ];
 
 export default function DtraxCompanyProfilePresentation() {
-  return <SlideShell slides={slides} title="D'trax · Company Profile" logoRange={[1, slides.length - 2]} logoHidden={[3]} />;
+  return <SlideShell slides={slides} title="D'trax · Company Profile" logoRange={[1, slides.length - 2]} logoHidden={[3, 11]} />;
 }
