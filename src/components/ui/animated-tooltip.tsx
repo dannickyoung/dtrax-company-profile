@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState, type MouseEvent } from "react";
+import { useEffect, useRef, useState, type MouseEvent } from "react";
 import { AnimatePresence, motion, useMotionValue, useSpring, useTransform } from "framer-motion";
 import { cn } from "@/lib/utils";
 
@@ -10,11 +10,27 @@ const tones = ["bg-[#FFB6B6]", "bg-[#9DD6FF]", "bg-[#DDFF97]"];
 export function AnimatedTooltip({
   items,
   size = 64,
+  autoplay = true,
+  intervalMs = 2200,
 }: {
   items: { id: number; name: string; designation: string; initials: string }[];
   size?: number;
+  autoplay?: boolean;
+  intervalMs?: number;
 }) {
   const [hovered, setHovered] = useState<number | null>(null);
+  const [auto, setAuto] = useState<number | null>(autoplay ? items[0]?.id ?? null : null);
+  useEffect(() => {
+    if (!autoplay || hovered !== null) return;
+    const timer = window.setInterval(() => {
+      setAuto((current) => {
+        const index = items.findIndex((item) => item.id === current);
+        return items[(index + 1) % items.length]?.id ?? null;
+      });
+    }, intervalMs);
+    return () => window.clearInterval(timer);
+  }, [autoplay, hovered, intervalMs, items]);
+  const shown = hovered ?? auto;
   const x = useMotionValue(0);
   const frame = useRef<number | null>(null);
   const spring = { stiffness: 100, damping: 15 };
@@ -38,7 +54,7 @@ export function AnimatedTooltip({
           onMouseLeave={() => setHovered(null)}
         >
           <AnimatePresence>
-            {hovered === item.id && (
+            {shown === item.id && (
               <motion.div
                 initial={{ opacity: 0, y: 20, scale: 0.6 }}
                 animate={{ opacity: 1, y: 0, scale: 1, transition: { type: "spring", stiffness: 260, damping: 12 } }}

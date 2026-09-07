@@ -27,7 +27,7 @@ export function OrbitingCircles({
     <>
       {path && (
         <svg aria-hidden="true" className="pointer-events-none absolute inset-0 size-full">
-          <circle className="stroke-[#151515]/15 stroke-1" cx="50%" cy="50%" r={radius} fill="none" strokeDasharray="4 8" />
+          <circle className="stroke-current opacity-20 stroke-1" cx="50%" cy="50%" r={radius} fill="none" strokeDasharray="4 8" />
         </svg>
       )}
       {Children.map(children, (child, index) => {

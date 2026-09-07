@@ -59,7 +59,7 @@ function Sheet({ children, className, label }: { children: ReactNode; className?
   return (
     <motion.div initial="hidden" animate="show" variants={stagger} className={cn(sans.className, "relative flex min-h-full w-full flex-col", className)}>
       {label ? (
-        <motion.span variants={fadeUp} className="absolute left-12 top-3 z-30 text-[11px] font-medium tracking-[0.04em] text-[#151515]/55">
+        <motion.span variants={fadeUp} className="absolute left-20 top-3 z-30 text-[11px] font-medium tracking-[0.04em] text-[#151515]/55">
           {label}
         </motion.span>
       ) : null}
@@ -399,13 +399,13 @@ function CoverSlide() {
   const strip = [OFFICE[1], SHOTS["Group-IB"][0], SHOTS["Singapore Pools"][0], SHOTS["OMS ROC"][0], SHOTS["Digital Edge"][0], SHOTS["Sumitomo Chemical Asia"][0], SHOTS["FIJI Water"][0]];
   return (
     <Sheet>
-      <div className={cn("relative flex w-full flex-col justify-center overflow-hidden px-12", SLIDE)}>
+      <div className={cn("relative flex w-full flex-col justify-center overflow-hidden px-20", SLIDE)}>
         <Stars count={10} />
-        <motion.div variants={fadeUp} className="absolute left-12 top-4 flex items-center gap-4">
+        <motion.div variants={fadeUp} className="absolute left-20 top-4 flex items-center gap-4">
           <img src={asset("/logo/dtrax-logo.png")} alt="D'trax logo" className="h-auto w-[5.5rem] object-contain" />
           <Sticker tone="blue" rotate={-5}>Company profile · 2026</Sticker>
         </motion.div>
-        <RotatingBadge text="D'TRAX DESIGN · SINCE 2003 · SINGAPORE · " className="absolute right-12 top-4" />
+        <RotatingBadge text="D'TRAX DESIGN · SINCE 2003 · SINGAPORE · " className="absolute right-20 top-4" />
         <h1 className="text-[9.5vw] font-bold leading-[0.98] tracking-[-0.04em] text-[#151515]">
           <motion.span variants={fadeUp} className="block">Imagine.</motion.span>
           <motion.span variants={fadeUp} className="flex items-center gap-[2vw]">
@@ -452,7 +452,7 @@ function AboutSlide() {
 
   return (
     <Sheet label="About D'trax">
-      <div className={cn("relative w-full px-12 pt-10", SLIDE)}>
+      <div className={cn("relative w-full px-20 pt-10", SLIDE)}>
         <AnimatePresence mode="wait">
           {phase === "typing" && (
             <motion.div key="search" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0, y: -10 }} transition={{ duration: 0.4 }} className="absolute inset-0 flex items-center justify-center">
@@ -472,8 +472,8 @@ function AboutSlide() {
             </motion.div>
           )}
           {phase === "content" && (
-            <motion.div key="content" initial="hidden" animate="show" variants={stagger} className="grid h-[calc(100dvh-10rem)] w-full grid-cols-1 gap-8 md:grid-cols-[1fr_1fr]">
-              <div className="flex flex-col justify-between pb-6">
+            <motion.div key="content" initial="hidden" animate="show" variants={stagger} className="grid h-[calc(100dvh-10rem)] w-full grid-cols-1 items-center gap-8 md:grid-cols-[1fr_1fr]">
+              <div className="flex flex-col justify-center pb-6">
                 <Display size="md">Since 2003, D&apos;trax has built offices that work on <Em>two fronts</Em> at once: for the people inside them, and for the business behind them.</Display>
                 <motion.div variants={fadeUp} className="mt-10 grid grid-cols-3 gap-6">
                   <Stat value={23} label="years in commercial workplaces, exclusively" delay={0.3} />
@@ -504,7 +504,7 @@ function PillarsSlide() {
   ];
   return (
     <Sheet label="About D'trax">
-      <div className={cn("relative grid w-full grid-cols-1 items-center gap-10 overflow-hidden px-12 pt-10 md:grid-cols-[0.85fr_1.15fr]", SLIDE)}>
+      <div className={cn("relative grid w-full grid-cols-1 items-center gap-10 overflow-hidden px-20 pt-10 md:grid-cols-[0.85fr_1.15fr]", SLIDE)}>
         <WarpGrid center="70% 55%" />
         <Stars count={10} />
         <div className="relative">
@@ -531,7 +531,7 @@ function PillarsSlide() {
 
 function MarketNode({ label, fill }: { label: string; fill: Tone }) {
   return (
-    <span className={cn("flex h-full w-full items-center justify-center rounded-full border-[3px] border-white px-1 text-center text-[10px] font-bold uppercase leading-tight tracking-[0.08em] shadow-[0_18px_40px_rgba(21,21,21,0.28),inset_0_-8px_14px_rgba(21,21,21,0.10)]", fillClass[fill])}>
+    <span className={cn("flex h-full w-full items-center justify-center rounded-full border-[3px] border-white/90 px-1 text-center text-[10px] font-bold uppercase leading-tight tracking-[0.08em] shadow-[inset_0_-8px_14px_rgba(21,21,21,0.12)]", fillClass[fill])} style={{ boxShadow: `0 0 34px ${hex[fill]}99, inset 0 -8px 14px rgba(21,21,21,0.12)` }}>
       {label}
     </span>
   );
@@ -540,44 +540,47 @@ function MarketNode({ label, fill }: { label: string; fill: Tone }) {
 function MarketsSlide() {
   const markets = ["Singapore", "China", "Hong Kong", "Malaysia", "Thailand"];
   return (
-    <Sheet label="Where we work">
-      <div className={cn("relative grid w-full grid-cols-1 items-center gap-8 overflow-hidden px-12 pt-8 md:grid-cols-[0.9fr_1.1fr]", SLIDE)}>
-        <WarpGrid center="68% 52%" />
-        <Stars count={22} />
-        <div className="relative">
-          <Display size="md"><NumberTicker value={100} suffix="+" className="tabular-nums" /> offices across <span className="whitespace-nowrap"><Em tone="blue">five markets</Em>.</span></Display>
-          <motion.p variants={fadeUp} className="mt-5 max-w-sm text-[13px] leading-relaxed text-[#151515]/65">Headquartered in Singapore, delivering commercial workplaces across the region since 2003.</motion.p>
-          <motion.div variants={stagger} className="mt-6 flex flex-wrap gap-2">
-            {markets.map((market, index) => (
-              <Sticker key={market} tone={(["ink", "pink", "blue", "lime", "pink"] as Fill[])[index]} rotate={[-4, 3, -2, 4, -3][index]}>{market}{index === 0 ? " · HQ" : ""}</Sticker>
-            ))}
+    <Sheet>
+      <div className="relative -mb-16 -mt-14 h-[100dvh] w-full overflow-hidden bg-[#151515] text-white">
+        <WarpGrid center="68% 52%" dark />
+        <Stars count={40} dark />
+        <div aria-hidden="true" className="absolute right-[6%] top-1/2 h-[40rem] w-[40rem] -translate-y-1/2 rounded-full bg-[#9DD6FF]/15 blur-[120px]" />
+        <motion.span variants={fadeUp} className="absolute left-20 top-16 text-[11px] font-medium tracking-[0.04em] text-white/55">Where we work</motion.span>
+        <div className="relative grid h-full grid-cols-1 items-center gap-8 px-20 md:grid-cols-[0.9fr_1.1fr]">
+          <div className="relative">
+            <Display size="md" className="text-white"><NumberTicker value={100} suffix="+" className="tabular-nums" /> offices across <span className="whitespace-nowrap"><Em tone="blue">five markets</Em>.</span></Display>
+            <motion.p variants={fadeUp} className="mt-5 max-w-sm text-[13px] leading-relaxed text-white/65">Headquartered in Singapore, delivering commercial workplaces across the region since 2003.</motion.p>
+            <motion.div variants={stagger} className="mt-6 flex flex-wrap gap-2">
+              {markets.map((market, index) => (
+                <Sticker key={market} tone={(["white", "pink", "blue", "lime", "pink"] as Fill[])[index]} rotate={[-4, 3, -2, 4, -3][index]}>{market}{index === 0 ? " · HQ" : ""}</Sticker>
+              ))}
+            </motion.div>
+          </div>
+          <motion.div variants={scaleIn} className="relative flex items-center justify-center">
+            <div className="relative flex h-[32rem] w-[32rem] items-center justify-center">
+              <Ripple color="#ffffff" mainCircleSize={160} numCircles={4} mainCircleOpacity={0.25} />
+              <motion.div aria-hidden="true" className="absolute h-36 w-36 rounded-full border-2 border-[#DDFF97]" animate={{ scale: [1, 1.6], opacity: [0.9, 0] }} transition={{ duration: 2.6, repeat: Infinity, ease: "easeOut" }} />
+              <div className="relative z-10 flex h-28 w-28 flex-col items-center justify-center rounded-full bg-[#DDFF97] text-[#151515] shadow-[0_0_60px_rgba(221,255,151,0.6),0_0_0_12px_rgba(221,255,151,0.15)]">
+                <MapPin className="h-4 w-4" />
+                <span className="mt-1 text-[13px] font-semibold leading-none">Singapore</span>
+                <span className="mt-1 text-[9px] uppercase tracking-[0.18em] text-[#151515]/60">HQ</span>
+              </div>
+              <OrbitingCircles radius={116} iconSize={68} duration={24} className="[&_svg]:stroke-white/25">
+                <MarketNode label="China" fill="pink" />
+                <MarketNode label="Hong Kong" fill="blue" />
+              </OrbitingCircles>
+              <OrbitingCircles radius={184} iconSize={68} duration={38} reverse>
+                <MarketNode label="Malaysia" fill="lime" />
+                <MarketNode label="Thailand" fill="pink" />
+              </OrbitingCircles>
+              <OrbitingCircles radius={236} iconSize={10} duration={52} path={false}>
+                <span className="h-2.5 w-2.5 rounded-full bg-white shadow-[0_0_12px_rgba(255,255,255,0.9)]" />
+                <span className="h-2 w-2 rounded-full bg-[#9DD6FF] shadow-[0_0_12px_rgba(157,214,255,0.9)]" />
+                <span className="h-2 w-2 rounded-full bg-[#FFB6B6] shadow-[0_0_12px_rgba(255,182,182,0.9)]" />
+              </OrbitingCircles>
+            </div>
           </motion.div>
         </div>
-        <motion.div variants={scaleIn} className="relative flex items-center justify-center">
-          <div className="relative flex h-[30rem] w-[30rem] items-center justify-center">
-            <div aria-hidden="true" className="absolute inset-0 rounded-full bg-[#9DD6FF]/20 blur-3xl" />
-            <Ripple color={INK} mainCircleSize={150} numCircles={4} mainCircleOpacity={0.2} />
-            <motion.div aria-hidden="true" className="absolute h-36 w-36 rounded-full border-2 border-[#DDFF97]" animate={{ scale: [1, 1.5], opacity: [0.9, 0] }} transition={{ duration: 2.6, repeat: Infinity, ease: "easeOut" }} />
-            <div className="relative z-10 flex h-28 w-28 flex-col items-center justify-center rounded-full bg-[#151515] text-white shadow-[0_24px_60px_rgba(21,21,21,0.35),0_0_0_10px_rgba(255,255,255,0.7)]">
-              <MapPin className="h-4 w-4 text-[#DDFF97]" />
-              <span className="mt-1 text-[13px] font-semibold leading-none">Singapore</span>
-              <span className="mt-1 text-[9px] uppercase tracking-[0.18em] text-white/60">HQ</span>
-            </div>
-            <OrbitingCircles radius={112} iconSize={68} duration={24}>
-              <MarketNode label="China" fill="pink" />
-              <MarketNode label="Hong Kong" fill="blue" />
-            </OrbitingCircles>
-            <OrbitingCircles radius={178} iconSize={68} duration={38} reverse>
-              <MarketNode label="Malaysia" fill="lime" />
-              <MarketNode label="Thailand" fill="pink" />
-            </OrbitingCircles>
-            <OrbitingCircles radius={224} iconSize={10} duration={52} path={false}>
-              <span className="h-2.5 w-2.5 rounded-full bg-[#151515]" />
-              <span className="h-2 w-2 rounded-full bg-[#9DD6FF] ring-2 ring-white" />
-              <span className="h-2 w-2 rounded-full bg-[#FFB6B6] ring-2 ring-white" />
-            </OrbitingCircles>
-          </div>
-        </motion.div>
       </div>
     </Sheet>
   );
@@ -605,7 +608,7 @@ function ServicesSlide() {
   ];
   return (
     <Sheet label="Services & capabilities">
-      <div className={cn("relative flex w-full flex-col justify-center overflow-hidden px-12 pt-10", SLIDE)}>
+      <div className={cn("relative flex w-full flex-col justify-center overflow-hidden px-20 pt-10", SLIDE)}>
         <WarpGrid center="50% 70%" />
         <div className="relative grid grid-cols-1 items-end gap-8 pb-8 md:grid-cols-[1fr_auto]">
           <Display size="md">Full turnkey delivery from a <Em>single</Em> in-house team.</Display>
@@ -693,10 +696,10 @@ function ApproachSlide() {
   const tones: Tone[] = ["pink", "blue", "lime", "pink", "blue", "lime"];
   return (
     <Sheet label="Our delivery approach">
-      <div className={cn("relative grid w-full grid-cols-1 gap-10 overflow-hidden px-12 pt-10 md:grid-cols-[0.85fr_1.15fr]", SLIDE)} onMouseEnter={() => setPaused(true)} onMouseLeave={() => setPaused(false)}>
+      <div className={cn("relative grid w-full grid-cols-1 items-center gap-10 overflow-hidden px-20 pt-6 md:grid-cols-[0.85fr_1.15fr]", SLIDE)} onMouseEnter={() => setPaused(true)} onMouseLeave={() => setPaused(false)}>
         <WarpGrid center="72% 55%" />
         <Stars count={10} />
-        <div className="relative flex flex-col pb-6">
+        <div className="relative flex flex-col justify-center pb-6">
           <Display size="md">Six stages. One <Em tone="pink">accountable</Em> team.</Display>
           <motion.p variants={fadeUp} className="mt-4 max-w-md text-[13px] leading-relaxed text-[#151515]/65">Buddy-system continuity keeps your project moving, with one point of contact from brief to handover.</motion.p>
           <motion.ol variants={stagger} className="mt-6 flex flex-col gap-1.5">
@@ -746,7 +749,7 @@ function RealityCaptureSlide() {
   ];
   return (
     <Sheet label="Real-time site transparency">
-      <div className={cn("grid w-full grid-cols-1 gap-8 px-12 pt-10 md:grid-cols-[1.15fr_0.85fr]", SLIDE)}>
+      <div className={cn("grid w-full grid-cols-1 gap-8 px-20 pt-10 md:grid-cols-[1.15fr_0.85fr]", SLIDE)}>
         <motion.div variants={scaleIn} className="mb-6 h-[calc(100dvh-12rem)]">
           <Compare
             className="h-full rounded-2xl"
@@ -778,7 +781,7 @@ function RealityCaptureSlide() {
 function TeamSlide() {
   return (
     <Sheet label="Our team">
-      <div className={cn("relative grid w-full grid-cols-1 items-center gap-10 overflow-hidden px-12 pt-10 md:grid-cols-[0.8fr_1.2fr]", SLIDE)}>
+      <div className={cn("relative grid w-full grid-cols-1 items-center gap-10 overflow-hidden px-20 pt-10 md:grid-cols-[0.8fr_1.2fr]", SLIDE)}>
         <WarpGrid center="70% 50%" />
         <Stars count={8} />
         <div className="relative">
@@ -871,7 +874,7 @@ function OrgChartSlide() {
   const chip: Record<Tone, string> = { pink: "bg-[#FFB6B6]", blue: "bg-[#9DD6FF]", lime: "bg-[#DDFF97]" };
   return (
     <Sheet label="Organisation chart">
-      <div className={cn("relative flex w-full flex-col px-12 pb-8 pt-8", SLIDE)}>
+      <div className={cn("relative flex w-full flex-col px-20 pb-8 pt-8", SLIDE)}>
         <WarpGrid center="50% 50%" />
         <div className="relative flex items-center gap-6">
           <Display size="sm">One team, <Em>five</Em> disciplines.</Display>
@@ -935,7 +938,7 @@ function FoundersSlide() {
   const tones: Tone[] = ["lime", "pink"];
   return (
     <Sheet label="The founders">
-      <div className={cn("relative flex w-full flex-col overflow-hidden px-12 pt-10", SLIDE)}>
+      <div className={cn("relative flex w-full flex-col overflow-hidden px-20 pt-10", SLIDE)}>
         <WarpGrid center="50% 60%" />
         <Stars count={8} />
         <div className="relative flex items-center gap-6">
@@ -979,7 +982,7 @@ function FoundersSlide() {
 function LeadersSlide() {
   return (
     <Sheet label="Key leaders">
-      <div className={cn("flex w-full flex-col justify-center px-12 pt-10", SLIDE)}>
+      <div className={cn("flex w-full flex-col justify-center px-20 pt-10", SLIDE)}>
         <div className="mb-6 flex items-end justify-between gap-8">
           <Display size="sm">Key leaders.</Display>
           <motion.p variants={fadeUp} className="max-w-sm text-right text-[13px] leading-relaxed text-[#151515]/65">Design, delivery and costing, led in-house.</motion.p>
@@ -1043,7 +1046,7 @@ function RecentProjectsSlide() {
   const pct = (value: number, total: number) => `${(value / total) * 100}%`;
   return (
     <Sheet label="Recent projects">
-      <div className={cn("relative flex w-full flex-col overflow-hidden px-12 pt-8", SLIDE)}>
+      <div className={cn("relative flex w-full flex-col overflow-hidden px-20 pt-8", SLIDE)}>
         <WarpGrid center="55% 50%" />
         <Stars count={10} />
         <div className="relative flex items-center gap-6">
@@ -1117,7 +1120,7 @@ function ProjectSlide({ project, index, variant = "split", reverse = false }: { 
       <Sheet>
         <div className="relative -mb-16 -mt-14 h-[100dvh] w-full">
           <Hero className="h-full w-full rounded-none" />
-          <motion.span variants={fadeUp} className="absolute left-12 top-6 rounded-full bg-white/92 px-3 py-1 text-[11px] font-medium text-[#151515]">{label}</motion.span>
+          <motion.span variants={fadeUp} className="absolute left-20 top-6 rounded-full bg-white/92 px-3 py-1 text-[11px] font-medium text-[#151515]">{label}</motion.span>
           <motion.div variants={fadeUp} className="absolute bottom-0 left-0 max-w-2xl rounded-tr-[1.5rem] bg-white p-8 pb-20 pl-12">
             <p className="text-[12px] text-[#151515]/55">{project.sector} · {project.location}</p>
             <Display size="md" className="mt-1">{project.name}</Display>
@@ -1138,9 +1141,9 @@ function ProjectSlide({ project, index, variant = "split", reverse = false }: { 
         <div className="relative -mb-16 -mt-14 flex h-[100dvh] w-full flex-col">
           <motion.div variants={scaleIn} className="relative min-h-0 flex-1">
             <Hero className="h-full w-full rounded-none" />
-            <motion.span variants={fadeUp} className="absolute left-12 top-6 rounded-full bg-white/92 px-3 py-1 text-[11px] font-medium text-[#151515]">{label}</motion.span>
+            <motion.span variants={fadeUp} className="absolute left-20 top-6 rounded-full bg-white/92 px-3 py-1 text-[11px] font-medium text-[#151515]">{label}</motion.span>
           </motion.div>
-          <Panel fill="ink" className="shrink-0 px-12 pb-20 pt-8" grain={false}>
+          <Panel fill="ink" className="shrink-0 px-20 pb-20 pt-8" grain={false}>
             <div className="grid grid-cols-1 gap-8 md:grid-cols-[0.9fr_1.1fr]">
               <div>
                 <p className="text-[12px] text-white/55">{project.sector} · {project.location}</p>
@@ -1162,7 +1165,7 @@ function ProjectSlide({ project, index, variant = "split", reverse = false }: { 
 
   return (
     <Sheet label={label}>
-      <div className={cn("grid w-full grid-cols-1 gap-8 px-12 pt-10 md:grid-cols-[1.15fr_0.85fr]", SLIDE, reverse && "md:[&>*:first-child]:order-2")}>
+      <div className={cn("grid w-full grid-cols-1 gap-8 px-20 pt-10 md:grid-cols-[1.15fr_0.85fr]", SLIDE, reverse && "md:[&>*:first-child]:order-2")}>
         <motion.div variants={scaleIn} className="mb-6 h-[calc(100dvh-12rem)]">
           <Hero className="h-full w-full" caption={project.name} />
         </motion.div>
@@ -1192,7 +1195,7 @@ function ProjectSlide({ project, index, variant = "split", reverse = false }: { 
 function TestimonialsSlide() {
   return (
     <Sheet label="Testimonials">
-      <div className={cn("flex w-full flex-col justify-center px-12 pt-10", SLIDE)}>
+      <div className={cn("flex w-full flex-col justify-center px-20 pt-10", SLIDE)}>
         <Display size="sm" className="mb-8">In their words.</Display>
         <motion.div variants={scaleIn}><AnimatedTestimonials testimonials={testimonials} /></motion.div>
       </div>
@@ -1213,7 +1216,7 @@ function CertificationsSlide() {
   ];
   return (
     <Sheet label="Certifications & awards">
-      <div className={cn("relative flex w-full flex-col justify-center overflow-hidden px-12 pt-10", SLIDE)}>
+      <div className={cn("relative flex w-full flex-col justify-center overflow-hidden px-20 pt-10", SLIDE)}>
         <Stars count={8} />
         <div className="relative flex items-end justify-between gap-8">
           <Display size="md" className="max-w-4xl">Certified for safety and quality. <Em>Recognised</Em> for design.</Display>
@@ -1247,7 +1250,7 @@ function ClosingSlide() {
           <Marquee className="bg-[#DDFF97] py-4 text-[5.5rem] font-bold leading-none tracking-[-0.04em] text-[#151515] [--duration:40s] [--gap:0]">{line("Let's build your workplace.")}</Marquee>
           <Marquee reverse className={cn(serif.className, "-mt-1 bg-[#FFB6B6] py-4 text-[5.5rem] italic leading-none text-[#151515] [--duration:46s] [--gap:0]")}>{line("Talk to us about your project.")}</Marquee>
         </motion.div>
-        <div className="relative mt-14 grid grid-cols-1 items-center gap-8 px-12 md:grid-cols-[1fr_auto_1fr]">
+        <div className="relative mt-14 grid grid-cols-1 items-center gap-8 px-20 md:grid-cols-[1fr_auto_1fr]">
           <motion.div variants={fadeUp} className="text-[13px] leading-relaxed text-[#151515]/70">
             <p className="font-semibold text-[#151515]">D&apos;trax Design Pte Ltd</p>
             <p>10 Anson Road, #30-13 International Plaza, Singapore 079903</p>
@@ -1302,5 +1305,5 @@ const slides: PresentationSlide[] = [
 ];
 
 export default function DtraxCompanyProfilePresentation() {
-  return <SlideShell slides={slides} title="D'trax · Company Profile" logoRange={[1, slides.length - 2]} />;
+  return <SlideShell slides={slides} title="D'trax · Company Profile" logoRange={[1, slides.length - 2]} logoHidden={[3]} />;
 }

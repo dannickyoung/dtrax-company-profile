@@ -16,6 +16,8 @@ interface SlideShellProps {
   title?: string;
   /** Zero-based inclusive range of slide indexes that show the corner logo. */
   logoRange?: [number, number];
+  /** Zero-based slide indexes that never show the corner logo (dark full-bleed slides). */
+  logoHidden?: number[];
 }
 
 const slideVariants = {
@@ -36,7 +38,7 @@ const slideVariants = {
   }),
 };
 
-export function SlideShell({ slides, title, logoRange = [1, 10] }: SlideShellProps) {
+export function SlideShell({ slides, title, logoRange = [1, 10], logoHidden = [] }: SlideShellProps) {
   const normalizedSlides = slides.map((slide, index) =>
     isPresentationSlide(slide)
       ? slide
@@ -196,7 +198,7 @@ export function SlideShell({ slides, title, logoRange = [1, 10] }: SlideShellPro
         </div>
       </motion.div>
 
-      {current >= logoRange[0] && current <= logoRange[1] ? (
+      {current >= logoRange[0] && current <= logoRange[1] && !logoHidden.includes(current) ? (
         <div className="pointer-events-none absolute bottom-12 left-12 z-20">
           <img
             src={asset("/logo/dtrax-logo.png")}
