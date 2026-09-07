@@ -192,7 +192,7 @@ function Belt({ children, reverse = false, speed = 40, className }: { children: 
         transition={{ duration: Math.max(20, distance / speed), repeat: Infinity, ease: "linear" }}
       >
         <div ref={ref} className="flex shrink-0 gap-3">{children}</div>
-        <div className="flex shrink-0 gap-3" aria-hidden="true">{children}</div>
+        {Array.from({ length: 4 }).map((_, copy) => <div key={copy} className="flex shrink-0 gap-3" aria-hidden="true">{children}</div>)}
       </motion.div>
     </div>
   );
@@ -1034,7 +1034,7 @@ function FocusStrips({ people, active, onActive, expanded = 2.6 }: { people: Spo
             animate={{ flexGrow: isActive ? expanded : 1 }}
             transition={{ type: "spring", stiffness: 140, damping: 26 }}
             onMouseEnter={() => onActive(index)}
-            className="relative min-w-0 basis-0 cursor-pointer overflow-hidden rounded-[1.75rem] bg-[#1f1f1f]"
+            className="relative min-w-0 basis-0 cursor-pointer overflow-hidden rounded-[1.75rem] bg-[#1f1f1f] shadow-[0_24px_60px_rgba(21,21,21,0.18)]"
           >
             {person.photo ? (
               <motion.img src={person.photo} alt={person.name} animate={{ scale: isActive ? 1 : 1.08, filter: isActive ? "grayscale(0%) brightness(1)" : "grayscale(100%) brightness(0.55)" }} transition={{ duration: 0.7, ease }} className="absolute inset-0 h-full w-full object-cover" style={{ objectPosition: person.photoPosition ?? "50% 15%" }} draggable={false} />
@@ -1082,14 +1082,14 @@ function FoundersSlide() {
     { name: "Jayne Ong", role: "Head of Costing & Operation · Co-founder", photo: TEAM.jayne, photoPosition: "50% 12%", tone: "pink", caption: "Budgets owned in-house from the first estimate to final account, and the operations that keep every project moving.", facts: ["Founded D'trax in 2003", "Costing and operations", "Profile to confirm"] },
   ];
   return (
-    <Sheet>
-      <div className="relative -mb-16 -mt-14 flex h-[100dvh] w-full flex-col bg-[#151515] px-20 pb-10 pt-16 text-white" onMouseEnter={() => setPaused(true)} onMouseLeave={() => setPaused(false)}>
-        <Stars count={16} dark />
+    <Sheet label="The founders">
+      <div className={cn("relative flex w-full flex-col px-20 pb-8 pt-10", SLIDE)} onMouseEnter={() => setPaused(true)} onMouseLeave={() => setPaused(false)}>
+        <WarpGrid center="50% 60%" />
         <div className="relative flex items-end justify-between gap-8">
-          <Display size="sm" className="text-white">The <Em tone="pink">founders</Em>.</Display>
-          <p className="max-w-xs text-right text-[12px] leading-relaxed text-white/60">Ronald Goh and Jayne Ong have run D&apos;trax from the front since 2003.</p>
+          <Display size="sm">The <Em tone="pink">founders</Em>.</Display>
+          <p className="max-w-xs text-right text-[12px] leading-relaxed text-[#151515]/60">Ronald Goh and Jayne Ong have run D&apos;trax from the front since 2003.</p>
         </div>
-        <div className="relative mt-5 min-h-0 flex-1"><FocusStrips people={people} active={active} onActive={setActive} expanded={2.2} /></div>
+        <div className="relative mt-5 h-[clamp(20rem,62vh,32rem)]"><FocusStrips people={people} active={active} onActive={setActive} expanded={2.2} /></div>
       </div>
     </Sheet>
   );
@@ -1110,14 +1110,14 @@ function LeadersSlide() {
     { name: "Danny Chua", role: "Senior Quantity Surveyor", photo: HEADSHOT["Danny Chua"], tone: "lime", caption: "Quantity surveying and cost management through delivery.", facts: ["Profile to confirm"] },
   ];
   return (
-    <Sheet>
-      <div className="relative -mb-16 -mt-14 flex h-[100dvh] w-full flex-col bg-[#151515] px-20 pb-10 pt-16 text-white" onMouseEnter={() => setPaused(true)} onMouseLeave={() => setPaused(false)}>
-        <Stars count={16} dark />
+    <Sheet label="Key leaders">
+      <div className={cn("relative flex w-full flex-col px-20 pb-8 pt-10", SLIDE)} onMouseEnter={() => setPaused(true)} onMouseLeave={() => setPaused(false)}>
+        <WarpGrid center="50% 60%" />
         <div className="relative flex items-end justify-between gap-8">
-          <Display size="sm" className="text-white">Key <Em>leaders</Em>.</Display>
-          <p className="max-w-xs text-right text-[12px] leading-relaxed text-white/60">Design, delivery and costing, led in-house.</p>
+          <Display size="sm">Key <Em>leaders</Em>.</Display>
+          <p className="max-w-xs text-right text-[12px] leading-relaxed text-[#151515]/60">Design, delivery and costing, led in-house.</p>
         </div>
-        <div className="relative mt-5 min-h-0 flex-1"><FocusStrips people={people} active={active} onActive={setActive} expanded={2.8} /></div>
+        <div className="relative mt-5 h-[clamp(20rem,62vh,32rem)]"><FocusStrips people={people} active={active} onActive={setActive} expanded={2.8} /></div>
       </div>
     </Sheet>
   );
@@ -1437,5 +1437,5 @@ const slides: PresentationSlide[] = [
 ];
 
 export default function DtraxCompanyProfilePresentation() {
-  return <SlideShell slides={slides} title="D'trax · Company Profile" logoRange={[1, slides.length - 2]} logoHidden={[3, 9, 10, 11]} />;
+  return <SlideShell slides={slides} title="D'trax · Company Profile" logoRange={[1, slides.length - 2]} logoHidden={[3, 11]} />;
 }
