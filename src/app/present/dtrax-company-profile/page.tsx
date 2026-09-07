@@ -431,26 +431,45 @@ function CoverSlide() {
    ──────────────────────────────────────────────────────────────── */
 
 function AboutSlide() {
-  const [phase, setPhase] = useState<"typing" | "fading" | "content">("typing");
+  const [phase, setPhase] = useState<"typing" | "loading" | "content">("typing");
+  const [progress, setProgress] = useState(0);
   useEffect(() => {
-    if (phase !== "fading") return;
-    const timer = window.setTimeout(() => setPhase("content"), 260);
-    return () => window.clearTimeout(timer);
+    if (phase !== "loading") return;
+    const start = performance.now();
+    const duration = 1600;
+    let frame = 0;
+    const tick = (now: number) => {
+      const t = Math.min(1, (now - start) / duration);
+      const eased = 1 - Math.pow(1 - t, 3);
+      setProgress(Math.round(eased * 100));
+      if (t < 1) frame = requestAnimationFrame(tick);
+      else window.setTimeout(() => setPhase("content"), 420);
+    };
+    frame = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(frame);
   }, [phase]);
 
   return (
     <Sheet label="About D'trax">
       <div className={cn("relative w-full px-12 pt-10", SLIDE)}>
         <AnimatePresence mode="wait">
-          {phase !== "content" && (
-            <motion.div key="search" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.4 }} className="absolute inset-0 flex items-center justify-center">
+          {phase === "typing" && (
+            <motion.div key="search" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0, y: -10 }} transition={{ duration: 0.4 }} className="absolute inset-0 flex items-center justify-center">
               <div className="w-full max-w-[32rem]">
-                <AnimatedGlowingSearchBar text="Who is D'trax?" onSequenceComplete={() => setPhase("fading")} />
+                <AnimatedGlowingSearchBar text="Who is D'trax?" onSequenceComplete={() => setPhase("loading")} />
               </div>
             </motion.div>
           )}
-        </AnimatePresence>
-        <AnimatePresence>
+          {phase === "loading" && (
+            <motion.div key="loading" initial={{ opacity: 0, scale: 0.96 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 1.04 }} transition={{ duration: 0.35 }} className="absolute inset-0 flex flex-col items-center justify-center">
+              <p className="text-[11px] font-medium uppercase tracking-[0.2em] text-[#151515]/50">Searching</p>
+              <p className="mt-2 text-[9rem] font-bold leading-none tracking-[-0.06em] text-[#151515] tabular-nums">{progress}<span className="text-[4rem] text-[#151515]/40">%</span></p>
+              <div className="mt-6 h-1.5 w-[22rem] overflow-hidden rounded-full bg-[#151515]/10">
+                <div className="h-full rounded-full bg-[#DDFF97]" style={{ width: `${progress}%`, boxShadow: "0 0 18px rgba(221,255,151,0.9)" }} />
+              </div>
+              <p className="mt-4 text-[12px] text-[#151515]/55">{progress < 40 ? "Finding 100+ offices" : progress < 80 ? "Checking 23 years of work" : "Loading D'trax"}</p>
+            </motion.div>
+          )}
           {phase === "content" && (
             <motion.div key="content" initial="hidden" animate="show" variants={stagger} className="grid h-[calc(100dvh-10rem)] w-full grid-cols-1 gap-8 md:grid-cols-[1fr_1fr]">
               <div className="flex flex-col justify-between pb-6">
