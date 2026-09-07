@@ -898,6 +898,33 @@ function flowLayout() {
   return { nodes, edges };
 }
 
+/** Hover preview card for a person node. Opens away from the canvas edge and never runs past the top or bottom. */
+function HoverPreview({ photo, name, role, side, align, position = "50% 12%" }: { photo: string; name: string; role: string; side: "left" | "right"; align: "top" | "center" | "bottom"; position?: string }) {
+  return (
+    <motion.div
+      initial={{ opacity: 0, x: side === "left" ? 12 : -12, scale: 0.9 }}
+      animate={{ opacity: 1, x: 0, scale: 1 }}
+      exit={{ opacity: 0, x: side === "left" ? 8 : -8, scale: 0.94 }}
+      transition={{ type: "spring", stiffness: 260, damping: 22 }}
+      className={cn(
+        "pointer-events-none absolute z-50 w-[11rem] overflow-hidden rounded-2xl bg-white p-1.5 shadow-[0_24px_60px_rgba(21,21,21,0.28)]",
+        side === "left" ? "right-full mr-4" : "left-full ml-4",
+        align === "top" ? "top-0" : align === "bottom" ? "bottom-0" : "top-1/2 -translate-y-1/2"
+      )}
+    >
+      <img src={photo} alt={name} className="h-[13rem] w-full rounded-xl object-cover" style={{ objectPosition: position }} draggable={false} />
+      <div className="px-2 pb-1.5 pt-2"><p className="text-[12px] font-semibold text-[#151515]">{name}</p><p className="text-[10px] text-[#151515]/55">{role}</p></div>
+    </motion.div>
+  );
+}
+
+function previewAlign(node: FlowNode): "top" | "center" | "bottom" {
+  const centre = node.y + node.h / 2;
+  if (centre < FLOW_H * 0.3) return "top";
+  if (centre > FLOW_H * 0.7) return "bottom";
+  return "center";
+}
+
 function MemberNode({ node, chip }: { node: FlowNode; chip: string }) {
   const [hovered, setHovered] = useState(false);
   const photo = HEADSHOT[node.title];
@@ -913,20 +940,21 @@ function MemberNode({ node, chip }: { node: FlowNode; chip: string }) {
         <p className="ml-auto truncate text-[10px] text-[#151515]/55">{node.sub}</p>
         <span className="absolute -left-1.5 top-1/2 h-2.5 w-2.5 -translate-y-1/2 rounded-full border-2 border-white bg-[#151515]" />
       </div>
-      <AnimatePresence>
-        {hovered && photo ? (
-          <motion.div
-            initial={{ opacity: 0, x: 12, scale: 0.9 }}
-            animate={{ opacity: 1, x: 0, scale: 1 }}
-            exit={{ opacity: 0, x: 8, scale: 0.94 }}
-            transition={{ type: "spring", stiffness: 260, damping: 22 }}
-            className="pointer-events-none absolute right-full top-1/2 z-50 mr-4 w-[11rem] -translate-y-1/2 overflow-hidden rounded-2xl bg-white p-1.5 shadow-[0_24px_60px_rgba(21,21,21,0.28)]"
-          >
-            <img src={photo} alt={node.title} className="h-[13rem] w-full rounded-xl object-cover" style={{ objectPosition: "50% 12%" }} draggable={false} />
-            <div className="px-2 pb-1.5 pt-2"><p className="text-[12px] font-semibold text-[#151515]">{node.title}</p><p className="text-[10px] text-[#151515]/55">{node.sub}</p></div>
-          </motion.div>
-        ) : null}
-      </AnimatePresence>
+      <AnimatePresence>{hovered && photo ? <HoverPreview photo={photo} name={node.title} role={node.sub ?? ""} side="left" align={previewAlign(node)} /> : null}</AnimatePresence>
+    </div>
+  );
+}
+
+function PersonNode({ node }: { node: FlowNode }) {
+  const [hovered, setHovered] = useState(false);
+  return (
+    <div className="relative h-full" onMouseEnter={() => setHovered(true)} onMouseLeave={() => setHovered(false)}>
+      <div className={cn("flex h-full items-center gap-3 rounded-2xl border border-[#151515]/10 bg-white px-2.5 shadow-[0_14px_36px_rgba(21,21,21,0.12)] transition-shadow duration-300", hovered && "shadow-[0_22px_50px_rgba(21,21,21,0.2)]")}>
+        <img src={node.photo} alt={node.title} className="h-[4.5rem] w-[4.5rem] shrink-0 rounded-xl object-cover" style={{ objectPosition: node.photoPosition }} draggable={false} />
+        <div className="min-w-0"><p className="truncate text-[13px] font-semibold leading-tight text-[#151515]">{node.title}</p><p className="truncate text-[10px] text-[#151515]/55">{node.sub}</p></div>
+        <span className="absolute -right-1.5 top-1/2 h-3 w-3 -translate-y-1/2 rounded-full border-2 border-white bg-[#151515]" />
+      </div>
+      <AnimatePresence>{hovered && node.photo ? <HoverPreview photo={node.photo} name={node.title} role={node.sub ?? ""} side="right" align={previewAlign(node)} position={node.photoPosition} /> : null}</AnimatePresence>
     </div>
   );
 }
@@ -966,11 +994,7 @@ function OrgChartSlide() {
               style={{ left: pct(node.x, FLOW_W), top: pct(node.y, FLOW_H), width: pct(node.w, FLOW_W), height: pct(node.h, FLOW_H) }}
             >
               {node.kind === "person" ? (
-                <div className="flex h-full items-center gap-3 rounded-2xl border border-[#151515]/10 bg-white px-2.5 shadow-[0_14px_36px_rgba(21,21,21,0.12)]">
-                  <img src={node.photo} alt={node.title} className="h-[4.5rem] w-[4.5rem] shrink-0 rounded-xl object-cover" style={{ objectPosition: node.photoPosition }} />
-                  <div className="min-w-0"><p className="truncate text-[13px] font-semibold leading-tight text-[#151515]">{node.title}</p><p className="truncate text-[10px] text-[#151515]/55">{node.sub}</p></div>
-                  <span className="absolute -right-1.5 top-1/2 h-3 w-3 -translate-y-1/2 rounded-full border-2 border-white bg-[#151515]" />
-                </div>
+                <PersonNode node={node} />
               ) : node.kind === "router" ? (
                 <div className="flex h-full items-center gap-3 rounded-2xl bg-[#151515] px-3 text-white shadow-[0_18px_44px_rgba(21,21,21,0.3)]">
                   <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[#DDFF97] text-[#151515]">{node.icon}</span>
