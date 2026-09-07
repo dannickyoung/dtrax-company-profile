@@ -11,6 +11,7 @@ export interface AnimatedTestimonial {
   designation: string;
   initials: string;
   logo?: string;
+  logoClassName?: string;
 }
 
 const tones = [
@@ -78,7 +79,7 @@ export function AnimatedTestimonials({
                     style={{ backgroundImage: "repeating-linear-gradient(135deg, rgba(21,21,21,0.06) 0 2px, transparent 2px 14px)" }}
                   />
                   {testimonial.logo ? (
-                    <img src={testimonial.logo} alt={testimonial.name} className="relative max-h-32 w-[64%] object-contain drop-shadow-[0_10px_20px_rgba(21,21,21,0.18)]" />
+                    <img src={testimonial.logo} alt={testimonial.name} className={cn("relative object-contain drop-shadow-[0_10px_20px_rgba(21,21,21,0.18)]", testimonial.logoClassName ?? "max-h-32 w-[64%]")} />
                   ) : (
                     <span className="relative text-7xl font-black tracking-[-0.06em] text-[#151515]/80">{testimonial.initials}</span>
                   )}

@@ -57,7 +57,7 @@ export function ExpandingProfileCards({ people, intervalMs = 4200, className, na
             }}
             onClick={() => setActive(index)}
             className={cn(
-              "relative flex min-w-0 basis-0 cursor-pointer overflow-hidden rounded-[1.5rem] bg-[#151515] transition-shadow duration-500",
+              "relative flex min-w-0 basis-0 cursor-pointer overflow-hidden rounded-[1.5rem] bg-white transition-shadow duration-500",
               isActive ? "shadow-[0_28px_70px_rgba(21,21,21,0.30)]" : "shadow-[0_10px_30px_rgba(21,21,21,0.12)]"
             )}
           >
@@ -84,20 +84,20 @@ export function ExpandingProfileCards({ people, intervalMs = 4200, className, na
                   animate={{ opacity: 1, x: 0 }}
                   exit={{ opacity: 0, x: 8 }}
                   transition={{ duration: 0.36, ease: [0.22, 1, 0.36, 1], delay: 0.12 }}
-                  className="flex min-w-0 flex-1 flex-col justify-center gap-4 overflow-hidden p-6 text-white"
+                  className="flex min-w-0 flex-1 flex-col justify-center gap-4 overflow-hidden p-6 text-[#151515]"
                 >
                   <Row label="Experience">{person.experience}</Row>
                   {person.qualifications ? <Row label="Qualifications">{person.qualifications}</Row> : null}
                   <Row label="Specialism">{person.specialism}</Row>
                   <div>
-                    <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[#DDFF97]">{person.projectsLabel ?? "Featured projects"}</p>
+                    <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[#151515]/50">{person.projectsLabel ?? "Featured projects"}</p>
                     <div className="mt-2 flex flex-wrap gap-1.5">
                       {person.projects.map((project, projectIndex) => {
                         const logo = person.projectLogos?.[projectIndex];
                         return logo ? (
-                          <span key={project} className="flex h-9 items-center rounded-lg bg-white px-2.5" title={project}><img src={logo} alt={project} className="h-5 max-w-[5.5rem] object-contain" /></span>
+                          <span key={project} className="flex h-12 items-center rounded-lg border border-[#151515]/10 bg-[#f4f4f2] px-3" title={project}><img src={logo} alt={project} className="h-8 max-w-[7rem] object-contain" /></span>
                         ) : (
-                          <span key={project} className="rounded-full border border-white/25 px-2.5 py-1 text-[11px] font-medium text-white/90">{project}</span>
+                          <span key={project} className="rounded-full border border-[#151515]/20 px-2.5 py-1 text-[11px] font-medium text-[#151515]/80">{project}</span>
                         );
                       })}
                     </div>
@@ -115,8 +115,8 @@ export function ExpandingProfileCards({ people, intervalMs = 4200, className, na
 function Row({ label, children }: { label: string; children: ReactNode }) {
   return (
     <div>
-      <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[#9DD6FF]">{label}</p>
-      <div className="mt-1 text-[13px] leading-relaxed text-white/85">{children}</div>
+      <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[#151515]/50">{label}</p>
+      <div className="mt-1 text-[13px] leading-relaxed text-[#151515]/80">{children}</div>
     </div>
   );
 }

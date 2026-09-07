@@ -3,7 +3,7 @@
 import { useEffect, useState, type ReactNode } from "react";
 import { DM_Sans, Instrument_Serif } from "next/font/google";
 import { AnimatePresence, motion } from "framer-motion";
-import { ArrowUpRight, Award, Calculator, HardHat, MapPin, PenTool, Phone, ShieldCheck, Sparkles, Users } from "lucide-react";
+import { ArrowUpRight, Award, Briefcase, Calculator, ClipboardList, GitFork, HardHat, MapPin, PenTool, Phone, ShieldCheck, Sparkles, Users } from "lucide-react";
 import { SlideShell } from "@/components/slides/SlideShell";
 import AnimatedGlowingSearchBar from "@/components/ui/animated-glowing-search-bar";
 import { AnimatedTestimonials, type AnimatedTestimonial } from "@/components/ui/animated-testimonials";
@@ -19,7 +19,6 @@ import { ExpandingProfileCards, type ProfileCardItem } from "@/components/ui/exp
 import { InfiniteMovingCards } from "@/components/ui/infinite-moving-cards";
 import { Marquee } from "@/components/ui/marquee";
 import { NumberTicker } from "@/components/ui/number-ticker";
-import { WobbleCard } from "@/components/ui/wobble-card";
 import { asset } from "@/lib/base-path";
 import { cn } from "@/lib/utils";
 import type { PresentationSlide } from "@/types";
@@ -191,7 +190,7 @@ function Slideshow({ images, alt, className, caption, intervalMs = 3400 }: { ima
       </AnimatePresence>
       {caption ? <span className="absolute bottom-4 left-4 rounded-full bg-white/92 px-3 py-1 text-[11px] font-medium text-[#151515]">{caption}</span> : null}
       {images.length > 1 ? (
-        <span className="absolute bottom-5 right-4 flex gap-1.5">
+        <span className="absolute bottom-5 left-1/2 flex -translate-x-1/2 gap-1.5">
           {images.map((image, i) => <span key={image} className={cn("h-1.5 rounded-full bg-white transition-all duration-300", i === index ? "w-6" : "w-1.5 opacity-60")} />)}
         </span>
       ) : null}
@@ -346,8 +345,8 @@ const orgTeams: { name: string; fill: Fill; members: { name: string; role: strin
 
 const testimonials: AnimatedTestimonial[] = [
   { quote: "The team was able to meet and deliver our needs in a timely manner despite the challenging Covid-19 situation as well as time constraints, and we are extremely satisfied with their efforts.", name: "Sergey Nikitin", designation: "CEO, Group-IB", initials: "SN", logo: LOGO["Group-IB"] },
-  { quote: "We would like to thank you for your assistance in completing our office renovation on time and within budget. Your team was well-organised, capable, and displayed flexibility catering to our requests. D'trax's expertise, commitment and follow-through throughout the entire project was exceptional.", name: "Thomas Lin", designation: "Senior Manager, IT and Admin, Mitsui Chemicals", initials: "TL", logo: LOGO["Mitsui Chemicals"] },
-  { quote: "The team provided their full commitment and dedication throughout the process, overcame challenges along the way, completed the project on time, and continued with further support on any adjustments we requested.", name: "Brett D. Hogg", designation: "Executive Vice President and Managing Director, Sony Pictures", initials: "BH", logo: LOGO["Sony Pictures"] },
+  { quote: "We would like to thank you for your assistance in completing our office renovation on time and within budget. Your team was well-organised, capable, and displayed flexibility catering to our requests. D'trax's expertise, commitment and follow-through throughout the entire project was exceptional.", name: "Thomas Lin", designation: "Senior Manager, IT and Admin, Mitsui Chemicals", initials: "TL", logo: LOGO["Mitsui Chemicals"], logoClassName: "w-[88%] max-h-40" },
+  { quote: "The team provided their full commitment and dedication throughout the process, overcame challenges along the way, completed the project on time, and continued with further support on any adjustments we requested.", name: "Brett D. Hogg", designation: "Executive Vice President and Managing Director, Sony Pictures", initials: "BH", logo: LOGO["Sony Pictures"], logoClassName: "w-[80%] max-h-44" },
 ];
 
 interface Project { name: string; sector: string; location: string; area: string; type: string; award?: string; tagline: ReactNode; points: string[]; photosNote: string; fill: Tone }
@@ -766,49 +765,106 @@ function TeamSlide() {
   );
 }
 
+/* n8n-style workflow canvas for the organisation chart */
+const FLOW_W = 1240;
+const FLOW_H = 600;
+
+type FlowNode = { id: string; x: number; y: number; w: number; h: number; kind: "person" | "router" | "team" | "member"; title: string; sub?: string; photo?: string; photoPosition?: string; tone?: Tone; icon?: ReactNode };
+
+function flowLayout() {
+  const nodes: FlowNode[] = [];
+  const edges: [string, string][] = [];
+  const memberH = 34, memberGap = 8, groupGap = 22;
+  const teamIcons = [<ClipboardList key="p" className="h-4 w-4" />, <Briefcase key="b" className="h-4 w-4" />, <PenTool key="d" className="h-4 w-4" />, <Users key="h" className="h-4 w-4" />, <Calculator key="c" className="h-4 w-4" />];
+  const tones: Tone[] = ["pink", "lime", "blue", "lime", "pink"];
+  const totalMembers = orgTeams.reduce((sum, team) => sum + team.members.length, 0);
+  const totalH = totalMembers * (memberH + memberGap) - memberGap + (orgTeams.length - 1) * groupGap;
+  let y = (FLOW_H - totalH) / 2;
+  orgTeams.forEach((team, teamIndex) => {
+    const groupH = team.members.length * (memberH + memberGap) - memberGap;
+    const teamId = `team-${teamIndex}`;
+    nodes.push({ id: teamId, x: 560, y: y + groupH / 2 - 28, w: 230, h: 56, kind: "team", title: team.name, sub: `${team.members.length} ${team.members.length === 1 ? "person" : "people"}`, tone: tones[teamIndex], icon: teamIcons[teamIndex] });
+    edges.push(["router", teamId]);
+    team.members.forEach((member, memberIndex) => {
+      const id = `m-${teamIndex}-${memberIndex}`;
+      nodes.push({ id, x: 920, y: y + memberIndex * (memberH + memberGap), w: 320, h: memberH, kind: "member", title: member.name, sub: member.role, tone: tones[teamIndex] });
+      edges.push([teamId, id]);
+    });
+    y += groupH + groupGap;
+  });
+  nodes.push({ id: "ronald", x: 0, y: FLOW_H / 2 - 100, w: 240, h: 68, kind: "person", title: "Ronald Goh", sub: "Managing Director", photo: TEAM.ronald, photoPosition: "50% 25%" });
+  nodes.push({ id: "jayne", x: 0, y: FLOW_H / 2 + 32, w: 240, h: 68, kind: "person", title: "Jayne Ong", sub: "Head of Costing & Operation", photo: TEAM.jayne, photoPosition: "50% 18%" });
+  nodes.push({ id: "router", x: 320, y: FLOW_H / 2 - 36, w: 190, h: 72, kind: "router", title: "Buddy system", sub: "one accountable contact", icon: <GitFork className="h-4 w-4" /> });
+  edges.push(["ronald", "router"], ["jayne", "router"]);
+  return { nodes, edges };
+}
+
 function OrgChartSlide() {
-  const founders = [
-    { name: "Ronald Goh", role: "Managing Director", photo: TEAM.ronald, position: "50% 25%" },
-    { name: "Jayne Ong", role: "Head of Costing & Operation", photo: TEAM.jayne, position: "50% 18%" },
-  ];
-  const panelFill: Record<Tone, string> = { pink: "bg-[#FFB6B6]/55", blue: "bg-[#9DD6FF]/55", lime: "bg-[#DDFF97]/60" };
+  const { nodes, edges } = flowLayout();
+  const byId = Object.fromEntries(nodes.map((node) => [node.id, node]));
+  const pct = (value: number, total: number) => `${(value / total) * 100}%`;
+  const path = (a: FlowNode, b: FlowNode) => {
+    const x1 = a.x + a.w, y1 = a.y + a.h / 2, x2 = b.x, y2 = b.y + b.h / 2, dx = Math.max(40, (x2 - x1) / 2);
+    return `M ${x1} ${y1} C ${x1 + dx} ${y1}, ${x2 - dx} ${y2}, ${x2} ${y2}`;
+  };
+  const chip: Record<Tone, string> = { pink: "bg-[#FFB6B6]", blue: "bg-[#9DD6FF]", lime: "bg-[#DDFF97]" };
   return (
     <Sheet label="Organisation chart">
       <div className={cn("relative flex w-full flex-col overflow-hidden px-12 pt-8", SLIDE)}>
-        <WarpGrid center="50% 30%" />
-        <Stars count={8} />
-        <div className="relative flex items-end justify-between gap-8">
+        <WarpGrid center="50% 50%" />
+        <div className="relative flex items-center gap-6">
           <Display size="sm">One team, <Em>five</Em> disciplines.</Display>
-          <Sticker tone="lime" rotate={3}>Buddy-system approach on every project</Sticker>
+          <Sticker tone="lime" rotate={3}>Buddy system on every project</Sticker>
         </div>
-        <motion.div variants={fadeUp} className="relative mt-5 flex justify-center gap-4">
-          {founders.map((person, index) => (
-            <motion.div key={person.name} animate={{ y: [0, -4, 0] }} transition={{ duration: 5, repeat: Infinity, ease: "easeInOut", delay: index * 0.8 }} className="flex items-center gap-3 rounded-full bg-white py-1.5 pl-1.5 pr-6 text-[#151515] shadow-[0_18px_44px_rgba(21,21,21,0.14)]">
-              <img src={person.photo} alt={person.name} className="h-14 w-14 rounded-full object-cover ring-2 ring-[#DDFF97]" style={{ objectPosition: person.position }} />
-              <div><p className="text-[14px] font-semibold leading-tight">{person.name}</p><p className="text-[11px] text-[#151515]/55">{person.role}</p></div>
-            </motion.div>
-          ))}
-        </motion.div>
-        <div className="relative mx-auto mt-3 h-5 w-px bg-[#151515]/30" />
-        <div className="relative mx-[10%] h-px bg-[#151515]/30" />
-        <motion.div variants={stagger} className="relative mb-6 mt-0 grid flex-1 grid-cols-5 gap-3">
-          {orgTeams.map((team, index) => (
-            <motion.div key={team.name} variants={fadeUp} className="flex h-full flex-col items-center">
-              <span className="h-5 w-px bg-[#151515]/30" />
-              <div className={cn("flex w-full flex-1 flex-col rounded-2xl p-2.5", panelFill[(["pink", "blue", "lime", "blue", "pink"] as Tone[])[index]])}>
-                <div className="flex items-center justify-between px-1 pb-2 pt-1">
-                  <span className="text-[12px] font-bold text-[#151515]">{team.name}</span>
-                  <span className="rounded-full bg-[#151515] px-2 py-0.5 text-[10px] font-semibold text-white">{team.members.length}</span>
+        <motion.div variants={scaleIn} className="relative mx-auto mt-4 w-full max-w-[1240px] flex-1" style={{ aspectRatio: `${FLOW_W} / ${FLOW_H}`, maxHeight: "calc(100dvh - 14rem)" }}>
+          <svg viewBox={`0 0 ${FLOW_W} ${FLOW_H}`} preserveAspectRatio="none" className="absolute inset-0 h-full w-full overflow-visible">
+            {edges.map(([from, to], index) => {
+              const d = path(byId[from], byId[to]);
+              return (
+                <g key={`${from}-${to}`}>
+                  <motion.path d={d} fill="none" stroke={INK} strokeOpacity="0.18" strokeWidth="2" initial={{ pathLength: 0 }} animate={{ pathLength: 1 }} transition={{ duration: 0.9, delay: 0.2 + index * 0.03, ease }} />
+                  <motion.path d={d} fill="none" stroke={INK} strokeWidth="2" strokeLinecap="round" strokeDasharray="6 14" initial={{ strokeDashoffset: 0, opacity: 0 }} animate={{ strokeDashoffset: -80, opacity: 0.7 }} transition={{ strokeDashoffset: { duration: 2.2, repeat: Infinity, ease: "linear" }, opacity: { delay: 1 + index * 0.03 } }} />
+                </g>
+              );
+            })}
+          </svg>
+          {nodes.map((node, index) => (
+            <motion.div
+              key={node.id}
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.4, delay: 0.1 + index * 0.03, ease }}
+              className="absolute"
+              style={{ left: pct(node.x, FLOW_W), top: pct(node.y, FLOW_H), width: pct(node.w, FLOW_W), height: pct(node.h, FLOW_H) }}
+            >
+              {node.kind === "person" ? (
+                <div className="flex h-full items-center gap-3 rounded-2xl border border-[#151515]/10 bg-white px-2.5 shadow-[0_14px_36px_rgba(21,21,21,0.12)]">
+                  <img src={node.photo} alt={node.title} className="h-11 w-11 shrink-0 rounded-xl object-cover" style={{ objectPosition: node.photoPosition }} />
+                  <div className="min-w-0"><p className="truncate text-[13px] font-semibold leading-tight text-[#151515]">{node.title}</p><p className="truncate text-[10px] text-[#151515]/55">{node.sub}</p></div>
+                  <span className="absolute -right-1.5 top-1/2 h-3 w-3 -translate-y-1/2 rounded-full border-2 border-white bg-[#151515]" />
                 </div>
-                <ul className="flex flex-col gap-2">
-                  {team.members.map((member) => (
-                    <li key={member.name} className="rounded-xl bg-white px-3 py-2.5 shadow-[0_6px_18px_rgba(21,21,21,0.06)]">
-                      <p className="text-[12px] font-semibold leading-tight text-[#151515]">{member.name}</p>
-                      <p className="text-[10px] leading-tight text-[#151515]/55">{member.role}</p>
-                    </li>
-                  ))}
-                </ul>
-              </div>
+              ) : node.kind === "router" ? (
+                <div className="flex h-full items-center gap-3 rounded-2xl bg-[#151515] px-3 text-white shadow-[0_18px_44px_rgba(21,21,21,0.3)]">
+                  <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[#DDFF97] text-[#151515]">{node.icon}</span>
+                  <div className="min-w-0"><p className="truncate text-[13px] font-semibold leading-tight">{node.title}</p><p className="truncate text-[10px] text-white/60">{node.sub}</p></div>
+                  <span className="absolute -left-1.5 top-1/2 h-3 w-3 -translate-y-1/2 rounded-full border-2 border-white bg-[#151515]" />
+                  <span className="absolute -right-1.5 top-1/2 h-3 w-3 -translate-y-1/2 rounded-full border-2 border-white bg-[#DDFF97]" />
+                </div>
+              ) : node.kind === "team" ? (
+                <div className="flex h-full items-center gap-3 rounded-2xl border border-[#151515]/10 bg-white px-3 shadow-[0_14px_36px_rgba(21,21,21,0.10)]">
+                  <span className={cn("flex h-9 w-9 shrink-0 items-center justify-center rounded-xl text-[#151515]", chip[node.tone ?? "pink"])}>{node.icon}</span>
+                  <div className="min-w-0"><p className="truncate text-[13px] font-semibold leading-tight text-[#151515]">{node.title}</p><p className="truncate text-[10px] text-[#151515]/55">{node.sub}</p></div>
+                  <span className="absolute -left-1.5 top-1/2 h-3 w-3 -translate-y-1/2 rounded-full border-2 border-white bg-[#151515]" />
+                  <span className="absolute -right-1.5 top-1/2 h-3 w-3 -translate-y-1/2 rounded-full border-2 border-white bg-[#151515]" />
+                </div>
+              ) : (
+                <div className="flex h-full items-center gap-2.5 rounded-xl border border-[#151515]/10 bg-white px-3 shadow-[0_8px_20px_rgba(21,21,21,0.07)]">
+                  <span className={cn("h-2.5 w-2.5 shrink-0 rounded-full", chip[node.tone ?? "pink"])} />
+                  <p className="truncate text-[12px] font-semibold text-[#151515]">{node.title}</p>
+                  <p className="ml-auto truncate text-[10px] text-[#151515]/55">{node.sub}</p>
+                  <span className="absolute -left-1.5 top-1/2 h-2.5 w-2.5 -translate-y-1/2 rounded-full border-2 border-white bg-[#151515]" />
+                </div>
+              )}
             </motion.div>
           ))}
         </motion.div>
@@ -887,28 +943,62 @@ function TrackRecordSlide() {
 }
 
 function RecentProjectsSlide() {
-  const Tile = ({ project }: { project: (typeof recentProjects)[number] }) => (
-    <div className="w-[15rem] shrink-0 overflow-hidden rounded-2xl bg-white shadow-[0_10px_40px_rgba(21,21,21,0.06)]">
-      <div className="flex h-[6.5rem] items-center justify-center bg-[#f4f4f2] px-8"><img src={RECENT_LOGO[project.name]} alt={project.name} className="max-h-12 w-full object-contain" /></div>
-      <div className="p-3">
-        <p className="truncate text-[13px] font-semibold tracking-tight text-[#151515]" title={project.name}>{project.name}</p>
-        <p className="truncate text-[10px] text-[#151515]/55" title={project.address}>{project.address}</p>
-        <p className="text-[10px] text-[#151515]/55">{project.type} · {project.year}</p>
-      </div>
-    </div>
-  );
+  const W = 1240, H = 520;
+  const rowH = 26, gap = 6.5;
+  const rows = recentProjects.map((project, index) => ({ ...project, y: 4 + index * (rowH + gap) }));
+  const hub = { x: 640, y: H / 2 - 46, w: 280, h: 92 };
+  const typeCounts = Object.entries(recentProjects.reduce<Record<string, number>>((acc, project) => ({ ...acc, [project.type]: (acc[project.type] ?? 0) + 1 }), {}));
+  const outputs = typeCounts.map(([type, count], index) => ({ type, count, y: H / 2 - (typeCounts.length * 46) / 2 + index * 46 + 4, x: 990, w: 250, h: 36 }));
+  const strokes = [PINK, BLUE, LIME];
+  const curve = (x1: number, y1: number, x2: number, y2: number) => { const dx = (x2 - x1) * 0.55; return `M ${x1} ${y1} C ${x1 + dx} ${y1}, ${x2 - dx} ${y2}, ${x2} ${y2}`; };
+  const pct = (value: number, total: number) => `${(value / total) * 100}%`;
   return (
     <Sheet label="Recent projects">
-      <div className={cn("relative flex w-full flex-col justify-center overflow-hidden pt-10", SLIDE)}>
-        <div className="px-12"><Display size="sm">Recent projects, 2024 to 2026.</Display></div>
-        <motion.div variants={scaleIn} className="mt-6 w-full">
-          <Marquee className="[--duration:80s] [--gap:0.75rem]">{recentProjects.slice(0, 8).map((project) => <Tile key={project.name} project={project} />)}</Marquee>
-          <Marquee reverse className="[--duration:86s] [--gap:0.75rem]">{recentProjects.slice(8).map((project) => <Tile key={project.name} project={project} />)}</Marquee>
-        </motion.div>
-        <motion.div variants={fadeUp} className="mt-4 w-full">
-          <Marquee className="[--duration:70s] [--gap:0.75rem]">
-            {Object.entries(LOGO).map(([name, src]) => <span key={name} className="flex h-12 w-32 shrink-0 items-center justify-center rounded-xl bg-white px-4 shadow-[0_6px_18px_rgba(21,21,21,0.05)]"><img src={src} alt={name} className="max-h-7 w-full object-contain" /></span>)}
-          </Marquee>
+      <div className={cn("relative flex w-full flex-col overflow-hidden px-12 pt-8", SLIDE)}>
+        <WarpGrid center="55% 50%" />
+        <Stars count={10} />
+        <div className="relative flex items-center gap-6">
+          <Display size="sm">Recent projects, 2024 to 2026.</Display>
+          <Sticker tone="pink" rotate={-3}>16 offices in three years</Sticker>
+        </div>
+        <motion.div variants={scaleIn} className="relative mx-auto mt-4 w-full max-w-[1240px] flex-1" style={{ aspectRatio: `${W} / ${H}`, maxHeight: "calc(100dvh - 14rem)" }}>
+          <svg viewBox={`0 0 ${W} ${H}`} preserveAspectRatio="none" className="absolute inset-0 h-full w-full overflow-visible">
+            {rows.map((row, index) => {
+              const d = curve(300, row.y + rowH / 2, hub.x, hub.y + hub.h / 2);
+              const color = strokes[index % strokes.length];
+              return (
+                <g key={row.name}>
+                  <motion.path d={d} fill="none" stroke={color} strokeWidth="2.5" strokeOpacity="0.9" initial={{ pathLength: 0 }} animate={{ pathLength: 1 }} transition={{ duration: 1.1, delay: 0.15 + index * 0.05, ease }} />
+                  <motion.path d={d} fill="none" stroke={INK} strokeWidth="2.5" strokeLinecap="round" strokeDasharray="28 600" initial={{ strokeDashoffset: 628, opacity: 0 }} animate={{ strokeDashoffset: 0, opacity: 0.8 }} transition={{ strokeDashoffset: { duration: 3.2, repeat: Infinity, ease: "linear", delay: index * 0.2 }, opacity: { delay: 1.2 } }} />
+                </g>
+              );
+            })}
+            {outputs.map((output, index) => {
+              const d = curve(hub.x + hub.w, hub.y + hub.h / 2, output.x, output.y + output.h / 2);
+              return <motion.path key={output.type} d={d} fill="none" stroke={INK} strokeOpacity="0.35" strokeWidth="2" strokeDasharray="6 10" initial={{ pathLength: 0 }} animate={{ pathLength: 1, strokeDashoffset: -64 }} transition={{ pathLength: { duration: 0.8, delay: 1 + index * 0.1 }, strokeDashoffset: { duration: 2.4, repeat: Infinity, ease: "linear" } }} />;
+            })}
+          </svg>
+          {rows.map((row, index) => (
+            <motion.div key={row.name} initial={{ opacity: 0, x: -12 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.4, delay: 0.1 + index * 0.04, ease }} className="absolute flex items-center gap-2.5 rounded-full border border-[#151515]/10 bg-white pl-2 pr-3 shadow-[0_8px_20px_rgba(21,21,21,0.07)]" style={{ left: 0, top: pct(row.y, H), width: pct(300, W), height: pct(rowH, H) }}>
+              <img src={RECENT_LOGO[row.name]} alt={row.name} className="h-4 w-10 shrink-0 object-contain" />
+              <span className="truncate text-[11px] font-semibold text-[#151515]">{row.name}</span>
+              <span className="ml-auto shrink-0 text-[10px] text-[#151515]/50">{row.year}</span>
+              <span className="absolute -right-1.5 top-1/2 h-2.5 w-2.5 -translate-y-1/2 rounded-full border-2 border-white" style={{ background: strokes[index % strokes.length] }} />
+            </motion.div>
+          ))}
+          <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.5, delay: 0.9, ease }} className="absolute flex items-center gap-4 rounded-2xl bg-[#151515] px-5 text-white shadow-[0_24px_60px_rgba(21,21,21,0.35)]" style={{ left: pct(hub.x, W), top: pct(hub.y, H), width: pct(hub.w, W), height: pct(hub.h, H) }}>
+            <img src={asset("/logo/dtrax-logo-light.png")} alt="D'trax" className="h-7 w-auto object-contain" />
+            <div className="min-w-0"><p className="text-[13px] font-semibold leading-tight">Delivered by one team</p><p className="text-[10px] text-white/60">Brief to handover, in-house</p></div>
+            <span className="absolute -left-1.5 top-1/2 h-3 w-3 -translate-y-1/2 rounded-full border-2 border-white bg-[#151515]" />
+            <span className="absolute -right-1.5 top-1/2 h-3 w-3 -translate-y-1/2 rounded-full border-2 border-white bg-[#DDFF97]" />
+          </motion.div>
+          {outputs.map((output, index) => (
+            <motion.div key={output.type} initial={{ opacity: 0, x: 12 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.4, delay: 1.2 + index * 0.1, ease }} className="absolute flex items-center justify-between rounded-full border border-[#151515]/10 bg-white px-4 shadow-[0_8px_20px_rgba(21,21,21,0.07)]" style={{ left: pct(output.x, W), top: pct(output.y, H), width: pct(output.w, W), height: pct(output.h, H) }}>
+              <span className="truncate text-[11px] font-semibold text-[#151515]">{output.type}</span>
+              <span className={cn("ml-2 shrink-0 rounded-full px-2 py-0.5 text-[10px] font-bold text-[#151515]", ["bg-[#DDFF97]", "bg-[#9DD6FF]", "bg-[#FFB6B6]", "bg-[#DDFF97]"][index % 4])}>{output.count}</span>
+              <span className="absolute -left-1.5 top-1/2 h-2.5 w-2.5 -translate-y-1/2 rounded-full border-2 border-white bg-[#151515]" />
+            </motion.div>
+          ))}
         </motion.div>
       </div>
     </Sheet>
@@ -991,9 +1081,7 @@ function ProjectSlide({ project, index, variant = "split", reverse = false }: { 
     <Sheet label={label}>
       <div className={cn("grid w-full grid-cols-1 gap-8 px-12 pt-10 md:grid-cols-[1.15fr_0.85fr]", SLIDE, reverse && "md:[&>*:first-child]:order-2")}>
         <motion.div variants={scaleIn} className="mb-6 h-[calc(100dvh-12rem)]">
-          <WobbleCard containerClassName="h-full rounded-2xl bg-transparent" className="h-full">
-            <Hero className="h-full w-full" caption={project.name} />
-          </WobbleCard>
+          <Hero className="h-full w-full" caption={project.name} />
         </motion.div>
         <div className="flex flex-col justify-center pb-6">
           <motion.p variants={fadeUp} className="text-[12px] text-[#151515]/55">{project.sector} · {project.location}</motion.p>
@@ -1066,7 +1154,7 @@ function ClosingSlide() {
     return () => window.clearInterval(timer);
   }, []);
   const caption = activeAvatar === 0 ? "10 Anson Road, #30-13 International Plaza, Singapore 079903" : "+65 6224 9242 · www.dtrax.com.sg";
-  const line = (text: string) => Array.from({ length: 4 }, (_, index) => <span key={index} className="mx-6 whitespace-nowrap">{text} <span className="mx-2 text-[#151515]/40">✦</span></span>);
+  const line = (text: string) => Array.from({ length: 4 }, (_, index) => <span key={index} className="mx-6 inline-flex items-center whitespace-nowrap">{text} <span className="mx-8 inline-block h-4 w-4 rounded-full bg-[#151515]/35" /></span>);
   return (
     <Sheet>
       <div className={cn("relative flex w-full flex-col justify-center overflow-hidden", SLIDE)}>
