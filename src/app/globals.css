@@ -188,3 +188,28 @@
     scroll-behavior: auto !important;
   }
 }
+
+/* Company deck: print pages */
+
+.deck-print-page {
+  break-after: page;
+  page-break-after: always;
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
+}
+
+.deck-print-page:last-of-type {
+  break-after: auto;
+  page-break-after: auto;
+}
+
+
+
+@keyframes deck-appear {
+  to { opacity: 1; }
+}
+
+@keyframes deck-dash {
+  from { stroke-dashoffset: 100; }
+  to { stroke-dashoffset: 0; }
+}

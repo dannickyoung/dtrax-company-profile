@@ -1,0 +1,21 @@
+@import "tailwindcss";
+@source "../../src/decks";
+@source "../../src/components/deck";
+
+html, body { height: 100%; margin: 0; background: #2a2827; }
+#deck { height: 100%; }
+.font-dm-sans { font-family: "DM Sans", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Arial, sans-serif; font-optical-sizing: auto; }
+.font-instrument-serif { font-family: "Instrument Serif", Georgia, "Times New Roman", serif; }
+
+@keyframes deck-appear {
+  to { opacity: 1; }
+}
+
+@keyframes deck-dash {
+  from { stroke-dashoffset: 100; }
+  to { stroke-dashoffset: 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; }
+}

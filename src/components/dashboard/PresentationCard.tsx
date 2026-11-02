@@ -1,6 +1,7 @@
 "use client";
 
 import { PlayIcon } from "@heroicons/react/24/solid";
+import { ArrowDownTrayIcon } from "@heroicons/react/24/outline";
 import {
   RectangleStackIcon,
   CheckCircleIcon as CheckOutline,
@@ -27,6 +28,18 @@ export function PresentationCard({
     e.preventDefault();
     e.stopPropagation();
     toggleComplete(presentation.slug);
+  };
+
+  const handleDownload = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (!presentation.pdf) return;
+    const link = document.createElement("a");
+    link.href = `${BASE}${presentation.pdf}`;
+    link.download = presentation.pdf.split("/").pop() ?? "";
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
   };
 
   const statusLabel = complete ? "Complete" : "Draft";
@@ -105,6 +118,19 @@ export function PresentationCard({
             {presentation.slideCount} slides
           </span>
 
+          <div className="flex items-center gap-2">
+          {presentation.pdf && (
+            <button
+              type="button"
+              onClick={handleDownload}
+              aria-label={`Download ${presentation.title} as PDF`}
+              title="Download PDF"
+              className="flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-lg font-medium transition-all duration-150 active:scale-95 bg-black/5 text-text-secondary hover:bg-black/10 hover:text-text-primary"
+            >
+              <ArrowDownTrayIcon className="w-4 h-4" />
+              PDF
+            </button>
+          )}
           <button
             onClick={handleToggleStatus}
             className={`flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-lg font-medium transition-all duration-150 active:scale-95 ${
@@ -120,6 +146,7 @@ export function PresentationCard({
             )}
             {complete ? "Done" : "Mark Done"}
           </button>
+          </div>
         </div>
       </div>
     </a>

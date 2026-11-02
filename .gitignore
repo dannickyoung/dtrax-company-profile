@@ -37,3 +37,9 @@ next-env.d.ts
 # testing
 coverage/
 node_modules
+
+# Standalone share build
+/share-out
+
+# Generated media (source downloads, renders)
+/media
