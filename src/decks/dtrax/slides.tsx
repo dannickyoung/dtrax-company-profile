@@ -3,13 +3,14 @@
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import { DM_Sans, Instrument_Serif } from "next/font/google";
 import { motion } from "framer-motion";
-import { Award, Calculator, Eye, HardHat, Key, PenTool, Wrench } from "lucide-react";
+import { Award, Calculator, Eye, HardHat, Key, PenTool, Wrench, X, ZoomIn } from "lucide-react";
 import { CountUp, Reveal, useDeck, type DeckSlide } from "@/components/deck/Deck";
 import { Beam, BlurText, Float } from "@/components/deck/fx";
 import { Sketch, type SketchName } from "@/components/deck/vectors";
 import { cn } from "@/lib/utils";
 import {
-  CARD_QR, CERT, CERTIFICATIONS, CLIENT_LOGO, FEATURED, FOCUS, HEADSHOT, IN_PROGRESS, JAYNE, LEADERS, LOGO, OFFICE, ORG_TEAMS, RECENT, RENDER, RONALD, SERVICES, STAGES, TEAM_PHOTO, TESTIMONIALS,
+  BCA_LOGO, CARD_QR, CERT, CERTIFICATIONS, CLIENT_LOGO, FEATURED, FOCUS, HEADSHOT, IN_PROGRESS, JAYNE, LEADERS, LOGO, OFFICE, ORG_TEAMS, RECENT, RONALD, SERVICES, STAGES, TEAM_PHOTO, TESTIMONIALS, WABTEC,
+  featured,
   type Leader, type Project,
 } from "./data";
 
@@ -244,10 +245,10 @@ function WhyDtrax({ page }: { page: number }) {
       ),
     },
     {
-      tone: "pink", title: "Award-winning.", body: "SIDA 2023 Bronze, Best in Workplace Design, for the Group-IB office.",
+      tone: "pink", title: "Award-winning.", body: "SIDA 2023 Bronze, Best in Workplace Design, for the Group-IB (Innovis) office.",
       media: (
         <>
-          <Drift src={FEATURED[0].photos[0]} alt="Group-IB office" className="absolute inset-0" />
+          <Drift src={featured("Group-IB (Innovis)").photos[2]} alt="Group-IB (Innovis) office" className="absolute inset-0" />
           <div className="absolute inset-x-0 bottom-0 h-[55%] bg-gradient-to-t from-black/70 to-transparent" />
           <span className="absolute bottom-6 left-7 flex items-center gap-3 text-[18px] font-medium uppercase tracking-[0.18em] text-white"><Award className="h-[22px] w-[22px]" strokeWidth={1.5} />SIDA 2023 Bronze</span>
         </>
@@ -456,15 +457,15 @@ function ApproachDetail({ page, from }: { page: number; from: number }) {
 
 function RealityCapture({ page }: { page: number }) {
   const shots = [
-    { src: RENDER.sumitomo, label: "Design render" },
-    { src: FEATURED[7].photos[0], label: "Completed" },
+    { src: WABTEC.early, label: "Early works" },
+    { src: WABTEC.finishing, label: "Finishing works" },
   ];
   return (
     <Frame page={page} section="approach">
       <div className="absolute bottom-[150px] left-[160px] top-[170px] flex w-[1000px] flex-col gap-3">
         {shots.map((shot, i) => (
           <Reveal key={shot.label} from="fade" delay={0.2 + i * 0.3} className="relative flex-1 overflow-hidden rounded-[24px]">
-            <Drift src={shot.src} alt={`Sumitomo Chemical Asia, ${shot.label.toLowerCase()}`} className="absolute inset-0" />
+            <Drift src={shot.src} alt={`Wabtec site, ${shot.label.toLowerCase()}, from a 360° capture`} className="absolute inset-0" />
             <div className="absolute inset-x-0 bottom-0 h-[45%] bg-gradient-to-t from-black/55 to-transparent" />
             <span className="absolute bottom-6 left-8 text-[18px] font-medium uppercase tracking-[0.2em] text-white">{shot.label}</span>
           </Reveal>
@@ -478,7 +479,7 @@ function RealityCapture({ page }: { page: number }) {
             <p key={item} className={cn("flex items-center gap-4 border-t py-5 text-[20px]", RULE)}><Dot tone={TONES[i + 1]} />{item}</p>
           ))}
         </Reveal>
-        <Reveal delay={1}><p className={cn("mt-6 text-[18px] font-light", MUTED)}>Sumitomo Chemical Asia: design render and completed office.</p></Reveal>
+        <Reveal delay={1}><p className={cn("mt-6 text-[18px] font-light", MUTED)}>Wabtec: 360° site captures, from early works to finishing.</p></Reveal>
       </div>
     </Frame>
   );
@@ -498,7 +499,7 @@ function Founders({ page }: { page: number }) {
         <H size={82}>Our <Em>founders</Em></H>
         <Reveal delay={0.6}><p className={cn("mt-6 text-[22px] leading-[1.5]", BODY)}>Leading D’trax together since 2003.</p></Reveal>
         <div className="mt-16">
-          {([["Ronald Goh", "Managing Director", "lime"], ["Jayne Ong", "Head of Costing & Operation", "pink"]] as const).map(([name, role, tone], index) => (
+          {([[RONALD.name, RONALD.role, "lime"], [JAYNE.name, JAYNE.role, "pink"]] as const).map(([name, role, tone], index) => (
             <Reveal key={name} delay={0.8 + index * 0.15} className={cn("border-t py-7", RULE)}>
               <div className="flex items-center gap-4"><Dot tone={tone} /><p className="text-[36px] font-medium leading-none tracking-[-0.035em]">{name}</p></div>
               <p className={cn("mt-3 pl-[26px] text-[19px]", BODY)}>{role}</p>
@@ -517,9 +518,10 @@ function LogoStrip({ names, delay }: { names: string[]; delay: number }) {
   return (
     <Reveal delay={delay}>
       <Eyebrow>Featured projects</Eyebrow>
+      {/* Five to a row; longer lists wrap onto a second row. */}
       <div className={cn("mt-5 grid grid-cols-5 border-y", RULE)}>
-        {names.map((name) => (
-          <span key={name} className={cn("flex h-[96px] items-center justify-center border-l px-5 first:border-l-0", RULE)}><LogoMark name={name} area={5200} maxHeight={66} maxWidth={150} /></span>
+        {names.map((name, i) => (
+          <span key={name} className={cn("flex items-center justify-center px-5", names.length > 5 ? "h-[84px]" : "h-[96px]", RULE, i % 5 !== 0 && "border-l", i >= 5 && "border-t")}><LogoMark name={name} area={5200} maxHeight={66} maxWidth={150} /></span>
         ))}
       </div>
     </Reveal>
@@ -564,7 +566,7 @@ function KeyLeader({ page, leader, tone }: { page: number; leader: Leader; tone:
         <Reveal delay={0.4}><p className={cn("mt-4 text-[32px]", MUTED)}><Em>{leader.role}</Em></p></Reveal>
         <div className="mt-14 grid grid-cols-3">
           {factsOf(leader).map(([term, value], index) => (
-            <Reveal key={term} delay={0.5 + index * 0.12} className={cn("h-[270px] border-l px-8 first:border-l-0 first:pl-0", RULE)}>
+            <Reveal key={term} delay={0.5 + index * 0.12} className={cn("border-l px-8 first:border-l-0 first:pl-0", leader.projects.length > 5 ? "h-[220px]" : "h-[270px]", RULE)}>
               <p className="text-[18px] font-medium uppercase tracking-[0.16em] text-[#151515]/55">{term}</p>
               <p className={cn("mt-5 text-[19px] leading-[1.55]", BODY)}>{value}</p>
             </Reveal>
@@ -583,7 +585,8 @@ function OrgChart({ page }: { page: number }) {
   // The people's ring is slightly narrower than it is deep, so the outward labels on its sides stay inside the margins.
   const at = (r: number, deg: number) => ({ x: hub.x + r * (r === r2 ? 0.9 : 1) * Math.cos((deg * Math.PI) / 180), y: hub.y + r * Math.sin((deg * Math.PI) / 180) });
   const people = ORG_TEAMS.flatMap((team, teamIndex) => team.members.map((member) => ({ ...member, teamIndex })));
-  const from = 166, to = 14, stepDeg = (from - to) / (people.length - 1);
+  // The fan opens wider as the team grows, so neighbours along the bottom keep about 15° between them.
+  const spread = Math.min(84, 76 + (people.length - 11) * 8), from = 90 + spread, to = 90 - spread, stepDeg = (from - to) / (people.length - 1);
   const placed = people.map((person, index) => ({ ...person, angle: from - index * stepDeg }));
   const teams = ORG_TEAMS.map((team, teamIndex) => {
     const angles = placed.filter((person) => person.teamIndex === teamIndex).map((person) => person.angle);
@@ -631,7 +634,8 @@ function OrgChart({ page }: { page: number }) {
         const label = (
           <>
             <span className="bg-white px-2 text-[18px] font-medium leading-tight tracking-[-0.01em]">{person.name}</span>
-            <span className={cn("whitespace-nowrap bg-white px-2 text-[16px] font-light leading-tight", MUTED)}>{person.role}</span>
+            {/* Beside the avatar a role stays on one line; under it, a long role wraps so neighbours along the bottom don't collide. */}
+            <span className={cn("bg-white px-2 text-[16px] font-light leading-tight", side ? "whitespace-nowrap" : "max-w-[190px] [text-wrap:balance]", MUTED)}>{person.role}</span>
           </>
         );
         if (side) {
@@ -681,7 +685,7 @@ function TrackRecord({ page }: { page: number }) {
 
 /** Recent clients: logos only, each joined to a D'trax hub by a curved line. */
 function RecentProjects({ page }: { page: number }) {
-  const hub = { x: 960, y: 604 }, rx = 610, ry = 276;
+  const hub = { x: 960, y: 604 }, rx = 680, ry = 300;
   const n = RECENT.length;
   const point = (i: number) => {
     const angle = ((-90 + (360 / n) * (i + 0.5)) * Math.PI) / 180;
@@ -702,8 +706,8 @@ function RecentProjects({ page }: { page: number }) {
       {RECENT.map((name, i) => {
         const p = point(i);
         return (
-          <Reveal key={name} from="scale" delay={0.85 + i * 0.14} className="absolute flex h-[104px] w-[220px] items-center justify-center rounded-[20px] bg-white px-7 shadow-[0_0_0_1px_rgba(21,21,21,0.1)]" style={{ left: p.x - 110, top: p.y - 52 }}>
-            <Float index={i}><LogoMark name={name} area={7600} maxHeight={64} maxWidth={164} /></Float>
+          <Reveal key={name} from="scale" delay={0.85 + i * 0.14} className="absolute flex h-[96px] w-[200px] items-center justify-center rounded-[20px] bg-white px-6 shadow-[0_0_0_1px_rgba(21,21,21,0.1)]" style={{ left: p.x - 100, top: p.y - 48 }}>
+            <Float index={i}><LogoMark name={name} area={7000} maxHeight={60} maxWidth={150} /></Float>
           </Reveal>
         );
       })}
@@ -740,7 +744,7 @@ function ProjectPoints({ project, dark = false, size = 24 }: { project: Project;
 }
 
 /** Immersive heroes whose key detail would sit under the logo or off the edge. */
-const HERO_POSITION: Record<string, string> = { "Group-IB": "100% 50%" };
+const HERO_POSITION: Record<string, string> = {};
 
 const projectCounter = (number: number, total: number, dark = false) => (
   <div className="flex items-center gap-4"><Dot tone={TONES[(number - 1) % 3]} size={10} /><Eyebrow dark={dark}>{String(number).padStart(2, "0")} / {total}</Eyebrow></div>
@@ -842,7 +846,8 @@ function InProgress({ page }: { page: number }) {
   return (
     <Frame page={page} section="projects" dark>
       <Reveal from="fade" delay={0.1} className="absolute bottom-[150px] right-[160px] top-[170px] w-[620px] overflow-hidden rounded-[28px]">
-        <Drift src={TEAM_PHOTO.foundersPortrait} alt="The D'trax team at work in the studio" position="50% 40%" className="absolute inset-0" />
+        <Drift src={WABTEC.progress} alt="Wabtec, workstations being fitted out" position="50% 80%" className="absolute inset-0" />
+        <span className="absolute bottom-6 left-7 text-[18px] font-medium uppercase tracking-[0.18em] text-white [text-shadow:0_1px_12px_rgba(0,0,0,0.5)]">Wabtec, on site</span>
       </Reveal>
       <div className="absolute left-[160px] top-[190px] w-[860px]">
         <H size={80}>Now in <Em color={LIME}>progress</Em></H>
@@ -893,7 +898,19 @@ function Testimonial({ page, item, tone, number }: { page: number; item: (typeof
    08 · Certifications · Close
    ──────────────────────────────────────────────────────────────── */
 
+/**
+ * Certificates open full size in a pop-up when clicked (live only; the PDF shows them as plain images).
+ * Clicks are kept from reaching the player, so opening or closing never turns the slide; any key closes it.
+ */
 function Certifications({ page }: { page: number }) {
+  const { print } = useDeck();
+  const [open, setOpen] = useState<{ src: string; title: string } | null>(null);
+  useEffect(() => {
+    if (!open) return;
+    const close = (event: KeyboardEvent) => { event.preventDefault(); event.stopImmediatePropagation(); setOpen(null); };
+    window.addEventListener("keydown", close, true);
+    return () => window.removeEventListener("keydown", close, true);
+  }, [open]);
   return (
     <Frame page={page} section="certs">
       <div className="absolute left-[160px] right-[160px] top-[170px]">
@@ -901,13 +918,20 @@ function Certifications({ page }: { page: number }) {
         <div className="mt-16 grid grid-cols-4">
           {CERTIFICATIONS.map((cert, index) => (
             <Reveal key={cert.title} delay={0.4 + index * 0.12} className="border-l border-[#151515]/12 px-8 first:border-l-0 first:pl-0">
-              <div className={cn("flex h-[340px] items-center justify-center rounded-[20px] p-8", MIST)}>
+              <div className={cn("relative flex h-[340px] items-center justify-center rounded-[20px] p-8", MIST)}>
                 {cert.image ? (
-                  <img src={cert.image} alt={cert.title} draggable={false} className="max-h-full max-w-full object-contain shadow-[0_10px_30px_rgba(0,0,0,0.08)]" />
+                  print ? (
+                    <img src={cert.image} alt={cert.title} draggable={false} className="max-h-full max-w-full object-contain shadow-[0_10px_30px_rgba(0,0,0,0.08)]" />
+                  ) : (
+                    <button type="button" aria-label={`Enlarge the ${cert.title} certificate`} onClick={(event) => { event.stopPropagation(); setOpen({ src: cert.image!, title: cert.title }); }} className="group flex h-full max-w-full cursor-zoom-in items-center justify-center">
+                      <img src={cert.image} alt={cert.title} draggable={false} className="max-h-full max-w-full object-contain shadow-[0_10px_30px_rgba(0,0,0,0.08)] transition-transform duration-500 group-hover:scale-[1.04]" />
+                      <span className="pointer-events-none absolute bottom-4 right-4 flex h-[40px] w-[40px] items-center justify-center rounded-full bg-white/90 text-[#151515] opacity-0 shadow-[0_0_0_1px_rgba(21,21,21,0.1)] transition-opacity duration-300 group-hover:opacity-100"><ZoomIn className="h-[20px] w-[20px]" strokeWidth={1.5} /></span>
+                    </button>
+                  )
                 ) : (
-                  <div className="flex h-full w-[220px] flex-col items-center justify-center bg-white text-center shadow-[0_10px_30px_rgba(0,0,0,0.08)]">
-                    <span className="text-[18px] font-medium uppercase tracking-[0.2em] text-[#151515]/50">BCA</span>
-                    <span className="mt-3 text-[54px] font-medium leading-none tracking-[-0.04em]">CR06</span>
+                  <div className="flex h-full w-[220px] flex-col items-center justify-center bg-white px-6 text-center shadow-[0_10px_30px_rgba(0,0,0,0.08)]">
+                    <img src={BCA_LOGO} alt="BCA" draggable={false} className="w-[150px] object-contain" />
+                    <span className="mt-6 text-[48px] font-medium leading-none tracking-[-0.04em]">CR06</span>
                     <span className={cn("mt-3 text-[19px]", MUTED)}><Em>Grade L3</Em></span>
                   </div>
                 )}
@@ -918,6 +942,21 @@ function Certifications({ page }: { page: number }) {
           ))}
         </div>
       </div>
+      {open ? (
+        <motion.div
+          role="dialog"
+          aria-modal="true"
+          aria-label={`${open.title} certificate`}
+          className="absolute inset-0 z-50 flex cursor-zoom-out items-center justify-center bg-[#151515]/85 p-[60px]"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.25 }}
+          onClick={(event) => { event.stopPropagation(); setOpen(null); }}
+        >
+          <motion.img src={open.src} alt={open.title} draggable={false} className="max-h-full max-w-full object-contain shadow-[0_30px_80px_rgba(0,0,0,0.45)]" initial={{ scale: 0.94 }} animate={{ scale: 1 }} transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }} />
+          <span className="absolute right-[48px] top-[40px] flex h-[52px] w-[52px] items-center justify-center rounded-full bg-white/10 text-white"><X className="h-[24px] w-[24px]" strokeWidth={1.5} /></span>
+        </motion.div>
+      ) : null}
     </Frame>
   );
 }

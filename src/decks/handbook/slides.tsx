@@ -10,16 +10,16 @@ import {
 } from "lucide-react";
 import { CountUp, Reveal, useDeck, type DeckSlide } from "@/components/deck/Deck";
 import { Beam, BlurText } from "@/components/deck/fx";
-import { CERT, LOGO } from "@/decks/dtrax/data";
+import { LOGO } from "@/decks/dtrax/data";
 import { cn } from "@/lib/utils";
 import { Sketch } from "@/components/deck/vectors";
 import { DrawRule, StepLine } from "./fx";
 import { WelcomeDesk } from "./welcome-art";
 import {
-  ABOUT, ACK_FIELDS, ACK_RETURN, ACKNOWLEDGEMENT, AI_TOOLS, ALLOWANCES, BEFORE_YOU_START, BIZSAFE, BUDDY, BUDDY_DUTIES, CHAPTERS, CLAIM_STEPS, CLAIMS_REJECTED,
-  CLOSING_LINE, COMPANY, CONDUCT, CONDUCT_INTRO, DPO, EMERGENCY, FOUNDERS, FOUNDERS_QUOTE, INCIDENT_STEPS, INCIDENT_TYPES, IT_INTRO, IT_RULES, LEAVE,
+  ABOUT, AI_TOOLS, ALLOWANCES, BEFORE_YOU_START, BIZSAFE, BIZSAFE_CERT, BUDDY, BUDDY_DUTIES, CHAPTERS, CLAIM_STEPS, CLAIMS_REJECTED,
+  CLOSING_LINE, COMPANY, CONDUCT, CONDUCT_INTRO, DPO, EMERGENCY, FOUNDERS_QUOTE, INCIDENT_STEPS, INCIDENT_TYPES, IT_INTRO, IT_RULES, LEAVE,
   LEAVE_BENEFITS_NOTE, MISSION, MONITORING, PDPA, PHOTO, POLICIES_INTRO, SAFETY_DUTIES, SAFETY_FIRST_AID, SAFETY_INTRO, SAFETY_LEAD, SAFETY_SITE, TEAM_INTRO,
-  TEAMS, VALUES, VALUES_INTRO, VALUES_STANDARD, VISION, WELCOME, WELCOME_ABOARD,
+  VALUES, VALUES_INTRO, VALUES_STANDARD, VISION, WELCOME, WELCOME_ABOARD,
   type ChapterId, type LeaveRow, type Person, type Tone,
 } from "./data";
 
@@ -27,7 +27,7 @@ const serif = Instrument_Serif({ weight: "400", style: ["normal", "italic"], sub
 const sans = DM_Sans({ subsets: ["latin"], display: "swap" });
 
 /* ────────────────────────────────────────────────────────────────
-   D'trax Employee Handbook 2026, on a portrait A4-proportion canvas
+   D'trax Employee Handbook, on a portrait A4-proportion canvas
    (1240 × 1754). Same brand rules as the company profile: ink on
    white, pink / blue / lime as flat fields and small accents,
    medium display type, serif italic for emphasis, light body text,
@@ -96,7 +96,7 @@ function Frame({ page, chapter, dark = false, background, bare = false, children
           <Logo light={dark} className="h-[32px]" />
         </header>
         <footer className={cn("pointer-events-none absolute bottom-[56px] left-[110px] right-[110px] z-10 flex items-center justify-between text-[14px] font-light", dark ? "text-white/45" : "text-[#151515]/45")}>
-          <span>D&apos;trax Design Pte Ltd · Employee Handbook 2026</span>
+          <span>D&apos;trax Design Pte Ltd · Employee Handbook</span>
           <span className="tabular-nums">{page}</span>
         </footer>
       </>}
@@ -166,7 +166,7 @@ function Cover() {
         <Reveal from="fade"><Logo light className="h-[72px]" /></Reveal>
         <Reveal delay={0.15}><Eyebrow dark className="mt-14">D&apos;trax Design Pte Ltd</Eyebrow></Reveal>
         <h1 className="mt-6 font-medium tracking-[-0.05em] text-white" style={{ fontSize: 136, lineHeight: 0.98 }}>
-          <BlurText delay={0.3} stagger={0.14}>Employee<br />Handbook <Em color={LIME}>2026</Em></BlurText>
+          <BlurText delay={0.3} stagger={0.14}>Employee<br /><Em color={LIME}>Handbook</Em></BlurText>
         </h1>
         <Reveal delay={0.9} className="mt-12 border-t border-white/20 pt-8">
           <p className="text-[27px] font-normal tracking-[-0.02em] text-white"><Em>{CLOSING_LINE}</Em></p>
@@ -188,7 +188,6 @@ function Contents({ page }: { page: number }) {
     <Frame page={page}>
       <Body>
         <H size={72}>Contents</H>
-        <Reveal delay={0.3}><p className={cn("mt-5 text-[22px]", BODY)}>{print ? "Each chapter opens on a coloured page." : <>Each chapter opens on a coloured page. <Em>Click a chapter to go straight to it.</Em></>}</p></Reveal>
         <div className="mt-14">
           {CHAPTERS.map((chapter, index) => {
             const target = CHAPTER_PAGE[chapter.id];
@@ -545,17 +544,17 @@ function Claims({ page }: { page: number }) {
 }
 
 /* ────────────────────────────────────────────────────────────────
-   06 · Workplace safety & health
+   06 · Workplace safety and health
    ──────────────────────────────────────────────────────────────── */
 
 function SafetyOne({ page }: { page: number }) {
   return (
     <Frame page={page} chapter="safety">
       <Body>
-        <H>Workplace safety <Em>&amp; health</Em></H>
+        <H>Workplace safety <Em>and health</Em></H>
         <Reveal delay={0.3}><p className="mt-9 max-w-[980px] text-[30px] font-normal leading-[1.5] tracking-[-0.015em]">{SAFETY_INTRO}</p></Reveal>
         <Reveal delay={0.6} className={cn("mt-16 grid grid-cols-[440px_1fr] items-center gap-14 rounded-[24px] p-14", MIST)}>
-          <img src={CERT.bizsafe} alt="bizSAFE Star certificate" draggable={false} className="h-[660px] w-full bg-white object-contain shadow-[0_14px_36px_rgba(21,21,21,0.12)]" />
+          <img src={BIZSAFE_CERT} alt="bizSAFE Star certificate" draggable={false} className="h-[660px] w-full object-contain" />
           <div>
             <div className="flex items-center gap-3"><Dot tone="pink" /><Eyebrow>Certified</Eyebrow></div>
             <p className="mt-6 text-[52px] font-medium leading-none tracking-[-0.045em]">bizSAFE <Em>Star</Em></p>
@@ -622,7 +621,7 @@ function Pdpa({ page }: { page: number }) {
           ))}
         </div>
         <Reveal delay={0.9} className={cn("mt-12 flex items-center gap-10 rounded-[24px] px-14 py-14", MIST)}>
-          <Avatar person={{ name: DPO.name, role: DPO.role }} size={140} />
+          <Avatar person={DPO} size={140} />
           <div>
             <div className="flex items-center gap-3"><Dot tone="lime" /><Eyebrow>{DPO.role}</Eyebrow></div>
             <p className="mt-4 text-[56px] font-medium leading-none tracking-[-0.045em]">{DPO.name}</p>
@@ -731,56 +730,6 @@ function TeamIntro({ page }: { page: number }) {
   );
 }
 
-function OrgChart({ page }: { page: number }) {
-  const { print } = useDeck();
-  const col = 1020 / TEAMS.length;
-  const xs = TEAMS.map((_, i) => 110 + col / 2 + col * i);
-  const busY = 640, headY = 690, foundersBottom = 560;
-  return (
-    <Frame page={page} chapter="team">
-      <Body>
-        <div className="flex items-end justify-between">
-          <H>Organisation <Em>chart</Em></H>
-          {print ? null : <Reveal delay={0.4} className="pb-3"><p className={cn("text-[18px]", MUTED)}><Em>Hover a face to look closer.</Em></p></Reveal>}
-        </div>
-      </Body>
-      <svg className="absolute inset-0" width={PAGE_W} height={PAGE_H} viewBox={`0 0 ${PAGE_W} ${PAGE_H}`} aria-hidden="true">
-        {/* One soft curve from management to each team, drawn in as the team heading arrives. */}
-        {xs.map((x, i) => <Beam key={x} d={`M 620 ${foundersBottom} C 620 ${busY}, ${x} ${foundersBottom + 20}, ${x} ${headY - 10}`} color={TONE[TEAMS[i].tone]} base="rgba(21,21,21,0.2)" width={1.5} appear={0.5 + i * 0.08} delay={i * 0.35} />)}
-      </svg>
-      <Reveal from="scale" delay={0.15} className="absolute flex flex-col items-center" style={{ left: 320, width: 600, top: 330 }}>
-        <Eyebrow>Management</Eyebrow>
-        <div className="mt-5 flex gap-16">
-          {FOUNDERS.map((person) => (
-            <div key={person.name} className="group flex w-[230px] flex-col items-center text-center">
-              <span className="transition-transform duration-500 group-hover:scale-[1.35]"><Avatar person={person} size={104} /></span>
-              <span className="mt-4 text-[22px] font-medium leading-tight tracking-[-0.02em]">{person.name}</span>
-              <span className={cn("mt-1 text-[17px] font-light leading-tight", MUTED)}>{person.role}</span>
-            </div>
-          ))}
-        </div>
-      </Reveal>
-      {TEAMS.map((team, i) => (
-        <div key={team.name} className="absolute flex flex-col items-center" style={{ left: xs[i] - col / 2 + 6, width: col - 12, top: headY }}>
-          <Reveal from="scale" delay={0.6 + i * 0.08} className="flex h-[64px] flex-col items-center justify-start text-center">
-            <Dot tone={team.tone} size={10} />
-            <span className="mt-2 text-[18px] font-medium leading-[1.2] tracking-[-0.01em] [text-wrap:balance]">{team.name}</span>
-          </Reveal>
-          <div className="mt-8 flex flex-col items-center gap-7">
-            {team.members.map((person, m) => (
-              <Reveal key={person.name} from="scale" delay={0.9 + i * 0.08 + m * 0.06} className="group flex w-full flex-col items-center text-center">
-                <span className="relative z-0 transition-transform duration-500 group-hover:z-10 group-hover:scale-[1.5]"><Avatar person={person} size={68} /></span>
-                <span className="mt-3 text-[19px] font-medium leading-tight tracking-[-0.01em]">{person.name}</span>
-                <span className={cn("mt-1 text-[16px] font-light leading-tight [text-wrap:balance]", MUTED)}>{person.role}</span>
-              </Reveal>
-            ))}
-          </div>
-        </div>
-      ))}
-    </Frame>
-  );
-}
-
 /* ────────────────────────────────────────────────────────────────
    10 · Emergency contacts and incident escalation
    ──────────────────────────────────────────────────────────────── */
@@ -837,37 +786,12 @@ function BeforeYouStart({ page }: { page: number }) {
   );
 }
 
-function Acknowledgement({ page }: { page: number }) {
-  return (
-    <Frame page={page} chapter="close">
-      <Body>
-        <H>Acknowledgement <Em>of receipt</Em></H>
-        <Reveal delay={0.3}><p className="mt-10 text-[27px] font-normal leading-[1.6] text-[#151515]/85">{ACKNOWLEDGEMENT}</p></Reveal>
-        <Reveal delay={0.5} className="mt-16">
-          <Eyebrow>To be completed by the employee</Eyebrow>
-          <div className="mt-4">
-            {ACK_FIELDS.map((field) => (
-              <div key={field} className="flex h-[150px] items-end gap-8 pb-4">
-                <span className={cn("w-[200px] shrink-0", LABEL, LABEL_INK)}>{field}</span>
-                <span className="mb-[6px] h-px flex-1 bg-[#151515]/35" />
-              </div>
-            ))}
-          </div>
-        </Reveal>
-        <Reveal delay={0.7} className={cn("mt-16 rounded-[24px] px-12 py-12", MIST)}>
-          <p className={cn("text-[22px] leading-[1.55]", BODY)}>{ACK_RETURN.lead} <strong className="font-medium text-[#151515]">{ACK_RETURN.to}</strong>{ACK_RETURN.tail}</p>
-        </Reveal>
-      </Body>
-    </Frame>
-  );
-}
-
 function BackCover({ page }: { page: number }) {
   return (
     <Frame page={page} dark bare>
       <div className="absolute inset-x-[110px] top-[600px] flex flex-col items-center text-center">
         <Reveal from="fade"><Logo light className="h-[84px]" /></Reveal>
-        <Reveal delay={0.3}><p className="mt-12 text-[30px] font-light text-white/75">Employee Handbook <Em color={LIME}>2026</Em></p></Reveal>
+        <Reveal delay={0.3}><p className="mt-12 text-[30px] font-light text-white/75">Employee <Em color={LIME}>Handbook</Em></p></Reveal>
       </div>
       <Reveal delay={0.6} className="absolute bottom-[130px] left-[110px] right-[110px] border-t border-white/20 pt-8 text-center">
         <Eyebrow dark>D&apos;trax Design Pte Ltd</Eyebrow>
@@ -921,14 +845,12 @@ const defs: Def[] = [
 
   divider("team"),
   { id: "team", render: (page) => <TeamIntro page={page} /> },
-  { id: "org-chart", render: (page) => <OrgChart page={page} /> },
 
   divider("emergency"),
   { id: "emergency", render: (page) => <Emergency page={page} /> },
 
   divider("close"),
   { id: "before-you-start", render: (page) => <BeforeYouStart page={page} /> },
-  { id: "acknowledgement", render: (page) => <Acknowledgement page={page} /> },
   { id: "back-cover", dark: true, render: (page) => <BackCover page={page} /> },
 ];
 

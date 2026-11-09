@@ -1,5 +1,5 @@
 import { asset } from "@/lib/base-path";
-import { HEADSHOT, TEAM_PHOTO } from "@/decks/dtrax/data";
+import { TEAM_PHOTO } from "@/decks/dtrax/data";
 import type { SketchName } from "@/components/deck/vectors";
 
 /*
@@ -46,7 +46,7 @@ export const CHAPTERS = [
   { id: "mission", n: "03", label: "Mission, vision and values", tone: "pink", line: "Think clearly, speak plainly, and finish what you start.", sketch: "compass" },
   { id: "conduct", n: "04", label: "Code of conduct", tone: "lime", line: "The standards expected of everyone at D'trax.", sketch: "scales" },
   { id: "policies", n: "05", label: "Workplace policies", tone: "blue", line: "Leave and claims, at a high level.", sketch: "calendar" },
-  { id: "safety", n: "06", label: "Workplace safety & health", tone: "pink", line: "Safety is everyone's responsibility.", sketch: "helmet" },
+  { id: "safety", n: "06", label: "Workplace safety and health", tone: "pink", line: "Safety is everyone's responsibility.", sketch: "helmet" },
   { id: "pdpa", n: "07", label: "Personal data and PDPA", tone: "lime", line: "Personal data is used only for legitimate business purposes.", sketch: "shield" },
   { id: "it", n: "08", label: "IT, email, device and acceptable use", tone: "blue", line: "Use company systems responsibly, and protect company and client information.", sketch: "laptop" },
   { id: "team", n: "09", label: "Team and organisation", tone: "pink", line: "No job depends on one person.", sketch: "people" },
@@ -65,9 +65,8 @@ export const WELCOME: {
   name: string;
   role: string;
   /**
-   * Ronald's handwritten signature, as a transparent PNG or SVG, e.g.
-   * asset("/assets/handbook/ronald-signature.png"). Not supplied yet: while it is unset
-   * the letter keeps a blank space above the signature line.
+   * Ronald's handwritten signature, as a transparent PNG
+   * (from Vectors/Ronald's Signature.PNG, white knocked out).
    */
   signature?: string;
 } = {
@@ -82,6 +81,7 @@ export const WELCOME: {
   signOff: "Welcome to D'trax.",
   name: "Ronald Goh",
   role: "Managing Director",
+  signature: asset("/assets/handbook/ronald-signature.png"),
 };
 
 /* 02 · About this handbook */
@@ -170,9 +170,11 @@ export const CLAIM_STEPS = [
 export const CLAIMS_REJECTED = "Claims that are incomplete, unsupported, or do not meet the applicable requirements may be rejected.";
 export const ALLOWANCES = "Allowances and other benefits, where applicable, will be provided in accordance with the employee's employment contract and/or prevailing company policies, and may be reviewed or revised from time to time.";
 
-/* 06 · Workplace safety & health */
+/* 06 · Workplace safety and health */
 
 export const SAFETY_INTRO = "We work in both office and live-site environments, each of which presents different risks. D'trax is committed to providing a safe and healthy working environment and appropriate systems of work. Employees are expected to take reasonable care of their own safety and health and that of those around them, and to comply with applicable workplace safety and health requirements.";
+/** The certificate scan with its black scan frame cropped off. */
+export const BIZSAFE_CERT = asset("/assets/certs/cert-bizsafe-borderless.png");
 export const BIZSAFE = "D'trax is bizSAFE Star certified. This reflects the standard we work to, and maintaining that standard is a collective responsibility.";
 export const SAFETY_LEAD = "Safety is everyone's responsibility. Employees must work safely, follow applicable safe work procedures, use required personal protective equipment (PPE), and report hazards, near-misses, injuries, or unsafe conditions promptly.";
 /** The four duties named in SAFETY_LEAD, one per tile. */
@@ -187,7 +189,10 @@ export const PDPA = [
   "Personal data may only be accessed, used, shared, and retained for legitimate business purposes. Employees must safeguard personal data, prevent unauthorised disclosure, and report any suspected data breach immediately to the Data Protection Officer (DPO).",
   "Company and client information must not be removed, copied, or disclosed without authorisation. Confidentiality and data protection obligations continue after employment ends.",
 ];
-export const DPO = { name: "Victoria Tan", role: "Data Protection Officer" };
+export interface Person { name: string; role: string; photo?: string }
+
+/** photo: Victoria's headshot is still to come; set it here (e.g. asset("/assets/headshots/victoria-tan.jpg")) and the PDPA page shows it in place of her initials. */
+export const DPO: Person = { name: "Victoria Tan", role: "Data Protection Officer" };
 
 /* 08 · IT, email, device and acceptable use */
 
@@ -210,46 +215,6 @@ export const BUDDY = "We use a buddy-system approach across design and project w
 /** The three things BUDDY asks of each employee. */
 export const BUDDY_DUTIES = ["Know who your buddy is.", "Keep them updated on ongoing work.", "Give them enough information and context to step in when needed."];
 
-const headshot = (file: string) => asset(`/assets/headshots/${file}`);
-
-export interface Person { name: string; role: string; photo?: string }
-
-/** A tighter, face-centred crop of the Managing Director's desk portrait, for avatars. */
-export const RONALD_AVATAR = asset("/assets/handbook/ronald-avatar.jpg");
-
-export const FOUNDERS: Person[] = [
-  { name: "Ronald Goh", role: "Managing Director", photo: RONALD_AVATAR },
-  { name: "Jayne Ong", role: "Head of Costing & Operation", photo: TEAM_PHOTO.jayne },
-];
-
-/** From the organisation chart supplied with the 2026 copy (Images_attachments/image.png). */
-export const TEAMS: { name: string; tone: Tone; members: Person[] }[] = [
-  { name: "Project Team", tone: "lime", members: [
-    { name: "Sandrey Lim", role: "Project Director", photo: HEADSHOT["Sandrey Lim"] },
-    { name: "Steve Tan", role: "Senior Project Manager" },
-    { name: "Lim Fu Liang", role: "Construction Manager", photo: headshot("lim-fu-liang.jpg") },
-    { name: "Adrian Yen", role: "Project Executive", photo: HEADSHOT["Adrian Yen"] },
-  ] },
-  { name: "BD Team", tone: "blue", members: [
-    { name: "Roseline Chung", role: "Business Development Manager" },
-  ] },
-  { name: "Design Team", tone: "pink", members: [
-    { name: "Esther Choo", role: "Design Director", photo: HEADSHOT["Esther Choo"] },
-    { name: "Tan Swee Lan", role: "Senior CAD Designer", photo: HEADSHOT["Tan Swee Lan"] },
-    { name: "Sapp Cheng", role: "Interior Designer", photo: HEADSHOT["Sapp Cheng"] },
-    { name: "Steven Leng", role: "Interior Designer" },
-    { name: "Gilbert Penaflor", role: "3D Designer" },
-  ] },
-  { name: "HR / Admin Operation Team", tone: "lime", members: [
-    { name: "Victoria Tan", role: "Senior HR Executive" },
-    { name: "Mi Mi Nay Win", role: "Admin & Account Executive", photo: HEADSHOT["Mi Mi Nay Win"] },
-  ] },
-  { name: "Costing Team", tone: "blue", members: [
-    { name: "Danny Chua", role: "Senior Quantity Surveyor", photo: headshot("danny-chua.jpg") },
-    { name: "Yong Yee Yee", role: "Quantity Surveyor", photo: HEADSHOT["Yong Yee Yee"] },
-  ] },
-];
-
 /* 10 · Emergency contacts and incident escalation */
 
 export const EMERGENCY = "Employees should prioritise safety and seek immediate assistance in the event of an emergency, workplace incident, or unsafe condition. Emergency contact information and evacuation procedures will be communicated separately and displayed at company premises and project sites.";
@@ -270,10 +235,6 @@ export const BEFORE_YOU_START = [
 ];
 export const CLOSING_LINE = "Think clearly, speak plainly, and finish what you start.";
 export const WELCOME_ABOARD = "Welcome aboard.";
-
-export const ACKNOWLEDGEMENT = "I confirm that I have received, read, and understood the D'trax Employee Handbook. I agree to follow the standards and policies set out in it. I understand that this handbook is a practical guide, does not form part of my employment contract unless expressly stated, and that where the two differ, the employment contract prevails. I understand the handbook may be updated from time to time, and that the latest approved version is the one in force.";
-export const ACK_FIELDS = ["Name", "Employee ID", "Signature", "Date"];
-export const ACK_RETURN = { lead: "Please return the signed acknowledgement to", to: "HR", tail: ". It will be kept in your personnel file." };
 
 /** Company details, as used on the company profile's closing page. */
 export const COMPANY = {

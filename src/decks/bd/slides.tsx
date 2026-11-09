@@ -1,16 +1,17 @@
 "use client";
 
 import { useEffect, useRef, useState, type ReactNode } from "react";
+import { createPortal } from "react-dom";
 import { DM_Sans, Instrument_Serif } from "next/font/google";
 import { motion } from "framer-motion";
-import { Award, Building2, Calculator, Camera, ClipboardCheck, HardHat, PenTool, Undo2, UserRound, Users, Wrench } from "lucide-react";
+import { Award, Building2, Calculator, ClipboardCheck, HardHat, Maximize2, PenTool, Undo2, UserRound, Users, Wrench, X } from "lucide-react";
 import { CountUp, Reveal, useDeck, type DeckSlide } from "@/components/deck/Deck";
 import { Beam, BlurText, Float, Magnet } from "@/components/deck/fx";
 import { cn } from "@/lib/utils";
 import { Sketch, type SketchName } from "@/components/deck/vectors";
 import { GrowRule, MaskReveal } from "./fx";
 import {
-  AFTERCARE, ALTERATIONS, CLIENTS, CONTACT, COVER, CREDENTIALS, EXPERIENCE, FITOUT, GROUP_IB, LOGO, MOVE, PATH, PHOTO, POOLS, QR, SONY, SUMITOMO, TEAM_PHOTO, WORKPLACE,
+  AFTERCARE, ALTERATIONS, CLIENTS, CONTACT, COVER, CREDENTIALS, EXPERIENCE, FITOUT, GROUP_IB, LOGO, MOVE, PATH, PHOTO, POOLS, POSITION, QR, SONY, SUMITOMO, TEAM_PHOTO, WORKPLACE,
   type CaseStudy,
 } from "./data";
 
@@ -88,7 +89,7 @@ function Eyebrow({ children, dark = false, className }: { children: ReactNode; d
 function Photo({ src, alt, className, position }: { src: string; alt: string; className?: string; position?: string }) {
   return (
     <div className={cn("overflow-hidden", !className?.includes("absolute") && "relative", className)}>
-      <img src={src} alt={alt} draggable={false} className="absolute inset-0 h-full w-full object-cover" style={{ objectPosition: position ?? "50% 50%" }} />
+      <img src={src} alt={alt} draggable={false} className="absolute inset-0 h-full w-full object-cover" style={{ objectPosition: position ?? POSITION[src] ?? "50% 50%" }} />
     </div>
   );
 }
@@ -98,7 +99,7 @@ function Drift({ src, alt, position, className }: { src: string; alt: string; po
   const { print } = useDeck();
   return (
     <div className={cn("overflow-hidden", !className?.includes("absolute") && "relative", className)}>
-      <motion.img src={src} alt={alt} draggable={false} className="absolute inset-0 h-full w-full object-cover" style={{ objectPosition: position ?? "50% 50%" }} initial={print ? false : { scale: 1.08 }} animate={{ scale: 1 }} transition={{ duration: 10, ease: [0.16, 1, 0.3, 1] }} />
+      <motion.img src={src} alt={alt} draggable={false} className="absolute inset-0 h-full w-full object-cover" style={{ objectPosition: position ?? POSITION[src] ?? "50% 50%" }} initial={print ? false : { scale: 1.08 }} animate={{ scale: 1 }} transition={{ duration: 10, ease: [0.16, 1, 0.3, 1] }} />
     </div>
   );
 }
@@ -113,7 +114,7 @@ function Dot({ tone, size = 10 }: { tone: Tone; size?: number }) {
 }
 
 /** Optical corrections on top of area sizing: solid blocks read heavier, hairline marks lighter. */
-const WEIGHT: Record<string, number> = { "Sony Pictures": 1.35, "Union Bancaire Privée": 0.72, "HDFC Bank": 0.75, "FIJI Water": 0.8, "Procter & Gamble": 0.8, "Singapore Pools": 0.85 };
+const WEIGHT: Record<string, number> = { "Sony Pictures": 1.35, "Union Bancaire Privée": 0.72, "FIJI Water": 0.8, "Procter & Gamble": 0.8, "Singapore Pools": 0.85, "Hanwha": 0.8 };
 
 /** A logo sized to a fixed visual area, so wide and tall marks carry the same weight. */
 function LogoMark({ src, alt, area, maxHeight, maxWidth }: { src: string; alt: string; area: number; maxHeight: number; maxWidth: number }) {
@@ -125,7 +126,7 @@ function LogoMark({ src, alt, area, maxHeight, maxWidth }: { src: string; alt: s
   return <img ref={ref} src={src} alt={alt} draggable={false} onLoad={(event) => measure(event.currentTarget)} style={{ height, width: height * aspect }} className="object-contain" />;
 }
 
-/** "In practice" line: area and location, separated by a hairline. */
+/** Case study meta line: area and location, separated by a hairline. */
 function Meta({ study, dark = false }: { study: CaseStudy; dark?: boolean }) {
   return (
     <div className={cn("flex flex-wrap items-center gap-x-6 gap-y-2 text-[21px]", dark ? "text-white/70" : MUTED)}>
@@ -273,23 +274,22 @@ function Buddy({ page }: { page: number }) {
 function Workshop({ page }: { page: number }) {
   return (
     <Frame page={page} section="people">
-      <div className="absolute left-[160px] top-[190px] w-[900px]">
+      <div className="absolute left-[160px] top-[190px] w-[820px]">
         <H size={58}>The best starting point for an office is <Em>understanding how people use it.</Em></H>
         <Reveal delay={0.7}><p className={cn("mt-10 border-t pt-8 text-[23px] leading-[1.55]", RULE, BODY)}>{WORKPLACE.body}</p></Reveal>
         <Reveal delay={0.9}><p className={cn("mt-8 flex items-center gap-4 text-[19px] font-light", MUTED)}><Dot tone="blue" />{WORKPLACE.note}</p></Reveal>
       </div>
-      {/* Placeholder: the client will supply workshop video and photos. */}
-      <Reveal from="fade" delay={0.3} className={cn("absolute bottom-[150px] right-[160px] top-[170px] flex w-[600px] flex-col items-center justify-center rounded-[24px] border border-dashed text-center", RULE, MIST)}>
-        <Camera className="h-[44px] w-[44px] text-[#151515]/35" strokeWidth={1.25} />
-        <p className="mt-6 text-[22px] font-medium tracking-[-0.02em] text-[#151515]/60">Workshop snapshots</p>
-        <p className={cn("mt-2 text-[18px] font-light", MUTED)}>Video and photos to be supplied</p>
-      </Reveal>
+      {/* The Singapore Pools workplace workshop: the room at work, then the photo-card exercise up close. */}
+      <div className="absolute bottom-[150px] right-[160px] top-[170px] grid w-[700px] grid-rows-[1.25fr_1fr] gap-4">
+        <MaskReveal delay={0.3} className="relative overflow-hidden rounded-[24px]"><Drift src={PHOTO.workshopRoom} alt="Singapore Pools staff in a D'trax workplace workshop" className="absolute inset-0" /></MaskReveal>
+        <MaskReveal delay={0.45} className="relative overflow-hidden rounded-[24px]"><Photo src={PHOTO.workshopCards} alt="Matching workspace photographs to activities during the workshop" className="absolute inset-0" /></MaskReveal>
+      </div>
     </Frame>
   );
 }
 
 /** Case study, split layout: story on the left, photo mosaic on the right. */
-function CaseSplit({ page, section, study, tone, eyebrow = "In practice", children }: { page: number; section: Section; study: CaseStudy; tone: Tone; eyebrow?: string; children?: ReactNode }) {
+function CaseSplit({ page, section, study, tone, eyebrow = "What we did", children }: { page: number; section: Section; study: CaseStudy; tone: Tone; eyebrow?: string; children?: ReactNode }) {
   return (
     <Frame page={page} section={section}>
       <MaskReveal className="absolute bottom-[150px] right-[160px] top-[170px] w-[800px] overflow-hidden rounded-[24px]"><Drift src={study.photos[0]} alt={study.name} className="absolute inset-0" /></MaskReveal>
@@ -306,10 +306,10 @@ function CaseSplit({ page, section, study, tone, eyebrow = "In practice", childr
   );
 }
 
-/** The photographs after a case study's hero, split into gallery slides: three, then up to two. */
+/** One gallery slide per case study: its chosen three photographs, or the three after the hero. */
 const galleries = (study: CaseStudy) => {
-  const rest = study.photos.slice(1);
-  return rest.length > 3 ? [rest.slice(0, 3), rest.slice(3, 5)] : rest.length ? [rest] : [];
+  const photos = study.gallery ?? study.photos.slice(1, 4);
+  return photos.length ? [photos] : [];
 };
 
 /** A gallery slide: large photographs only, with the project named quietly in the corner. */
@@ -355,7 +355,7 @@ function Quote({ page, section, study, tone }: { page: number; section: Section;
   return (
     <Frame page={page} section={section}>
       <MaskReveal from="left" className="absolute bottom-[150px] left-[160px] top-[170px] w-[480px] overflow-hidden rounded-[24px]">
-        <Drift src={study.photos[1] ?? study.photos[0]} alt={study.name} className="absolute inset-0" />
+        <Drift src={study.quotePhoto ?? study.photos[1] ?? study.photos[0]} alt={study.name} className="absolute inset-0" />
       </MaskReveal>
       <div className="absolute bottom-[150px] left-[760px] right-[160px] top-[170px] flex flex-col justify-center">
         <Reveal from="fade"><span className={cn(serif.className, "block h-[110px] overflow-visible italic leading-[1.2]")} style={{ fontSize: 180, color: TONE[tone], WebkitTextStroke: "1px rgba(21,21,21,0.25)" }}>“</span></Reveal>
@@ -415,7 +415,7 @@ function CaseImmersive({ page, section, study, tone }: { page: number; section: 
       <div aria-hidden="true" className="absolute inset-x-0 bottom-0 h-[260px] bg-gradient-to-t from-[#151515]/70 to-transparent" />
       <div aria-hidden="true" className="absolute inset-x-0 top-0 h-[220px] bg-gradient-to-b from-[#151515]/70 to-transparent" />
       <div className="absolute left-[160px] top-[220px] w-[620px]">
-        <Reveal><div className="flex items-center gap-4"><Dot tone={tone} size={12} /><Eyebrow dark>In practice</Eyebrow></div></Reveal>
+        <Reveal><div className="flex items-center gap-4"><Dot tone={tone} size={12} /><Eyebrow dark>What we did</Eyebrow></div></Reveal>
         <H size={88} className="mt-6" delay={0.1}>{study.name}</H>
         <Reveal delay={0.45} className="mt-6"><Meta study={study} dark /></Reveal>
         <Reveal delay={0.6} className="mt-8">
@@ -481,7 +481,7 @@ function Alterations({ page }: { page: number }) {
   return (
     <Frame page={page} section="current">
       <MaskReveal from="left" className="absolute bottom-[150px] left-[160px] top-[170px] w-[620px] overflow-hidden rounded-[24px]">
-        <Drift src={PHOTO.edelmanReception} alt="An office reworked by D'trax" className="absolute inset-0" />
+        <Drift src={PHOTO.pod} alt="A meeting pod added to an existing office" className="absolute inset-0" />
       </MaskReveal>
       <div className="absolute left-[880px] right-[160px] top-[190px]">
         <H size={64}>Make more of the office <Em>you have</Em></H>
@@ -590,6 +590,9 @@ function Aftercare({ page }: { page: number }) {
    06 · Clients & credentials
    ──────────────────────────────────────────────────────────────── */
 
+/** Logo rows on the clients page, as [start, end) slices of CLIENTS: 6, then a centred 5, then 6. */
+const CLIENT_ROWS: [number, number][] = [[0, 6], [6, 11], [11, 17]];
+
 function Clients({ page }: { page: number }) {
   return (
     <Frame page={page} section="clients">
@@ -598,15 +601,20 @@ function Clients({ page }: { page: number }) {
         <Reveal delay={0.3}><Eyebrow className="pb-3">Our clients include</Eyebrow></Reveal>
       </div>
       <div className={cn("absolute left-[160px] right-[160px] top-[320px] border-t", RULE)}>
-        {[CLIENTS.slice(0, 6), CLIENTS.slice(6, 12), CLIENTS.slice(12)].map((row, r) => (
-          <div key={r} className={cn("flex justify-center border-b", RULE)}>
-            {row.map((client, i) => (
-              <Reveal key={client.name} from="fade" delay={0.3 + (r * 6 + i) * 0.05} className={cn("flex h-[128px] w-[266.67px] items-center justify-center px-9", i ? cn("border-l", RULE) : "")}>
-                <Float index={r * 6 + i}><LogoMark src={client.logo} alt={client.name} area={11000 * (WEIGHT[client.name] ?? 1)} maxHeight={84} maxWidth={196} /></Float>
-              </Reveal>
-            ))}
-          </div>
-        ))}
+        {/* 6 · 5 · 6: full rows run edge to edge; the short middle row is centred and framed by hairlines on both sides, so every cell is the same width and boxed the same way. */}
+        {CLIENT_ROWS.map(([start, end], r) => {
+          const row = CLIENTS.slice(start, end);
+          const full = row.length === 6;
+          return (
+            <div key={r} className={cn("flex justify-center border-b", RULE)}>
+              {row.map((client, i) => (
+                <Reveal key={client.name} from="fade" delay={0.3 + (start + i) * 0.05} className={cn("flex h-[128px] w-[266.67px] items-center justify-center px-9", (i > 0 || !full) && cn("border-l", RULE), !full && i === row.length - 1 && cn("border-r", RULE))}>
+                  <Float index={start + i}><LogoMark src={client.logo} alt={client.name} area={11000 * (WEIGHT[client.name] ?? 1)} maxHeight={84} maxWidth={196} /></Float>
+                </Reveal>
+              ))}
+            </div>
+          );
+        })}
       </div>
       <Reveal delay={1.3} className="absolute left-[160px] right-[160px] top-[760px] flex items-center gap-12">
         <p className="font-medium leading-none tracking-[-0.06em]" style={{ fontSize: 120 }}><CountUp value={37} suffix="%" delay={1.4} /></p>
@@ -617,19 +625,48 @@ function Clients({ page }: { page: number }) {
   );
 }
 
+/**
+ * A certificate scan that opens full size in a pop-up when clicked (live only; print shows the scan as is).
+ * The pop-up is portalled to <body> so it escapes the scaled slide, and it swallows clicks and keys
+ * so closing it never advances or leaves the deck.
+ */
+function Certificate({ src, title }: { src: string; title: string }) {
+  const { print } = useDeck();
+  const [open, setOpen] = useState(false);
+  useEffect(() => {
+    if (!open) return;
+    const onKey = (event: KeyboardEvent) => {
+      event.stopImmediatePropagation();
+      event.stopPropagation();
+      if (event.key === "Escape") { event.preventDefault(); setOpen(false); }
+    };
+    window.addEventListener("keydown", onKey, true);
+    return () => window.removeEventListener("keydown", onKey, true);
+  }, [open]);
+  const scan = <img src={src} alt={title} draggable={false} className="max-h-full max-w-full object-contain shadow-[0_10px_30px_rgba(0,0,0,0.08)]" />;
+  if (print) return scan;
+  return (
+    <>
+      <button type="button" aria-label={`Enlarge ${title}`} className="group relative flex h-full max-w-full cursor-zoom-in items-center justify-center" onClick={(event) => { event.stopPropagation(); setOpen(true); }}>
+        {scan}
+        <span className="absolute bottom-3 right-3 flex h-[44px] w-[44px] items-center justify-center rounded-full bg-[#151515]/75 text-white opacity-0 transition-opacity duration-300 group-hover:opacity-100"><Maximize2 className="h-[20px] w-[20px]" strokeWidth={1.6} /></span>
+      </button>
+      {open ? createPortal(
+        <div role="dialog" aria-modal="true" aria-label={title} className="fixed inset-0 z-[1000] flex cursor-zoom-out items-center justify-center bg-[#151515]/85 p-[4vh] backdrop-blur-sm" onClick={(event) => { event.stopPropagation(); setOpen(false); }}>
+          <motion.img src={src} alt={title} draggable={false} initial={{ opacity: 0, scale: 0.96 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }} className="max-h-full max-w-full bg-white object-contain shadow-[0_20px_60px_rgba(0,0,0,0.4)]" />
+          <button type="button" aria-label="Close" className="absolute right-6 top-6 flex h-[48px] w-[48px] items-center justify-center rounded-full bg-white/10 text-white transition-colors hover:bg-white/20" onClick={(event) => { event.stopPropagation(); setOpen(false); }}><X className="h-[22px] w-[22px]" /></button>
+        </div>,
+        document.body,
+      ) : null}
+    </>
+  );
+}
+
 function Credentials({ page }: { page: number }) {
-  const card = (key: string, image: string | undefined, delay: number, title: string, body: string, tone: Tone) => (
+  const card = (key: string, image: string | undefined, delay: number, title: string, body: string, tone: Tone, logo?: string) => (
     <Reveal key={key} delay={delay} className="border-l border-[#151515]/12 px-8 first:border-l-0 first:pl-0">
       <div className={cn("flex h-[320px] items-center justify-center rounded-[20px] p-8", MIST)}>
-        {image ? (
-          <img src={image} alt={title} draggable={false} className="max-h-full max-w-full object-contain shadow-[0_10px_30px_rgba(0,0,0,0.08)]" />
-        ) : (
-          <div className="flex h-full w-[220px] flex-col items-center justify-center bg-white text-center shadow-[0_10px_30px_rgba(0,0,0,0.08)]">
-            <span className="text-[18px] font-medium uppercase tracking-[0.2em] text-[#151515]/50">BCA</span>
-            <span className="mt-3 text-[54px] font-medium leading-none tracking-[-0.04em]">CR06</span>
-            <span className={cn("mt-3 text-[19px]", MUTED)}><Em>Grade L3</Em></span>
-          </div>
-        )}
+        {image ? <Certificate src={image} title={title} /> : logo ? <img src={logo} alt="BCA" draggable={false} className="w-[200px] object-contain" /> : null}
       </div>
       <div className="mt-7 flex items-start gap-3"><span className="mt-[11px] flex"><Dot tone={tone} /></span><p className="text-[23px] font-medium leading-tight tracking-[-0.025em]">{title}</p></div>
       {body ? <p className={cn("mt-3 text-[19px] leading-[1.5]", BODY)}>{body}</p> : null}
@@ -643,7 +680,7 @@ function Credentials({ page }: { page: number }) {
           <div>
             <Reveal delay={0.3}><Eyebrow>Safety and contractor credentials</Eyebrow></Reveal>
             <div className="mt-6 grid grid-cols-3">
-              {CREDENTIALS.safety.map((cert, i) => card(cert.title, cert.image, 0.4 + i * 0.12, cert.title, cert.body, TONES[i]))}
+              {CREDENTIALS.safety.map((cert, i) => card(cert.title, "image" in cert ? cert.image : undefined, 0.4 + i * 0.12, cert.title, cert.body, TONES[i], "logo" in cert ? cert.logo : undefined))}
             </div>
           </div>
           <div className="border-l border-[#151515]/12 pl-8">

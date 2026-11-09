@@ -1,12 +1,46 @@
 import { asset } from "@/lib/base-path";
-import { CERT, CLIENT_LOGO, LOGO, OFFICE, TEAM_PHOTO } from "@/decks/dtrax/data";
+import { LOGO, OFFICE, TEAM_PHOTO } from "@/decks/dtrax/data";
 
 /* Copy follows "D'trax BD Deck Copy 2026" (client brief), as written.
    Photos, logos and certificates are reused from the company profile. */
 
-export { CERT, LOGO, OFFICE, TEAM_PHOTO };
+export { LOGO, OFFICE, TEAM_PHOTO };
 
 const project = (folder: string, file: string) => asset(`/assets/projects/${folder}/${file}`);
+/** Photos and marks used only by this deck (originals in media/originals/assets/bd). */
+const bd = (path: string) => asset(`/assets/bd/${path}`);
+const trimLogo = (file: string) => asset(`/assets/logos/trim/${file}`);
+
+/** Client marks for this deck, on the shared trimmed logo files (kept local so the company profile's client list can change independently). */
+const CLIENT_LOGO = {
+  "Sony Pictures": trimLogo("sony-pictures.png"),
+  "Procter & Gamble": trimLogo("procter-gamble.png"),
+  "Traveloka": trimLogo("traveloka.png"),
+  "Mitsui Chemicals": trimLogo("mitsui-chemicals.png"),
+  "Sumitomo Chemical Asia": trimLogo("sumitomo-chemical.png"),
+  "Aramco Trading Singapore": trimLogo("aramco.png"),
+  "Group-IB (Innovis)": trimLogo("group-ib.png"),
+  "FIJI Water": trimLogo("fiji-water.png"),
+  "Singapore Pools": trimLogo("singapore-pools.png"),
+  "Union Bancaire Privée": trimLogo("union-bancaire-priv-e.png"),
+  "Edelman": trimLogo("edelman.png"),
+  "Embecta": trimLogo("embecta.png"),
+  "Digital Edge": trimLogo("digital-edge.png"),
+  "SeaLead Shipping": trimLogo("sealead.png"),
+  "Singapore Kindness Movement": trimLogo("singapore-kindness-movement.png"),
+  "Hanwha": trimLogo("hanwha.png"),
+  "Wabtec": trimLogo("wabtec.png"),
+};
+
+/** Certificate scans with their scan frames cropped off. */
+export const CERT = {
+  iso: asset("/assets/certs/cert-iso-borderless.png"),
+  bizsafe: asset("/assets/certs/cert-bizsafe-borderless.png"),
+  sida: asset("/assets/certs/cert-sida-borderless.png"),
+};
+
+/** BCA mark with its white background knocked out, for the credentials page (no certificate). */
+export const BCA_LOGO = bd("logos/bca.png");
 
 export const QR = asset("/assets/bd/ronald-goh-qr.png");
 
@@ -32,6 +66,28 @@ export const PHOTO = {
   sonyPantry: project("sony-pictures", "4.jpg"),
   edelmanMeeting: project("edelman", "3.jpg"),
   edelmanReception: project("edelman", "2.jpg"),
+  /* Singapore Pools workplace workshop, from "Workshop Photos" (Dtrax-SGP-Workshop_00107, 00091, 00122, 00180, 00099, 00097). */
+  workshopRoom: bd("workshop/room.jpg"),
+  workshopCards: bd("workshop/cards.jpg"),
+  workshopTable: bd("workshop/table.jpg"),
+  workshopGroup: bd("workshop/group.jpg"),
+  workshopPhotoCards: bd("workshop/photo-cards.jpg"),
+  workshopBoard: bd("workshop/board.jpg"),
+  /* Group-IB at Innovis, from "Group-IB (Innovis)" (_DSF3848, 3652, 3608, 3386, 3871). */
+  innovisEntrance: bd("group-ib-innovis/entrance.jpg"),
+  innovisOpenOffice: bd("group-ib-innovis/open-office.jpg"),
+  innovisMeeting: bd("group-ib-innovis/meeting-room.jpg"),
+  innovisCafe: bd("group-ib-innovis/cafe.jpg"),
+  innovisBar: bd("group-ib-innovis/bar.jpg"),
+  /* From "Before After": S-7 (the meeting pod) and _DSF2780 (Sony Pictures boardroom). */
+  pod: bd("before-after/pod.jpg"),
+  sonyBoardroom: bd("before-after/sony-boardroom.jpg"),
+};
+
+/** Crops that need steering away from the centre, keyed by photo (object-position). */
+export const POSITION: Record<string, string> = {
+  /* Pull the Singapore Pools crop right so the logo wall sits in the narrow quote panel. */
+  [PHOTO.poolsPantry]: "72% 50%",
 };
 
 export const COVER = {
@@ -49,8 +105,8 @@ export const EXPERIENCE = {
     { value: 37, suffix: "%", label: "of our projects in the last five years came from returning clients" },
   ],
   leaders: [
-    { name: "Ronald Goh", role: "Co-founder and Managing Director", body: "More than 25 years in corporate interior fit-out.", photo: TEAM_PHOTO.ronald, position: "50% 22%" },
-    { name: "Jayne Ong", role: "Co-founder, Head of Costing and Operation", body: "More than 20 years in costing and operations, overseeing project costing, cost control and day-to-day operations.", photo: TEAM_PHOTO.jayne, position: "50% 14%" },
+    { name: "Ronald Goh", role: "Co-founder and Managing Director", body: "More than 30 years in corporate interior fit-out.", photo: bd("team/ronald-leadership.jpg"), position: "50% 50%" },
+    { name: "Jayne Ong", role: "Co-founder, Head of Operation", body: "More than 20 years in costing and operations, overseeing project costing, cost control and day-to-day operations.", photo: TEAM_PHOTO.jayne, position: "50% 14%" },
   ],
   buddy: "Every designer and project manager has a designated colleague who can step in when needed, keeping your project moving.",
 };
@@ -69,7 +125,12 @@ export interface CaseStudy {
   award?: string;
   outcomes?: { value: number; suffix: string; label: string }[];
   quote?: { text: string; name: string; role: string };
+  /** photos[0] is the case study's hero. */
   photos: string[];
+  /** The three photographs on the gallery page; defaults to the three after the hero. */
+  gallery?: string[];
+  /** The photograph beside the quote; defaults to photos[1]. */
+  quotePhoto?: string;
   logo: string;
 }
 
@@ -90,7 +151,9 @@ export const POOLS: CaseStudy = {
     name: "Mohd Norhelmy Bin Ja’afar",
     role: "Director, Workplace and Sustainability Engineering, Singapore Pools",
   },
-  photos: [PHOTO.poolsBreakout, PHOTO.poolsLobby, PHOTO.poolsMeeting, PHOTO.poolsWork, project("singapore-pools", "s-4.jpg"), project("singapore-pools", "s-13.jpg")],
+  photos: [PHOTO.workshopTable],
+  gallery: [PHOTO.workshopGroup, PHOTO.workshopPhotoCards, PHOTO.workshopBoard],
+  quotePhoto: PHOTO.poolsPantry,
   logo: CLIENT_LOGO["Singapore Pools"],
 };
 
@@ -100,7 +163,7 @@ export const FITOUT = {
 };
 
 export const GROUP_IB: CaseStudy = {
-  name: "Group-IB",
+  name: "Group-IB (Innovis)",
   area: "7,500 sq ft",
   location: "Innovis, Fusionopolis",
   summary: ["An office combining spaces for focused work, meetings and social time."],
@@ -108,10 +171,12 @@ export const GROUP_IB: CaseStudy = {
   quote: {
     text: "The team was able to meet and deliver our needs in a timely manner despite the challenging Covid-19 situation as well as time constraints, and we are extremely satisfied with their efforts.",
     name: "Sergey Nikitin",
-    role: "CEO, Group-IB",
+    role: "CEO, Group-IB (Innovis)",
   },
-  photos: [PHOTO.groupIbBar, PHOTO.groupIbLounge, PHOTO.groupIbMeeting, PHOTO.groupIbWork, project("group-ib", "g-8.jpg"), project("group-ib", "g-4.jpg")],
-  logo: CLIENT_LOGO["Group-IB"],
+  photos: [PHOTO.innovisEntrance],
+  gallery: [PHOTO.innovisOpenOffice, PHOTO.innovisMeeting, PHOTO.innovisCafe],
+  quotePhoto: PHOTO.innovisBar,
+  logo: CLIENT_LOGO["Group-IB (Innovis)"],
 };
 
 export const PATH = [
@@ -166,36 +231,37 @@ export const SONY: CaseStudy = {
     name: "Brett D. Hogg",
     role: "Executive Vice President and Managing Director, Sony Pictures",
   },
-  photos: [PHOTO.sonyReception, PHOTO.sonyViewing, PHOTO.sonyMeeting, PHOTO.sonyPantry, project("sony-pictures", "5.jpg")],
+  photos: [PHOTO.sonyReception, PHOTO.sonyViewing, PHOTO.sonyMeeting, PHOTO.sonyPantry],
+  quotePhoto: PHOTO.sonyBoardroom,
   logo: CLIENT_LOGO["Sony Pictures"],
 };
 
 /** Clients in the order the copy lists them. "Aramco Trading" uses the company profile's Aramco mark. */
 export const CLIENTS: { name: string; logo: string }[] = [
   ["Sony Pictures", CLIENT_LOGO["Sony Pictures"]],
-  ["Spotify", CLIENT_LOGO["Spotify"]],
   ["Procter & Gamble", CLIENT_LOGO["Procter & Gamble"]],
   ["Traveloka", CLIENT_LOGO["Traveloka"]],
   ["Mitsui Chemicals", CLIENT_LOGO["Mitsui Chemicals"]],
   ["Sumitomo Chemical Asia", CLIENT_LOGO["Sumitomo Chemical Asia"]],
   ["Aramco Trading", CLIENT_LOGO["Aramco Trading Singapore"]],
-  ["Group-IB", CLIENT_LOGO["Group-IB"]],
+  ["Group-IB (Innovis)", CLIENT_LOGO["Group-IB (Innovis)"]],
   ["FIJI Water", CLIENT_LOGO["FIJI Water"]],
   ["Singapore Pools", CLIENT_LOGO["Singapore Pools"]],
   ["Union Bancaire Privée", CLIENT_LOGO["Union Bancaire Privée"]],
-  ["HDFC Bank", CLIENT_LOGO["HDFC Bank"]],
   ["Edelman", CLIENT_LOGO["Edelman"]],
-  ["Embecta", asset("/assets/logos/trim/embecta.png")],
-  ["Digital Edge", asset("/assets/logos/trim/digital-edge.png")],
+  ["Embecta", CLIENT_LOGO["Embecta"]],
+  ["Digital Edge", CLIENT_LOGO["Digital Edge"]],
   ["SeaLead Shipping", CLIENT_LOGO["SeaLead Shipping"]],
   ["Singapore Kindness Movement", CLIENT_LOGO["Singapore Kindness Movement"]],
+  ["Hanwha", CLIENT_LOGO["Hanwha"]],
+  ["Wabtec", CLIENT_LOGO["Wabtec"]],
 ].map(([name, logo]) => ({ name, logo }));
 
 export const CREDENTIALS = {
   safety: [
     { title: "ISO 45001:2018", body: "Occupational Health and Safety", image: CERT.iso },
     { title: "bizSAFE Star", body: "", image: CERT.bizsafe },
-    { title: "BCA registration", body: "CR06 Interior Decoration and Finishing Works, Grade L3" },
+    { title: "BCA registration", body: "CR06 Interior Decoration and Finishing Works, Grade L3", logo: BCA_LOGO },
   ],
   award: { title: "Singapore Interior Design Awards 2023", body: "Bronze — Best in Workplace Design", image: CERT.sida },
 };

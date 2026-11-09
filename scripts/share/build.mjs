@@ -13,7 +13,7 @@ const root = resolve(here, "../..");
 const DECKS = {
   dtrax: { title: "D'trax Company Profile 2026", description: "D'trax Design company profile deck, 2026." },
   bd: { title: "D'trax BD Deck 2026", description: "D'trax Design business development deck, 2026." },
-  handbook: { title: "D'trax Employee Handbook 2026", description: "D'trax Design employee handbook, 2026." },
+  handbook: { title: "D'trax Employee Handbook", description: "D'trax Design employee handbook." },
 };
 const deck = process.argv[2] ?? "dtrax";
 if (!DECKS[deck]) throw new Error(`Unknown deck "${deck}". Use one of: ${Object.keys(DECKS).join(", ")}`);
