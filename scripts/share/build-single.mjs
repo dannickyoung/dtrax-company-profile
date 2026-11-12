@@ -32,6 +32,12 @@ const deck = process.argv[2] ?? "dtrax";
 if (!DECKS[deck]) throw new Error(`Unknown deck "${deck}". Use one of: ${Object.keys(DECKS).join(", ")}`);
 const out = resolve(process.argv[3] ?? join(root, "share-out", "single", DECKS[deck].file));
 const MAX_EDGE = 1920;
+// Shown from the first bytes of the file until the deck has mounted: a thin lime bar and a percentage on black.
+const LOADER = `<div id="deck-loader" style="position:fixed;inset:0;z-index:100;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;background:#151515;color:rgba(255,255,255,.7);font:500 13px/1 'DM Sans',system-ui,sans-serif;letter-spacing:.2em;transition:opacity .5s ease">
+<div style="width:min(320px,60vw);height:2px;border-radius:2px;background:rgba(255,255,255,.14);overflow:hidden"><div id="deck-loader-bar" style="height:100%;width:0;background:#DDFF97;transition:width .25s ease-out"></div></div>
+<div><span id="deck-loader-pct" style="font-variant-numeric:tabular-nums">0%</span>&nbsp;&nbsp;LOADING</div>
+</div>
+<script>window.__DECK_PROGRESS__=function(f,end){var p=Math.round(Math.min(f,1)*100);document.getElementById("deck-loader-bar").style.width=p+"%";document.getElementById("deck-loader-pct").textContent=p+"%";if(end){var l=document.getElementById("deck-loader");setTimeout(function(){l.style.opacity="0";setTimeout(function(){l.remove()},550)},250)}};</script>`;
 const DEFAULT_EDGE = 1400; // referenced but never drawn in the click-through (e.g. unused table entries)
 const QUALITY = 76;
 const sizesFile = join(here, "single-sizes.json");
@@ -137,9 +143,30 @@ try {
     map[path] = `data:${mime};base64,${buf.toString("base64")}`;
   }
 
+  // The file is tens of MB and nothing can render until the deck script at the end has run. So the page opens on a
+  // loader, and the media map arrives as a run of small inline scripts: the parser runs each one as its bytes land,
+  // and each moves the bar to the share of the file received so far. The deck script is the last share.
+  const scriptOf = (code) => `<script>${code.replace(/<\/script/gi, "<\\/script")}</script>`;
+  const CHUNK = 256 * 1024;
+  const pieces = [];
+  for (const [path, uri] of Object.entries(map))
+    for (let i = 0; i < uri.length; i += CHUNK) pieces.push([path, uri.slice(i, i + CHUNK)]);
+  const total = pieces.reduce((sum, [, part]) => sum + part.length, 0) + js.length;
+  const batches = [];
+  let batch = [], size = 0, done = 0;
+  for (const piece of pieces) {
+    batch.push(piece); size += piece[1].length;
+    if (size >= CHUNK) { done += size; batches.push([batch, done / total]); batch = []; size = 0; }
+  }
+  if (batch.length) { done += size; batches.push([batch, done / total]); }
+  const payload = [
+    scriptOf("window.__DECK_ASSETS__={};window.__DECK_PUT__=function(l,f){for(var i=0;i<l.length;i++)__DECK_ASSETS__[l[i][0]]=(__DECK_ASSETS__[l[i][0]]||'')+l[i][1];__DECK_PROGRESS__(f)};"),
+    ...batches.map(([list, frac]) => scriptOf(`__DECK_PUT__(${JSON.stringify(list).replace(/</g, "\\u003c")},${frac.toFixed(4)})`)),
+  ].join("\n");
+
   const esc = (s) => s.replace(/&/g, "&amp;").replace(/"/g, "&quot;").replace(/</g, "&lt;");
   const html = `<!doctype html>
-<html lang="en">
+<html lang="en" style="background:#151515">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -151,9 +178,11 @@ try {
 <style>${css.replace(/<\/style/gi, "<\\/style")}</style>
 </head>
 <body>
+${LOADER}
 <div id="deck"></div>
-<script>window.__DECK_ASSETS__=${JSON.stringify(map).replace(/</g, "\\u003c")};</script>
+${payload}
 <script>${js.replace(/<\/script/gi, "<\\/script")}</script>
+<script>__DECK_PROGRESS__(1, true)</script>
 </body>
 </html>
 `;
