@@ -37,10 +37,14 @@ export const HEADSHOT: Record<string, string> = {
   "Adrian Yen": asset("/assets/headshots/adrian-yen.jpg"),
   "Danny Chua": asset("/assets/headshots/danny-chua.jpg"),
   "Esther Choo": asset("/assets/headshots/esther-choo.jpg"),
+  "Gilbert Penaflor": asset("/assets/headshots/gilbert-penaflor.jpg"),
+  "Johnathan Ng": asset("/assets/headshots/johnathan-ng.jpg"),
   "Mi Mi Nay Win": asset("/assets/headshots/mi-mi-nay-win.jpg"),
   "Sandrey Lim": asset("/assets/headshots/sandrey-lim.jpg"),
   "Sapp Cheng": asset("/assets/headshots/sapp-cheng.jpg"),
+  "Steven Leng": asset("/assets/headshots/steven-leng.jpg"),
   "Tan Swee Lan": asset("/assets/headshots/tan-swee-lan.jpg"),
+  "Victoria Tan": asset("/assets/headshots/victoria-tan.jpg"),
   "Yong Yee Yee": asset("/assets/headshots/yong-yee-yee.jpg"),
 };
 
@@ -277,7 +281,7 @@ export const LEADERS: Leader[] = [
   },
 ];
 
-/** Organisation chart. Founders sit at the centre; teams and people fan out below. */
+/** Organisation chart. Founders sit at the centre; teams ring them, and each team's people ring their team. */
 export const ORG_TEAMS: { name: string; members: { name: string; role: string }[] }[] = [
   { name: "Project Team", members: [{ name: "Sandrey Lim", role: "Project Director" }, { name: "Steve Tan", role: "Senior Project Manager" }, { name: "Erick Chng", role: "Construction Manager" }, { name: "Adrian Yen", role: "Senior Project Executive" }] },
   { name: "BD Team", members: [{ name: "Johnathan Ng", role: "Business Development Manager" }] },

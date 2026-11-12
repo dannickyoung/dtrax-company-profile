@@ -1,6 +1,6 @@
 // Builds the deck as a standalone page (index.html + deck.js + deck.css + assets/)
 // for sharing outside the Next.js site, e.g. as a claude.ai link.
-// Usage: node scripts/share/build.mjs <dtrax|bd|handbook> <output-dir>
+// Usage: node scripts/share/build.mjs <dtrax|bd|bd-johnathan|handbook> <output-dir>
 import { execFileSync } from "node:child_process";
 import { cpSync, mkdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
@@ -13,6 +13,7 @@ const root = resolve(here, "../..");
 const DECKS = {
   dtrax: { title: "D'trax Company Profile 2026", description: "D'trax Design company profile deck, 2026." },
   bd: { title: "D'trax BD Deck 2026", description: "D'trax Design business development deck, 2026." },
+  "bd-johnathan": { title: "D'trax BD Deck 2026 · Johnathan Ng", description: "D'trax Design business development deck, 2026." },
   handbook: { title: "D'trax Employee Handbook", description: "D'trax Design employee handbook." },
 };
 const deck = process.argv[2] ?? "dtrax";

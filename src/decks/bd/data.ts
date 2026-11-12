@@ -42,7 +42,12 @@ export const CERT = {
 /** BCA mark with its white background knocked out, for the credentials page (no certificate). */
 export const BCA_LOGO = bd("logos/bca.png");
 
-export const QR = asset("/assets/bd/ronald-goh-qr.png");
+/** Who the closing page puts forward: the BD deck is built once per contact, each with their own digital business card. */
+export interface BdContact { name: string; qr: string }
+export const CONTACTS = {
+  ronald: { name: "Ronald Goh", qr: asset("/assets/bd/ronald-goh-qr.png") },
+  johnathan: { name: "Johnathan Ng", qr: asset("/assets/bd/johnathan-ng-qr.png") },
+} satisfies Record<string, BdContact>;
 
 export const PHOTO = {
   poolsBreakout: project("singapore-pools", "s-5.jpg"),
@@ -269,7 +274,6 @@ export const CREDENTIALS = {
 export const CONTACT = {
   lead: "Share your office location, approximate floor area, target date and what you would like to change.",
   next: "We’ll discuss your requirements and outline the next steps for your project.",
-  name: "Ronald Goh",
   company: "D’trax Design",
   web: "www.dtrax.com.sg",
   address: ["10 Anson Road, #30-13 International Plaza", "Singapore 079903"],

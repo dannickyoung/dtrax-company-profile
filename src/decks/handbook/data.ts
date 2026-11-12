@@ -191,8 +191,7 @@ export const PDPA = [
 ];
 export interface Person { name: string; role: string; photo?: string }
 
-/** photo: Victoria's headshot is still to come; set it here (e.g. asset("/assets/headshots/victoria-tan.jpg")) and the PDPA page shows it in place of her initials. */
-export const DPO: Person = { name: "Victoria Tan", role: "Data Protection Officer" };
+export const DPO: Person = { name: "Victoria Tan", role: "Data Protection Officer", photo: asset("/assets/headshots/victoria-tan.jpg") };
 
 /* 08 · IT, email, device and acceptable use */
 

@@ -1,6 +1,6 @@
 // Builds a deck as ONE self-contained .html file (JS + CSS inline, media as data URIs) for hosts that serve a
 // single file from an opaque/sandboxed origin, e.g. the website's Admin → Decks. Google Fonts stay external.
-// Usage: node scripts/share/build-single.mjs <dtrax|bd|handbook> [output.html]
+// Usage: node scripts/share/build-single.mjs <dtrax|bd|bd-johnathan|handbook> [output.html]
 //
 // Size matters (the file is downloaded whole before slide 1 can show), so:
 // - Only the media THIS deck can show is inlined. Every asset() call lives in a module-level data table, so the
@@ -25,6 +25,7 @@ const root = resolve(here, "../..");
 const DECKS = {
   dtrax: { file: "dtrax-company-profile-2026.html", title: "D'trax Company Profile 2026", description: "D'trax Design company profile deck, 2026." },
   bd: { file: "dtrax-bd-deck-2026.html", title: "D'trax BD Deck 2026", description: "D'trax Design business development deck, 2026." },
+  "bd-johnathan": { file: "dtrax-bd-deck-johnathan-2026.html", title: "D'trax BD Deck 2026 · Johnathan Ng", description: "D'trax Design business development deck, 2026." },
   handbook: { file: "dtrax-employee-handbook.html", title: "D'trax Employee Handbook", description: "D'trax Design employee handbook." },
 };
 const deck = process.argv[2] ?? "dtrax";

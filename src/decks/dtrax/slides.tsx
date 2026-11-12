@@ -578,78 +578,94 @@ function KeyLeader({ page, leader, tone }: { page: number; leader: Leader; tone:
   );
 }
 
-/** Top-down chart: founders at the top, teams below, people fanned out beneath, joined by curved lines. */
+/** Which side of an avatar on the outer ring its label sits, so labels always point away from the centre. */
+function labelSide(deg: number): "left" | "right" | "top" | "bottom" {
+  const cos = Math.cos((deg * Math.PI) / 180);
+  if (cos < -0.5) return "left";
+  if (cos > 0.5) return "right";
+  return Math.sin((deg * Math.PI) / 180) < 0 ? "top" : "bottom";
+}
+
+/**
+ * Radial chart: the founders at the centre, the teams on a ring around them, and each team's people on an outer
+ * ring, gathered in their team's sector. A thin ring joins the teams to one another as well as to the founders.
+ */
 function OrgChart({ page }: { page: number }) {
   const { print } = useDeck();
-  const hub = { x: 960, y: 215 }, r1 = 300, r2 = 620;
-  // The people's ring is slightly narrower than it is deep, so the outward labels on its sides stay inside the margins.
-  const at = (r: number, deg: number) => ({ x: hub.x + r * (r === r2 ? 0.9 : 1) * Math.cos((deg * Math.PI) / 180), y: hub.y + r * Math.sin((deg * Math.PI) / 180) });
-  const people = ORG_TEAMS.flatMap((team, teamIndex) => team.members.map((member) => ({ ...member, teamIndex })));
-  // The fan opens wider as the team grows, so neighbours along the bottom keep about 15° between them.
-  const spread = Math.min(84, 76 + (people.length - 11) * 8), from = 90 + spread, to = 90 - spread, stepDeg = (from - to) / (people.length - 1);
-  const placed = people.map((person, index) => ({ ...person, angle: from - index * stepDeg }));
+  // Sized so outward labels clear the title column, the margins and the footer.
+  const hub = { x: 985, y: 558 };
+  const TEAM_RING = { rx: 320, ry: 200 }, PEOPLE_RING = { rx: 505, ry: 312 };
+  const at = (ring: { rx: number; ry: number }, deg: number) => ({ x: hub.x + ring.rx * Math.cos((deg * Math.PI) / 180), y: hub.y + ring.ry * Math.sin((deg * Math.PI) / 180) });
+  // One slot per person plus one empty slot after each team, so the teams read as separate groups around the circle.
+  const slots = ORG_TEAMS.reduce((sum, team) => sum + team.members.length + 1, 0), step = 360 / slots, start = -90 - step * 1.5;
+  let slot = 0;
   const teams = ORG_TEAMS.map((team, teamIndex) => {
-    const angles = placed.filter((person) => person.teamIndex === teamIndex).map((person) => person.angle);
-    return { ...team, tone: TONES[teamIndex % 3], angle: angles.reduce((sum, a) => sum + a, 0) / angles.length };
+    const members = team.members.map((member) => ({ ...member, teamIndex, angle: start + step * slot++ }));
+    slot++;
+    return { ...team, tone: TONES[teamIndex % 3], members, angle: members.reduce((sum, m) => sum + m.angle, 0) / members.length };
   });
+  const people = teams.flatMap((team) => team.members);
   const draw = (delay: number) => (print ? {} : { initial: { pathLength: 0, opacity: 0 }, animate: { pathLength: 1, opacity: 1 }, transition: { duration: 0.8, delay, ease: [0.22, 1, 0.36, 1] as const } });
   return (
     <Frame page={page} section="team">
-      <div className="absolute left-[160px] top-[170px] w-[440px]">
+      <div className="absolute left-[160px] top-[170px] w-[360px]">
         <H size={58}>Organisation <Em>chart</Em></H>
+        <Reveal delay={0.5}><p className={cn("mt-6 text-[20px] leading-[1.5]", BODY)}>Founder-led, and one team: every team works in open reach of the founders and of each other.</p></Reveal>
       </div>
       <svg className="absolute inset-0" width="1920" height="1080" viewBox="0 0 1920 1080" aria-hidden="true">
-        {teams.map((team, i) => <Beam key={team.name} d={curve(hub, at(r1, team.angle), team.angle > 90 ? 0.18 : -0.18)} color={TONE[team.tone]} base="rgba(21,21,21,0.22)" width={1.75} appear={0.4 + i * 0.07} />)}
-        {placed.map((person, i) => <motion.path key={person.name} d={curve(at(r1, teams[person.teamIndex].angle), at(r2, person.angle), person.angle > teams[person.teamIndex].angle ? 0.16 : -0.16)} fill="none" stroke={INK} strokeOpacity={0.16} strokeWidth={1.5} strokeLinecap="round" {...draw(0.8 + i * 0.05)} />)}
+        <motion.ellipse cx={hub.x} cy={hub.y} rx={PEOPLE_RING.rx} ry={PEOPLE_RING.ry} fill="none" stroke={INK} strokeOpacity={0.08} strokeWidth={1.25} strokeDasharray="2 7" strokeLinecap="round" {...draw(0.2)} />
+        <motion.ellipse cx={hub.x} cy={hub.y} rx={TEAM_RING.rx} ry={TEAM_RING.ry} fill="none" stroke={INK} strokeOpacity={0.18} strokeWidth={1.5} {...draw(0.3)} />
+        {teams.map((team, i) => <Beam key={team.name} d={curve(hub, at(TEAM_RING, team.angle), 0)} color={TONE[team.tone]} base="rgba(21,21,21,0.22)" width={1.75} appear={0.4 + i * 0.07} />)}
+        {people.map((person, i) => {
+          const team = teams[person.teamIndex];
+          return <motion.path key={person.name} d={curve(at(TEAM_RING, team.angle), at(PEOPLE_RING, person.angle), person.angle > team.angle ? 0.14 : -0.14)} fill="none" stroke={INK} strokeOpacity={0.16} strokeWidth={1.5} strokeLinecap="round" {...draw(0.8 + i * 0.05)} />;
+        })}
       </svg>
-      <Reveal from="scale" delay={0.1} className="absolute flex flex-col items-center" style={{ left: hub.x - 160, top: hub.y - 75, width: 320 }}>
+      <Reveal from="scale" delay={0.1} className="absolute flex h-[290px] w-[290px] flex-col items-center justify-center rounded-full bg-white shadow-[0_0_0_1px_rgba(21,21,21,0.08),0_0_60px_18px_rgba(221,255,151,0.7)]" style={{ left: hub.x - 145, top: hub.y - 145 }}>
         <div className="flex">
           {[TEAM_PHOTO.ronald, TEAM_PHOTO.jayne].map((src, i) => (
-            <span key={src} className={cn("h-[112px] w-[112px] overflow-hidden rounded-full border-[4px] border-white bg-[#E8E8E6] shadow-[0_0_0_1px_rgba(21,21,21,0.12)]", i === 1 && "-ml-5")}>
+            <span key={src} className={cn("h-[108px] w-[108px] overflow-hidden rounded-full border-[4px] border-white bg-[#E8E8E6] shadow-[0_0_0_1px_rgba(21,21,21,0.12)]", i === 1 && "-ml-4")}>
               <img src={src} alt="" draggable={false} className="h-full w-full object-cover" style={{ objectPosition: "50% 18%" }} />
             </span>
           ))}
         </div>
-        <span className="mt-3 rounded-full bg-white px-5 py-1 text-[19px] font-medium tracking-[-0.01em]">Ronald Goh · Jayne Ong</span>
-        <span className={cn("rounded-full bg-white px-4 text-[18px]", MUTED)}><Em>Founders</Em></span>
+        <span className="mt-3 text-[19px] font-medium tracking-[-0.01em]">Ronald Goh · Jayne Ong</span>
+        <span className={cn("text-[18px]", MUTED)}><Em>Founders</Em></span>
       </Reveal>
       {teams.map((team, i) => {
-        const p = at(r1, team.angle);
+        const p = at(TEAM_RING, team.angle);
         return (
           <Reveal key={team.name} from="scale" delay={0.4 + i * 0.07} className="absolute flex -translate-x-1/2 -translate-y-1/2 items-center gap-3 whitespace-nowrap rounded-full bg-white px-5 py-2.5 text-[19px] font-medium tracking-[-0.01em] shadow-[0_0_0_1px_rgba(21,21,21,0.15)]" style={{ left: p.x, top: p.y }}>
             <Dot tone={team.tone} />{team.name}
           </Reveal>
         );
       })}
-      {placed.map((person, i) => {
-        const p = at(r2, person.angle);
+      {people.map((person, i) => {
+        const p = at(PEOPLE_RING, person.angle);
         const photo = HEADSHOT[person.name];
-        // On the steep sides of the fan, people sit close together vertically, so their label goes beside the avatar, facing outward.
-        const side = person.angle > 128 ? "left" : person.angle < 52 ? "right" : null;
+        // Labels face outward: beside the avatar on the sides of the ring, above it at the top and below it at the bottom.
+        const side = labelSide(person.angle);
         const face = (
           <span className="shrink-0 overflow-hidden rounded-full border-[3px] border-white shadow-[0_0_0_1px_rgba(21,21,21,0.12)] transition-transform duration-500 group-hover:scale-[1.5]">
             {photo ? <img src={photo} alt={person.name} draggable={false} className="h-[84px] w-[84px] object-cover" style={{ objectPosition: "50% 15%" }} /> : <Initials name={person.name} size={84} />}
           </span>
         );
         const label = (
-          <>
+          <span className={cn("flex flex-col", side === "left" ? "items-end text-right" : side === "right" ? "items-start" : "items-center text-center")}>
             <span className="bg-white px-2 text-[18px] font-medium leading-tight tracking-[-0.01em]">{person.name}</span>
-            {/* Beside the avatar a role stays on one line; under it, a long role wraps so neighbours along the bottom don't collide. */}
-            <span className={cn("bg-white px-2 text-[16px] font-light leading-tight", side ? "whitespace-nowrap" : "max-w-[190px] [text-wrap:balance]", MUTED)}>{person.role}</span>
-          </>
+            <span className={cn("bg-white px-2 text-[16px] font-light leading-tight", side === "left" || side === "right" ? "whitespace-nowrap" : "max-w-[190px] [text-wrap:balance]", MUTED)}>{person.role}</span>
+          </span>
         );
-        if (side) {
+        if (side === "left" || side === "right") {
           return (
             <Reveal key={person.name} from="scale" delay={0.8 + i * 0.05} className={cn("group absolute flex items-center gap-2", side === "left" && "flex-row-reverse")} style={side === "left" ? { right: 1920 - p.x - 45, top: p.y - 45 } : { left: p.x - 45, top: p.y - 45 }}>
-              {face}
-              <span className={cn("flex flex-col", side === "left" ? "items-end text-right" : "items-start")}>{label}</span>
+              {face}{label}
             </Reveal>
           );
         }
         return (
-          <Reveal key={person.name} from="scale" delay={0.8 + i * 0.05} className="group absolute flex w-[260px] -translate-x-1/2 flex-col items-center text-center" style={{ left: p.x, top: p.y - 42 }}>
-            {face}
-            <span className="mt-3 flex flex-col items-center">{label}</span>
+          <Reveal key={person.name} from="scale" delay={0.8 + i * 0.05} className={cn("group absolute flex w-[220px] -translate-x-1/2 items-center gap-2", side === "top" ? "flex-col-reverse" : "flex-col")} style={side === "top" ? { left: p.x, bottom: 1080 - p.y - 45 } : { left: p.x, top: p.y - 45 }}>
+            {face}{label}
           </Reveal>
         );
       })}

@@ -25,7 +25,7 @@ export const presentations: PresentationEntry[] = [
   },
   {
     slug: "dtrax-bd-deck",
-    title: "D'trax · BD Deck",
+    title: "D'trax · BD Deck (Ronald Goh)",
     weekNumber: 44,
     year: 2026,
     dateRangeStart: "2026-10-30",
@@ -33,6 +33,17 @@ export const presentations: PresentationEntry[] = [
     slideCount: 31,
     status: "draft",
     pdf: "/dtrax-bd-deck-2026.pdf",
+  },
+  {
+    slug: "dtrax-bd-deck-johnathan",
+    title: "D'trax · BD Deck (Johnathan Ng)",
+    weekNumber: 46,
+    year: 2026,
+    dateRangeStart: "2026-11-12",
+    dateRangeEnd: "2026-11-12",
+    slideCount: 31,
+    status: "draft",
+    pdf: "/dtrax-bd-deck-johnathan-2026.pdf",
   },
   {
     slug: "dtrax-employee-handbook",

@@ -11,8 +11,8 @@ import { cn } from "@/lib/utils";
 import { Sketch, type SketchName } from "@/components/deck/vectors";
 import { GrowRule, MaskReveal } from "./fx";
 import {
-  AFTERCARE, ALTERATIONS, CLIENTS, CONTACT, COVER, CREDENTIALS, EXPERIENCE, FITOUT, GROUP_IB, LOGO, MOVE, PATH, PHOTO, POOLS, POSITION, QR, SONY, SUMITOMO, TEAM_PHOTO, WORKPLACE,
-  type CaseStudy,
+  AFTERCARE, ALTERATIONS, CLIENTS, CONTACT, CONTACTS, COVER, CREDENTIALS, EXPERIENCE, FITOUT, GROUP_IB, LOGO, MOVE, PATH, PHOTO, POOLS, POSITION, SONY, SUMITOMO, TEAM_PHOTO, WORKPLACE,
+  type BdContact, type CaseStudy,
 } from "./data";
 
 const serif = Instrument_Serif({ weight: "400", style: ["normal", "italic"], subsets: ["latin"], display: "swap" });
@@ -695,7 +695,7 @@ function Credentials({ page }: { page: number }) {
   );
 }
 
-function Closing({ page }: { page: number }) {
+function Closing({ page, contact }: { page: number; contact: BdContact }) {
   return (
     <Frame page={page} dark bare>
       <Drift src={TEAM_PHOTO.foundersBar} alt="The D'trax studio" position="50% 45%" className="absolute inset-0" />
@@ -708,9 +708,9 @@ function Closing({ page }: { page: number }) {
       </div>
       <Reveal delay={1} className="absolute bottom-[150px] right-[160px] top-[340px] flex w-[520px] flex-col border-l border-white/15 pl-16">
         <Magnet strength={0.15} className="w-fit">
-          <div className="rounded-[20px] bg-white p-5"><img src={QR} alt="QR code to contact Ronald Goh" draggable={false} className="h-[220px] w-[220px] [image-rendering:pixelated]" /></div>
+          <div className="rounded-[20px] bg-white p-5"><img src={contact.qr} alt={`QR code to contact ${contact.name}`} draggable={false} className="h-[220px] w-[220px] [image-rendering:pixelated]" /></div>
         </Magnet>
-        <p className="mt-10 text-[36px] font-medium tracking-[-0.03em]">{CONTACT.name}</p>
+        <p className="mt-10 text-[36px] font-medium tracking-[-0.03em]">{contact.name}</p>
         <p className="mt-1 text-[20px] text-white/60"><Em>{CONTACT.company}</Em></p>
         <div className="mt-8 border-t border-white/15 pt-6 text-[19px] font-light leading-[1.6] text-white/80">
           <p>{CONTACT.web}</p>
@@ -770,7 +770,13 @@ const defs: Def[] = [
   { id: "clients-divider", render: (page) => <Divider page={page} section="clients" sketch="seal" title={<>Clients &amp; <Em>credentials</Em></>} line="Experience across industries, with the credentials behind it." /> },
   { id: "clients", render: (page) => <Clients page={page} /> },
   { id: "credentials", render: (page) => <Credentials page={page} /> },
-  { id: "closing", dark: true, render: (page) => <Closing page={page} /> },
 ];
 
-export const slides: DeckSlide[] = defs.map((def, index) => ({ id: def.id, steps: def.steps, dark: def.dark, render: () => def.render(index + 1) }));
+/** The same deck for each BD contact; only the closing page (name and QR) changes. */
+const deckFor = (contact: BdContact): DeckSlide[] => {
+  const closing: Def = { id: "closing", dark: true, render: (page) => <Closing page={page} contact={contact} /> };
+  return [...defs, closing].map((def, index) => ({ id: def.id, steps: def.steps, dark: def.dark, render: () => def.render(index + 1) }));
+};
+
+export const slides = deckFor(CONTACTS.ronald);
+export const slidesJohnathan = deckFor(CONTACTS.johnathan);
