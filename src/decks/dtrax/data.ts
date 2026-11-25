@@ -120,6 +120,9 @@ export const FOCUS: Record<string, string> = {
   [asset("/assets/projects/singapore-pools/s-2.jpg")]: "74% 50%",
   [asset("/assets/projects/singapore-pools/s-3.jpg")]: "50% 40%",
   [asset("/assets/projects/traveloka/1.jpg")]: "78% 50%",
+  /* Reality-capture strips (1000 × 374 crops of 1728 × 1080 screenshots): keep the Wabtec wall in frame. */
+  [asset("/assets/projects/wabtec/early.jpg")]: "50% 58%",
+  [asset("/assets/projects/wabtec/finishing.jpg")]: "50% 62%",
 };
 
 export interface Project {
