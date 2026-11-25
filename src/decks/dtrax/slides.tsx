@@ -210,7 +210,7 @@ function AboutStatement({ page }: { page: number }) {
 function AboutStats({ page }: { page: number }) {
   const stats = [
     { value: 100, suffix: "+", label: "offices delivered since 2003", tone: "lime" as Tone },
-    { value: 37, suffix: "%", label: "of our projects in the last 5 years came from returning clients", tone: "pink" as Tone },
+    { value: 65, suffix: "%", label: "of our projects in the last 5 years came from returning clients", tone: "pink" as Tone },
   ];
   return (
     <Frame page={page} section="about">
@@ -237,7 +237,7 @@ function WhyDtrax({ page }: { page: number }) {
       media: <Drift src={TEAM_PHOTO.foundersPortrait} alt="The D'trax team at work" position="50% 40%" className="absolute inset-0" />,
     },
     {
-      tone: "blue", title: "Certified and compliant.", body: "ISO 45001:2018 · bizSAFE Star · BCA-registered, CR06 Interior Decoration & Finishing Works (L3).",
+      tone: "blue", title: "Certified and compliant.", body: "ISO 45001:2018 · bizSAFE Star · BCA-registered, CR06 Interior Decoration & Finishing Works.",
       media: (
         <div className={cn("absolute inset-0 flex items-center justify-center gap-6 px-10", MIST)}>
           {[CERT.iso, CERT.bizsafe].map((src, i) => <img key={src} src={src} alt={i ? "bizSAFE Star certificate" : "ISO 45001 certificate"} draggable={false} className="h-[270px] w-auto bg-white object-contain shadow-[0_14px_36px_rgba(21,21,21,0.12)]" />)}
@@ -831,17 +831,20 @@ function ProjectSlide({ page, project, number, total }: { page: number; project:
 /** The photographs after the hero, split into gallery slides: three, then up to two. */
 const galleries = (project: Project) => {
   const rest = project.photos.slice(1);
+  if (project.gallery === "mosaic") return rest.length ? [rest] : [];
   return rest.length > 3 ? [rest.slice(0, 3), rest.slice(3, 5)] : rest.length ? [rest] : [];
 };
 
 /** A gallery slide: large photographs only, with the project named quietly in the corner. */
 function ProjectPhotos({ page, project, photos, part, parts, dark }: { page: number; project: Project; photos: string[]; part: number; parts: number; dark: boolean }) {
-  const grid = photos.length === 3 ? "grid-cols-[1.75fr_1fr] grid-rows-2" : photos.length === 2 ? "grid-cols-2 grid-rows-1" : "grid-cols-1 grid-rows-1";
+  // Mosaic (5 photos): the first tall on the left, four small tiles in a 2 × 2 grid beside it.
+  const mosaic = photos.length === 5;
+  const grid = mosaic ? "grid-cols-3 grid-rows-2" : photos.length === 3 ? "grid-cols-[1.75fr_1fr] grid-rows-2" : photos.length === 2 ? "grid-cols-2 grid-rows-1" : "grid-cols-1 grid-rows-1";
   return (
     <Frame page={page} section="projects" dark={dark}>
       <div className={cn("absolute bottom-[130px] left-[160px] right-[160px] top-[150px] grid gap-4", grid)}>
         {photos.map((src, i) => (
-          <Reveal key={src} from="fade" delay={0.1 + i * 0.12} className={cn("relative overflow-hidden rounded-[20px]", photos.length === 3 && i === 0 && "row-span-2")}>
+          <Reveal key={src} from="fade" delay={0.1 + i * 0.12} className={cn("relative overflow-hidden rounded-[20px]", (photos.length === 3 || mosaic) && i === 0 && "row-span-2")}>
             <Photo src={src} alt={`${project.name}, view ${i + 2}`} className="absolute inset-0" />
             {i === 0 ? (
               <>
@@ -946,9 +949,8 @@ function Certifications({ page }: { page: number }) {
                   )
                 ) : (
                   <div className="flex h-full w-[220px] flex-col items-center justify-center bg-white px-6 text-center shadow-[0_10px_30px_rgba(0,0,0,0.08)]">
-                    <img src={BCA_LOGO} alt="BCA" draggable={false} className="w-[150px] object-contain" />
+                    <img src={BCA_LOGO} alt="BCA" draggable={false} className="w-[150px] -translate-x-[10px] object-contain" />
                     <span className="mt-6 text-[48px] font-medium leading-none tracking-[-0.04em]">CR06</span>
-                    <span className={cn("mt-3 text-[19px]", MUTED)}><Em>Grade L3</Em></span>
                   </div>
                 )}
               </div>

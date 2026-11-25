@@ -107,7 +107,7 @@ export const EXPERIENCE = {
   stats: [
     { value: 2003, prefix: "Since ", suffix: "", label: "Designing and building offices since 2003" },
     { value: 100, suffix: "+", label: "Offices delivered" },
-    { value: 37, suffix: "%", label: "of our projects in the last five years came from returning clients" },
+    { value: 65, suffix: "%", label: "of our projects in the last five years came from returning clients" },
   ],
   leaders: [
     { name: "Ronald Goh", role: "Co-founder and Managing Director", body: "More than 30 years in corporate interior fit-out.", photo: bd("team/ronald-leadership.jpg"), position: "50% 50%" },
@@ -266,7 +266,7 @@ export const CREDENTIALS = {
   safety: [
     { title: "ISO 45001:2018", body: "Occupational Health and Safety", image: CERT.iso },
     { title: "bizSAFE Star", body: "", image: CERT.bizsafe },
-    { title: "BCA registration", body: "CR06 Interior Decoration and Finishing Works, Grade L3", logo: BCA_LOGO },
+    { title: "BCA registration", body: "CR06 Interior Decoration and Finishing Works", logo: BCA_LOGO },
   ],
   award: { title: "Singapore Interior Design Awards 2023", body: "Bronze — Best in Workplace Design", image: CERT.sida },
 };

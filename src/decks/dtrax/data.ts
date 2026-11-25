@@ -132,6 +132,8 @@ export interface Project {
   tagline: string;
   points: string[];
   photos: string[];
+  /** "mosaic": every photo after the hero on one slide, in small tiles. For sets too low-res to fill half a slide. */
+  gallery?: "mosaic";
 }
 
 /** In the client's order. */
@@ -202,6 +204,8 @@ export const FEATURED: Project[] = [
     tagline: "Where agritech meets a greener way to work.",
     points: ["A workspace built to be modern, agile and sustainable", "Design that reflects the company’s focus on innovation and sustainability", "Spaces that support collaboration and productivity"],
     photos: numbered("ocp", 6),
+    /* The only copies we have are 600 to 1,400 px wide: small tiles keep them near their real size. */
+    gallery: "mosaic",
   },
   {
     name: "Edelman", sector: "Public Relations / Communications", location: "Beach Centre, 15 Beach Road", area: "5,000 sq ft", type: "Additions & Alterations",
@@ -291,10 +295,10 @@ export const LEADERS: Leader[] = [
 /** Organisation chart. Founders sit at the centre; teams ring them, and each team's people ring their team. */
 export const ORG_TEAMS: { name: string; members: { name: string; role: string }[] }[] = [
   { name: "Project Team", members: [{ name: "Sandrey Lim", role: "Project Director" }, { name: "Steve Tan", role: "Senior Project Manager" }, { name: "Erick Chng", role: "Construction Manager" }, { name: "Adrian Yen", role: "Senior Project Executive" }] },
-  { name: "BD Team", members: [{ name: "Johnathan Ng", role: "Business Development Manager" }] },
-  { name: "Design Team", members: [{ name: "Esther Choo", role: "Design Director" }, { name: "Tan Swee Lan", role: "Senior CAD Designer" }, { name: "Sapp Cheng", role: "Interior Designer" }, { name: "Gilbert Penaflor", role: "3D Designer" }] },
-  { name: "HR / Admin Operation", members: [{ name: "Victoria Tan", role: "Senior HR Executive" }, { name: "Mi Mi Nay Win", role: "Admin & Account Executive" }] },
   { name: "Costing Team", members: [{ name: "Danny Chua", role: "Senior Quantity Surveyor" }] },
+  { name: "HR / Admin Operation", members: [{ name: "Victoria Tan", role: "Senior HR Executive" }, { name: "Mi Mi Nay Win", role: "Admin & Account Executive" }] },
+  { name: "Design Team", members: [{ name: "Esther Choo", role: "Design Director" }, { name: "Tan Swee Lan", role: "Senior CAD Designer" }, { name: "Sapp Cheng", role: "Interior Designer" }, { name: "Gilbert Penaflor", role: "3D Designer" }] },
+  { name: "BD Team", members: [{ name: "Johnathan Ng", role: "Business Development Manager" }] },
 ];
 
 export const TESTIMONIALS = [
@@ -309,6 +313,6 @@ export const TESTIMONIALS = [
 export const CERTIFICATIONS = [
   { title: "ISO 45001:2018", body: "Occupational Health and Safety Management System, for interior design, addition and alteration, and renovation works. Certified February 2024.", image: CERT.iso },
   { title: "bizSAFE Star", body: "The highest bizSAFE level, awarded by the Workplace Safety and Health Council. Valid to February 2027.", image: CERT.bizsafe },
-  { title: "BCA-registered contractor", body: "CR06, Interior Decoration and Finishing Works, Grade L3. Valid to March 2027." },
+  { title: "BCA-registered contractor", body: "CR06, Interior Decoration and Finishing Works. Valid to March 2027." },
   { title: "SIDA 2023 Bronze", body: "Best in Workplace Design. Singapore Interior Design Awards, Completed Category (floor area 500 sqm and above), for the Group-IB (Innovis) office.", image: CERT.sida },
 ];

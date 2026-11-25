@@ -76,9 +76,22 @@ const shim = join(tmp, "base-path.ts");
 writeFileSync(shim, `const g = globalThis as any;
 const map: Record<string, string> = g.__DECK_ASSETS__ ?? {};
 export const BASE = "";
+// Videos become blob: URLs. iOS WebKit (Safari, and the WhatsApp/in-app viewers built on it) won't play a
+// multi-MB data: URI, so the intro would error out and skip straight to the deck. Decoded once, on first use.
+const blobs: Record<string, string> = {};
+const toBlobUrl = (uri: string) => {
+  const comma = uri.indexOf(",");
+  const mime = uri.slice(5, uri.indexOf(";"));
+  const bin = atob(uri.slice(comma + 1));
+  const bytes = new Uint8Array(bin.length);
+  for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+  return URL.createObjectURL(new Blob([bytes], { type: mime }));
+};
 export const asset = (path: string) => {
   g.__DECK_ASSET_LOG__?.add(path);
-  if (map[path]) return map[path];
+  const uri = map[path];
+  if (uri && uri.startsWith("data:video/") && typeof URL !== "undefined" && URL.createObjectURL) return (blobs[path] ??= toBlobUrl(uri));
+  if (uri) return uri;
   if (!g.__DECK_ASSET_LOG__) console.warn("[deck] asset not inlined:", path);
   return path;
 };

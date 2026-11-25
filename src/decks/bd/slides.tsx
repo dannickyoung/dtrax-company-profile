@@ -185,7 +185,7 @@ function ExperienceStats({ page }: { page: number }) {
   const stats: { node: ReactNode; eyebrow: string; label: string; tone: Tone }[] = [
     { node: <>2003</>, eyebrow: "Since", label: "Designing and building offices since 2003", tone: "lime" },
     { node: <CountUp value={100} suffix="+" delay={0.5} />, eyebrow: "Delivered", label: "Offices delivered", tone: "blue" },
-    { node: <CountUp value={37} suffix="%" delay={0.7} />, eyebrow: "Returning clients", label: "of our projects in the last five years came from returning clients", tone: "pink" },
+    { node: <CountUp value={65} suffix="%" delay={0.7} />, eyebrow: "Returning clients", label: "of our projects in the last five years came from returning clients", tone: "pink" },
   ];
   return (
     <Frame page={page} section="experience">
@@ -617,7 +617,7 @@ function Clients({ page }: { page: number }) {
         })}
       </div>
       <Reveal delay={1.3} className="absolute left-[160px] right-[160px] top-[760px] flex items-center gap-12">
-        <p className="font-medium leading-none tracking-[-0.06em]" style={{ fontSize: 120 }}><CountUp value={37} suffix="%" delay={1.4} /></p>
+        <p className="font-medium leading-none tracking-[-0.06em]" style={{ fontSize: 120 }}><CountUp value={65} suffix="%" delay={1.4} /></p>
         <span className="h-[90px] w-px bg-[#151515]/15" />
         <p className="max-w-[1100px] text-[30px] leading-[1.3] tracking-[-0.02em]">of projects over the last five years came from <Em>returning clients.</Em></p>
       </Reveal>
@@ -666,7 +666,7 @@ function Credentials({ page }: { page: number }) {
   const card = (key: string, image: string | undefined, delay: number, title: string, body: string, tone: Tone, logo?: string) => (
     <Reveal key={key} delay={delay} className="border-l border-[#151515]/12 px-8 first:border-l-0 first:pl-0">
       <div className={cn("flex h-[320px] items-center justify-center rounded-[20px] p-8", MIST)}>
-        {image ? <Certificate src={image} title={title} /> : logo ? <img src={logo} alt="BCA" draggable={false} className="w-[200px] object-contain" /> : null}
+        {image ? <Certificate src={image} title={title} /> : logo ? <img src={logo} alt="BCA" draggable={false} className="w-[200px] -translate-x-[14px] object-contain" /> : null}
       </div>
       <div className="mt-7 flex items-start gap-3"><span className="mt-[11px] flex"><Dot tone={tone} /></span><p className="text-[23px] font-medium leading-tight tracking-[-0.025em]">{title}</p></div>
       {body ? <p className={cn("mt-3 text-[19px] leading-[1.5]", BODY)}>{body}</p> : null}
