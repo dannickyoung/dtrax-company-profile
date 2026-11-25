@@ -13,15 +13,30 @@ export const canFullscreen = () => {
   const el = document.documentElement as WebkitEl;
   return Boolean(el.requestFullscreen || el.webkitRequestFullscreen);
 };
-export const toggleFullscreen = () => {
+/** Enters or leaves full screen. Resolves true if the page ended up full screen when entering (false if refused). */
+export const toggleFullscreen = async (): Promise<boolean> => {
   const doc = document as WebkitDoc;
   const el = document.documentElement as WebkitEl;
   try {
-    if (fullscreenElement()) return void (document.exitFullscreen ? document.exitFullscreen().catch(() => {}) : doc.webkitExitFullscreen?.());
-    if (el.requestFullscreen) return void el.requestFullscreen().catch(() => el.webkitRequestFullscreen?.());
-    el.webkitRequestFullscreen?.();
+    if (fullscreenElement()) {
+      await (document.exitFullscreen ? document.exitFullscreen() : doc.webkitExitFullscreen?.());
+      return true;
+    }
+    if (el.requestFullscreen) await el.requestFullscreen().catch(() => el.webkitRequestFullscreen?.());
+    else el.webkitRequestFullscreen?.();
   } catch {
-    /* refused (e.g. not a user gesture): nothing to undo */
+    /* refused: checked below */
+  }
+  await new Promise((r) => setTimeout(r, 300)); // the webkit call doesn't return a promise
+  return Boolean(fullscreenElement());
+};
+
+/** Opened from a Home Screen app (the website's deck page passes ?app=1): already full screen, nothing to toggle. */
+const inHomeScreenApp = () => {
+  try {
+    return new URLSearchParams(window.location.search).has("app") || (navigator as Navigator & { standalone?: boolean }).standalone === true;
+  } catch {
+    return false;
   }
 };
 
@@ -64,16 +79,23 @@ export function useIsFullscreen() {
 export function FullscreenButton({ className = "" }: { className?: string }) {
   const on = useIsFullscreen();
   const [hint, setHint] = useState(false);
+  const [hidden, setHidden] = useState(false);
+  // Checked after mount (the live decks are prerendered, where there is no window).
+  useEffect(() => setHidden(inHomeScreenApp() && !canFullscreen()), []);
   useEffect(() => {
     if (!hint) return;
-    const timer = window.setTimeout(() => setHint(false), 4000);
+    const timer = window.setTimeout(() => setHint(false), 7000);
     return () => window.clearTimeout(timer);
   }, [hint]);
+  if (hidden) return null;
   return (
 <>
 <button
   type="button"
-  onClick={(event) => { event.stopPropagation(); if (canFullscreen()) toggleFullscreen(); else setHint(true); }}
+  onClick={async (event) => {
+    event.stopPropagation();
+    if (!canFullscreen() || !(await toggleFullscreen())) setHint(true);
+  }}
   aria-label={on ? "Exit full screen" : "Full screen"}
   title={on ? "Exit full screen (F)" : "Full screen (F)"}
   className={`flex h-10 w-10 items-center justify-center rounded-full outline-none ${className}`}
@@ -82,7 +104,8 @@ export function FullscreenButton({ className = "" }: { className?: string }) {
 </button>
 {hint && (
   <div role="status" className="fixed inset-x-4 bottom-20 z-[60] mx-auto max-w-[420px] rounded-2xl bg-[#151515]/90 px-5 py-4 text-center text-[15px] leading-snug text-white shadow-lg backdrop-blur">
-    This browser doesn&rsquo;t allow full screen for web pages. Turn your phone sideways for the biggest view.
+    <p className="font-medium">Full screen on iPhone</p>
+    <p className="mt-1 text-white/80">Open the deck&rsquo;s link in Safari or Chrome, tap Share, then <b>Add to Home Screen</b>. Open it from your Home Screen and it plays full screen.</p>
   </div>
 )}
 </>
