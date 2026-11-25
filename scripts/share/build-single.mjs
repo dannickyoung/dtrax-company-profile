@@ -39,7 +39,10 @@ const LOADER = `<div id="deck-loader" style="position:fixed;inset:0;z-index:100;
 </div>
 <script>window.__DECK_PROGRESS__=function(f,end){var p=Math.round(Math.min(f,1)*100);document.getElementById("deck-loader-bar").style.width=p+"%";document.getElementById("deck-loader-pct").textContent=p+"%";if(end){var l=document.getElementById("deck-loader");setTimeout(function(){l.style.opacity="0";setTimeout(function(){l.remove()},550)},250)}};</script>`;
 const DEFAULT_EDGE = 1400; // referenced but never drawn in the click-through (e.g. unused table entries)
-const QUALITY = 76;
+// Image quality to try, best first: each deck uses the highest one that keeps the file under MAX_BYTES, so it can
+// be sent by email or messaging apps (10 MB is a common attachment limit).
+const QUALITIES = [76, 72, 68, 64, 60];
+const MAX_BYTES = 10_000_000;
 // DM Sans and Instrument Serif, inlined (scripts/share/make-fonts.mjs) so a downloaded deck keeps its type offline.
 const FONTS = readFileSync(join(here, "fonts-inline.css"), "utf8");
 const sizesFile = join(here, "single-sizes.json");
@@ -119,78 +122,104 @@ try {
   const css = (await postcss([tailwind()]).process(readFileSync(cssPath, "utf8"), { from: cssPath })).css;
 
   const MIME = { ".gif": "image/gif", ".svg": "image/svg+xml", ".mp4": "video/mp4", ".webm": "video/webm" };
-  const map = {};
-  let raw = 0, packed = 0, images = 0;
+  // Videos are re-encoded once (H.264 CRF 30 at up to 1080p, AAC 96k: the intro is mostly type on black, and this
+  // looks the same at a third of the size). The original is kept if that comes out no smaller, or ffmpeg is missing.
+  const videos = new Map();
   for (const { path, file } of media) {
-    const ext = extname(file).toLowerCase();
-    const original = readFileSync(file);
-    let buf = original, mime = MIME[ext];
-    if ([".jpg", ".jpeg", ".png", ".webp"].includes(ext)) {
-      images++;
-      const img = sharp(original, { failOn: "none" }).rotate();
-      const { width = 0, height = 0, hasAlpha } = await img.metadata();
-      const edge = Math.min(MAX_EDGE, SIZES[path] ?? DEFAULT_EDGE);
-      const sized = () => (Math.max(width, height) > edge ? img.clone().resize({ width: edge, height: edge, fit: "inside" }) : img.clone());
-      buf = await sized().webp({ quality: QUALITY, alphaQuality: 90, effort: 6 }).toBuffer();
-      // Flat graphics with alpha (logos, QR codes, signatures) often come out smaller AND sharper lossless.
-      if (hasAlpha || ext === ".png") {
-        const lossless = await sized().webp({ lossless: true, effort: 6 }).toBuffer();
-        if (lossless.length <= buf.length * 1.25) buf = lossless;
+    if (extname(file).toLowerCase() !== ".mp4") continue;
+    const small = join(tmp, `video-${videos.size}.mp4`);
+    try {
+      execFileSync("ffmpeg", ["-v", "error", "-y", "-i", file, "-vf", "scale='min(1920,iw)':-2", "-c:v", "libx264", "-preset", "slow", "-crf", "30", "-pix_fmt", "yuv420p", "-movflags", "+faststart", "-c:a", "aac", "-b:a", "96k", small]);
+      const buf = readFileSync(small);
+      if (buf.length < statSync(file).size) videos.set(path, buf);
+    } catch { console.warn(`ffmpeg unavailable or failed for ${path}; embedding the original`); }
+  }
+
+  /** Encodes every image at `quality` and assembles the whole file. Run again at a lower quality if it's too big. */
+  const assemble = async (QUALITY) => {
+    const map = {};
+    let raw = 0, packed = 0, images = 0;
+    for (const { path, file } of media) {
+      const ext = extname(file).toLowerCase();
+      const original = readFileSync(file);
+      let buf = videos.get(path) ?? original, mime = MIME[ext];
+      if ([".jpg", ".jpeg", ".png", ".webp"].includes(ext)) {
+        images++;
+        const img = sharp(original, { failOn: "none" }).rotate();
+        const { width = 0, height = 0, hasAlpha } = await img.metadata();
+        const edge = Math.min(MAX_EDGE, SIZES[path] ?? DEFAULT_EDGE);
+        const sized = () => (Math.max(width, height) > edge ? img.clone().resize({ width: edge, height: edge, fit: "inside" }) : img.clone());
+        buf = await sized().webp({ quality: QUALITY, alphaQuality: 90, effort: 6 }).toBuffer();
+        // Flat graphics with alpha (logos, QR codes, signatures) often come out smaller AND sharper lossless.
+        if (hasAlpha || ext === ".png") {
+          const lossless = await sized().webp({ lossless: true, effort: 6 }).toBuffer();
+          if (lossless.length <= buf.length * 1.25) buf = lossless;
+        }
+        mime = "image/webp";
       }
-      mime = "image/webp";
+      if (!mime) throw new Error(`No MIME type for ${path}`);
+      raw += original.length;
+      packed += buf.length;
+      map[path] = `data:${mime};base64,${buf.toString("base64")}`;
     }
-    if (!mime) throw new Error(`No MIME type for ${path}`);
-    raw += original.length;
-    packed += buf.length;
-    map[path] = `data:${mime};base64,${buf.toString("base64")}`;
-  }
 
-  // The file is tens of MB and nothing can render until the deck script at the end has run. So the page opens on a
-  // loader, and the media map arrives as a run of small inline scripts: the parser runs each one as its bytes land,
-  // and each moves the bar to the share of the file received so far. The deck script is the last share.
-  const scriptOf = (code) => `<script>${code.replace(/<\/script/gi, "<\\/script")}</script>`;
-  const CHUNK = 256 * 1024;
-  const pieces = [];
-  for (const [path, uri] of Object.entries(map))
-    for (let i = 0; i < uri.length; i += CHUNK) pieces.push([path, uri.slice(i, i + CHUNK)]);
-  const total = pieces.reduce((sum, [, part]) => sum + part.length, 0) + js.length;
-  const batches = [];
-  let batch = [], size = 0, done = 0;
-  for (const piece of pieces) {
-    batch.push(piece); size += piece[1].length;
-    if (size >= CHUNK) { done += size; batches.push([batch, done / total]); batch = []; size = 0; }
-  }
-  if (batch.length) { done += size; batches.push([batch, done / total]); }
-  const payload = [
-    scriptOf("window.__DECK_ASSETS__={};window.__DECK_PUT__=function(l,f){for(var i=0;i<l.length;i++)__DECK_ASSETS__[l[i][0]]=(__DECK_ASSETS__[l[i][0]]||'')+l[i][1];__DECK_PROGRESS__(f)};"),
-    ...batches.map(([list, frac]) => scriptOf(`__DECK_PUT__(${JSON.stringify(list).replace(/</g, "\\u003c")},${frac.toFixed(4)})`)),
-  ].join("\n");
+    // The file is tens of MB and nothing can render until the deck script at the end has run. So the page opens on a
+    // loader, and the media map arrives as a run of small inline scripts: the parser runs each one as its bytes land,
+    // and each moves the bar to the share of the file received so far. The deck script is the last share.
+    const scriptOf = (code) => `<script>${code.replace(/<\/script/gi, "<\\/script")}</script>`;
+    const CHUNK = 256 * 1024;
+    const pieces = [];
+    for (const [path, uri] of Object.entries(map))
+      for (let i = 0; i < uri.length; i += CHUNK) pieces.push([path, uri.slice(i, i + CHUNK)]);
+    const total = pieces.reduce((sum, [, part]) => sum + part.length, 0) + js.length;
+    const batches = [];
+    let batch = [], size = 0, done = 0;
+    for (const piece of pieces) {
+      batch.push(piece); size += piece[1].length;
+      if (size >= CHUNK) { done += size; batches.push([batch, done / total]); batch = []; size = 0; }
+    }
+    if (batch.length) { done += size; batches.push([batch, done / total]); }
+    const payload = [
+      scriptOf("window.__DECK_ASSETS__={};window.__DECK_PUT__=function(l,f){for(var i=0;i<l.length;i++)__DECK_ASSETS__[l[i][0]]=(__DECK_ASSETS__[l[i][0]]||'')+l[i][1];__DECK_PROGRESS__(f)};"),
+      ...batches.map(([list, frac]) => scriptOf(`__DECK_PUT__(${JSON.stringify(list).replace(/</g, "\\u003c")},${frac.toFixed(4)})`)),
+    ].join("\n");
 
-  const esc = (s) => s.replace(/&/g, "&amp;").replace(/"/g, "&quot;").replace(/</g, "&lt;");
-  const html = `<!doctype html>
-<html lang="en" style="background:#151515">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>${esc(DECKS[deck].title)}</title>
-<meta name="description" content="${esc(DECKS[deck].description)}">
-<style>${FONTS}</style>
-<style>${css.replace(/<\/style/gi, "<\\/style")}</style>
-</head>
-<body>
-${LOADER}
-<div id="deck"></div>
-${payload}
-<script>${js.replace(/<\/script/gi, "<\\/script")}</script>
-<script>__DECK_PROGRESS__(1, true)</script>
-</body>
-</html>
-`;
+    const esc = (s) => s.replace(/&/g, "&amp;").replace(/"/g, "&quot;").replace(/</g, "&lt;");
+    const html = `<!doctype html>
+  <html lang="en" style="background:#151515">
+  <head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>${esc(DECKS[deck].title)}</title>
+  <meta name="description" content="${esc(DECKS[deck].description)}">
+  <style>${FONTS}</style>
+  <style>${css.replace(/<\/style/gi, "<\\/style")}</style>
+  </head>
+  <body>
+  ${LOADER}
+  <div id="deck"></div>
+  ${payload}
+  <script>${js.replace(/<\/script/gi, "<\\/script")}</script>
+  <script>__DECK_PROGRESS__(1, true)</script>
+  </body>
+  </html>
+  `;
+    return { html, raw, packed, images, quality: QUALITY };
+  };
+
+  let built;
+  for (const quality of QUALITIES) {
+    built = await assemble(quality);
+    if (Buffer.byteLength(built.html) < MAX_BYTES) break;
+    console.log(`  ${(Buffer.byteLength(built.html) / 1e6).toFixed(2)} MB at image quality ${quality}: over the limit, trying lower`);
+  }
+  const { html, raw, packed, images, quality } = built;
+  if (Buffer.byteLength(html) >= MAX_BYTES) throw new Error(`Still ${(Buffer.byteLength(html) / 1e6).toFixed(2)} MB at the lowest image quality; limit is ${MAX_BYTES / 1e6} MB`);
   execFileSync("mkdir", ["-p", dirname(out)]);
   writeFileSync(out, html);
   writeFileSync(out.replace(/\.html$/, ".assets.json"), JSON.stringify([...log].sort(), null, 1));
   const mb = (n) => (n / 1024 / 1024).toFixed(2) + " MB";
-  console.log(`Built ${out}: ${mb(Buffer.byteLength(html))} (${images} images + ${media.length - images} other, ${mb(raw)} → ${mb(packed)} before base64; pure: ${[...pure].join(", ")})`);
+  console.log(`Built ${out}: ${mb(Buffer.byteLength(html))}, ${(Buffer.byteLength(html) / 1e6).toFixed(2)} MB decimal, image quality ${quality} (${images} images + ${media.length - images} other, ${mb(raw)} → ${mb(packed)} before base64; pure: ${[...pure].join(", ")})`);
 } finally {
   rmSync(tmp, { recursive: true, force: true });
   rmSync(src, { recursive: true, force: true });
