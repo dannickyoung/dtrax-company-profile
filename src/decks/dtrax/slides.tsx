@@ -677,7 +677,7 @@ function OrgChart({ page }: { page: number }) {
    05 · Track record
    ──────────────────────────────────────────────────────────────── */
 
-/** A still wall of work: one photograph per featured project, fading in one by one. */
+/** A still wall of work: one photograph per featured project, fading in one by one. Seven columns, the first tile two rows tall, fits thirteen. */
 function TrackRecord({ page }: { page: number }) {
   const tiles = FEATURED.map((project) => ({ src: project.photos[0], name: project.name }));
   return (
@@ -686,12 +686,12 @@ function TrackRecord({ page }: { page: number }) {
         <H size={61}>A selection from <Em color={LIME}>100+</Em> offices</H>
         <Reveal delay={0.5}><p className={cn("pb-3 text-[22px]", BODY_DARK)}><Em>delivered since 2003</Em></p></Reveal>
       </div>
-      <div className="absolute bottom-[150px] left-[160px] right-[160px] top-[340px] grid grid-cols-6 grid-rows-2 gap-3">
+      <div className="absolute bottom-[150px] left-[160px] right-[160px] top-[340px] grid grid-cols-7 grid-rows-2 gap-3">
         {tiles.map((tile, i) => (
-          <Reveal key={tile.name} from="fade" delay={0.4 + i * 0.06} className="relative overflow-hidden rounded-[16px]">
+          <Reveal key={tile.name} from="fade" delay={0.4 + i * 0.06} className={cn("relative overflow-hidden rounded-[16px]", i === 0 && "row-span-2")}>
             <Photo src={tile.src} alt={tile.name} className="absolute inset-0" />
             <div className="absolute inset-x-0 bottom-0 h-[50%] bg-gradient-to-t from-black/70 to-transparent" />
-            <span className="absolute bottom-4 left-5 text-[17px] font-medium text-white">{tile.name}</span>
+            <span className="absolute bottom-4 left-5 right-4 text-[17px] font-medium leading-[1.25] text-white">{tile.name}</span>
           </Reveal>
         ))}
       </div>

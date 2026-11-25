@@ -36,12 +36,14 @@ export const TEAM_PHOTO = {
 export const HEADSHOT: Record<string, string> = {
   "Adrian Yen": asset("/assets/headshots/adrian-yen.jpg"),
   "Danny Chua": asset("/assets/headshots/danny-chua.jpg"),
+  "Erick Chng": asset("/assets/headshots/erick-chng.jpg"),
   "Esther Choo": asset("/assets/headshots/esther-choo.jpg"),
   "Gilbert Penaflor": asset("/assets/headshots/gilbert-penaflor.jpg"),
   "Johnathan Ng": asset("/assets/headshots/johnathan-ng.jpg"),
   "Mi Mi Nay Win": asset("/assets/headshots/mi-mi-nay-win.jpg"),
   "Sandrey Lim": asset("/assets/headshots/sandrey-lim.jpg"),
   "Sapp Cheng": asset("/assets/headshots/sapp-cheng.jpg"),
+  "Steve Tan": asset("/assets/headshots/steve-tan.jpg"),
   "Steven Leng": asset("/assets/headshots/steven-leng.jpg"),
   "Tan Swee Lan": asset("/assets/headshots/tan-swee-lan.jpg"),
   "Victoria Tan": asset("/assets/headshots/victoria-tan.jpg"),
@@ -147,6 +149,12 @@ export const FEATURED: Project[] = [
     photos: numbered("traveloka", 5),
   },
   {
+    name: "Hanwha Engine, Hanwha Ocean", sector: "Marine / Shipbuilding", location: "10 Marina Boulevard", area: "3,500 sq ft", type: "Design-and-build",
+    tagline: "Two distinct workplaces, unified under one corporate identity.",
+    points: ["Shared entrance unifying both entities under a single corporate identity from the first impression", "Dedicated facilities for each company, preserving operational independence without breaking cohesion", "Neutral palette lifted by Hanwha’s signature corporate orange for brand continuity across both workplaces"],
+    photos: photos("hanwha", ["h-1.jpg", "h-2.jpg", "h-3.jpg", "h-4.jpg", "h-5.jpg", "h-6.jpg"]),
+  },
+  {
     name: "Sumitomo Chemical Asia", sector: "Chemicals / Industrial", location: "Duo Tower, 3 Fraser Street", area: "12,188 sq ft", type: "A&A and reinstatement",
     tagline: "Design driven by how the company works.",
     points: ["Began with a study of how teams interact and move between tasks through the day", "Space planned around operational workflow", "A warm material palette, across one of our largest recent fit-outs"],
@@ -213,7 +221,6 @@ export const FEATURED: Project[] = [
 export const featured = (name: string) => FEATURED.find((project) => project.name === name)!;
 
 export const IN_PROGRESS = [
-  { name: "Hanwha Engine, Hanwha Ocean", sector: "Marine / Shipbuilding", type: "Design-and-build" },
   { name: "Wabtec", sector: "Engineering / Manufacturing", type: "Design-and-build" },
 ];
 
@@ -296,6 +303,7 @@ export const TESTIMONIALS = [
   { client: "Sumitomo Chemical Asia", quote: "Thanks to the designer’s creativity and practical approach, our office has been transformed into a more vibrant and productive environment. Although there were a few challenges along the way, the dedication and professionalism of the D’trax team ensured the project was executed smoothly and delivered on schedule.", name: "Dennis Lim", role: "General Manager, GA, Regional HR and Sustainability, Sumitomo Chemical Asia" },
   { client: "Mitsui Chemicals", quote: "We would like to thank you for your assistance in completing our office renovation on time and within budget. Your team was well-organised, capable, and displayed flexibility catering to our requests. D'trax's expertise, commitment and follow-through throughout the entire project was exceptional.", name: "Thomas Lin", role: "Senior Manager, IT and Admin, Mitsui Chemicals" },
   { client: "Sony Pictures", quote: "The team provided their full commitment and dedication throughout the process, overcame challenges along the way, completed the project on time, and continued with further support on any adjustments we requested.", name: "Brett D. Hogg", role: "Executive Vice President and Managing Director, Sony Pictures" },
+  { client: "FIJI Water", quote: "The attention to detail is visible in every corner of the office, and it is this dedication that has elevated the finished space from being merely functional to being truly exceptional.", name: "Jan Singh", role: "AVP Global Sourcing, Asia Pacific, The Wonderful Company (FIJI Water)" },
 ];
 
 export const CERTIFICATIONS = [
