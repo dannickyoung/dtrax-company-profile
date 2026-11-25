@@ -24,12 +24,15 @@ const here = dirname(fileURLToPath(import.meta.url));
 const root = resolve(here, "../..");
 const DECKS = {
   dtrax: { file: "dtrax-company-profile-2026.html", title: "D'trax Company Profile 2026", description: "D'trax Design company profile deck, 2026." },
-  bd: { file: "dtrax-bd-deck-2026.html", title: "D'trax BD Deck 2026", description: "D'trax Design business development deck, 2026." },
-  "bd-johnathan": { file: "dtrax-bd-deck-johnathan-2026.html", title: "D'trax BD Deck 2026 · Johnathan Ng", description: "D'trax Design business development deck, 2026." },
+  // The BD decks carry the intro video at near-original quality, so they're allowed up to 13 MB (user's call,
+  // 2026-11-25: video quality over the 10 MB rule). Every other deck stays under 10 MB.
+  bd: { maxBytes: 13_000_000, file: "dtrax-bd-deck-2026.html", title: "D'trax BD Deck 2026", description: "D'trax Design business development deck, 2026." },
+  "bd-johnathan": { maxBytes: 13_000_000, file: "dtrax-bd-deck-johnathan-2026.html", title: "D'trax BD Deck 2026 · Johnathan Ng", description: "D'trax Design business development deck, 2026." },
   handbook: { file: "dtrax-employee-handbook.html", title: "D'trax Employee Handbook", description: "D'trax Design employee handbook." },
 };
 const deck = process.argv[2] ?? "dtrax";
 if (!DECKS[deck]) throw new Error(`Unknown deck "${deck}". Use one of: ${Object.keys(DECKS).join(", ")}`);
+const MAX_BYTES = DECKS[deck].maxBytes ?? 10_000_000;
 const out = resolve(process.argv[3] ?? join(root, "share-out", "single", DECKS[deck].file));
 const MAX_EDGE = 1920;
 // Shown from the first bytes of the file until the deck has mounted: a thin lime bar and a percentage on black.
@@ -40,9 +43,10 @@ const LOADER = `<div id="deck-loader" style="position:fixed;inset:0;z-index:100;
 <script>window.__DECK_PROGRESS__=function(f,end){var p=Math.round(Math.min(f,1)*100);document.getElementById("deck-loader-bar").style.width=p+"%";document.getElementById("deck-loader-pct").textContent=p+"%";if(end){var l=document.getElementById("deck-loader");setTimeout(function(){l.style.opacity="0";setTimeout(function(){l.remove()},550)},250)}};</script>`;
 const DEFAULT_EDGE = 1400; // referenced but never drawn in the click-through (e.g. unused table entries)
 // Image quality to try, best first: each deck uses the highest one that keeps the file under MAX_BYTES, so it can
-// be sent by email or messaging apps (10 MB is a common attachment limit).
-const QUALITIES = [76, 72, 68, 64, 60];
-const MAX_BYTES = 10_000_000;
+// be sent by email or messaging apps (10 MB is a common attachment limit; per-deck maxBytes can raise it).
+const QUALITIES = [76, 72, 68, 64, 60, 56, 52];
+// H.264 CRF for embedded videos (lower = sharper and bigger). VIDEO_CRF=26 node … overrides it for a trial build.
+const VIDEO_CRF = Number(process.env.VIDEO_CRF ?? 23);
 // DM Sans and Instrument Serif, inlined (scripts/share/make-fonts.mjs) so a downloaded deck keeps its type offline.
 const FONTS = readFileSync(join(here, "fonts-inline.css"), "utf8");
 const sizesFile = join(here, "single-sizes.json");
@@ -135,14 +139,14 @@ try {
   const css = (await postcss([tailwind()]).process(readFileSync(cssPath, "utf8"), { from: cssPath })).css;
 
   const MIME = { ".gif": "image/gif", ".svg": "image/svg+xml", ".mp4": "video/mp4", ".webm": "video/webm" };
-  // Videos are re-encoded once (H.264 CRF 30 at up to 1080p, AAC 96k: the intro is mostly type on black, and this
-  // looks the same at a third of the size). The original is kept if that comes out no smaller, or ffmpeg is missing.
+  // Videos are re-encoded once (H.264 at VIDEO_CRF, up to 1080p, AAC 96k). CRF 23 measures SSIM 0.997 against
+  // the original over the whole clip; CRF 30 (used briefly) visibly blurred the camera moves. The original is kept if that comes out no smaller, or ffmpeg is missing.
   const videos = new Map();
   for (const { path, file } of media) {
     if (extname(file).toLowerCase() !== ".mp4") continue;
     const small = join(tmp, `video-${videos.size}.mp4`);
     try {
-      execFileSync("ffmpeg", ["-v", "error", "-y", "-i", file, "-vf", "scale='min(1920,iw)':-2", "-c:v", "libx264", "-preset", "slow", "-crf", "30", "-pix_fmt", "yuv420p", "-movflags", "+faststart", "-c:a", "aac", "-b:a", "96k", small]);
+      execFileSync("ffmpeg", ["-v", "error", "-y", "-i", file, "-vf", "scale='min(1920,iw)':-2", "-c:v", "libx264", "-preset", "slow", "-crf", String(VIDEO_CRF), "-pix_fmt", "yuv420p", "-movflags", "+faststart", "-c:a", "aac", "-b:a", "96k", small]);
       const buf = readFileSync(small);
       if (buf.length < statSync(file).size) videos.set(path, buf);
     } catch { console.warn(`ffmpeg unavailable or failed for ${path}; embedding the original`); }
