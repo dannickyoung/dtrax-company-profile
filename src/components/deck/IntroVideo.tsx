@@ -4,7 +4,26 @@ import { useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { Maximize, Minimize, Play } from "lucide-react";
 
-export const toggleFullscreen = () => (document.fullscreenElement ? document.exitFullscreen?.() : document.documentElement.requestFullscreen?.())?.catch?.(() => {});
+/* Standard Fullscreen API plus the webkit-prefixed one (older Safari, iPad, some Android WebViews). iPhone browsers
+   (all WebKit, Chrome included) have neither for pages: there the button explains instead of doing nothing. */
+type WebkitDoc = Document & { webkitFullscreenElement?: Element | null; webkitExitFullscreen?: () => void };
+type WebkitEl = HTMLElement & { webkitRequestFullscreen?: () => void };
+const fullscreenElement = () => document.fullscreenElement ?? (document as WebkitDoc).webkitFullscreenElement ?? null;
+export const canFullscreen = () => {
+  const el = document.documentElement as WebkitEl;
+  return Boolean(el.requestFullscreen || el.webkitRequestFullscreen);
+};
+export const toggleFullscreen = () => {
+  const doc = document as WebkitDoc;
+  const el = document.documentElement as WebkitEl;
+  try {
+    if (fullscreenElement()) return void (document.exitFullscreen ? document.exitFullscreen().catch(() => {}) : doc.webkitExitFullscreen?.());
+    if (el.requestFullscreen) return void el.requestFullscreen().catch(() => el.webkitRequestFullscreen?.());
+    el.webkitRequestFullscreen?.();
+  } catch {
+    /* refused (e.g. not a user gesture): nothing to undo */
+  }
+};
 
 /** True while the pointer has moved (or a key was pressed) in the last `ms`; utility buttons fade out when it's false. */
 export function useActive(ms = 2500) {
@@ -30,26 +49,43 @@ export function useActive(ms = 2500) {
 export function useIsFullscreen() {
   const [on, setOn] = useState(false);
   useEffect(() => {
-    const sync = () => setOn(Boolean(document.fullscreenElement));
+    const sync = () => setOn(Boolean(fullscreenElement()));
     sync();
     document.addEventListener("fullscreenchange", sync);
-    return () => document.removeEventListener("fullscreenchange", sync);
+    document.addEventListener("webkitfullscreenchange", sync);
+    return () => {
+      document.removeEventListener("fullscreenchange", sync);
+      document.removeEventListener("webkitfullscreenchange", sync);
+    };
   }, []);
   return on;
 }
 
 export function FullscreenButton({ className = "" }: { className?: string }) {
   const on = useIsFullscreen();
+  const [hint, setHint] = useState(false);
+  useEffect(() => {
+    if (!hint) return;
+    const timer = window.setTimeout(() => setHint(false), 4000);
+    return () => window.clearTimeout(timer);
+  }, [hint]);
   return (
+<>
 <button
   type="button"
-  onClick={(event) => { event.stopPropagation(); toggleFullscreen(); }}
+  onClick={(event) => { event.stopPropagation(); if (canFullscreen()) toggleFullscreen(); else setHint(true); }}
   aria-label={on ? "Exit full screen" : "Full screen"}
   title={on ? "Exit full screen (F)" : "Full screen (F)"}
   className={`flex h-10 w-10 items-center justify-center rounded-full outline-none ${className}`}
 >
   {on ? <Minimize className="h-4 w-4" /> : <Maximize className="h-4 w-4" />}
 </button>
+{hint && (
+  <div role="status" className="fixed inset-x-4 bottom-20 z-[60] mx-auto max-w-[420px] rounded-2xl bg-[#151515]/90 px-5 py-4 text-center text-[15px] leading-snug text-white shadow-lg backdrop-blur">
+    This browser doesn&rsquo;t allow full screen for web pages. Turn your phone sideways for the biggest view.
+  </div>
+)}
+</>
   );
 }
 
