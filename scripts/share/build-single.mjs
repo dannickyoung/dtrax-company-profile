@@ -40,6 +40,8 @@ const LOADER = `<div id="deck-loader" style="position:fixed;inset:0;z-index:100;
 <script>window.__DECK_PROGRESS__=function(f,end){var p=Math.round(Math.min(f,1)*100);document.getElementById("deck-loader-bar").style.width=p+"%";document.getElementById("deck-loader-pct").textContent=p+"%";if(end){var l=document.getElementById("deck-loader");setTimeout(function(){l.style.opacity="0";setTimeout(function(){l.remove()},550)},250)}};</script>`;
 const DEFAULT_EDGE = 1400; // referenced but never drawn in the click-through (e.g. unused table entries)
 const QUALITY = 76;
+// DM Sans and Instrument Serif, inlined (scripts/share/make-fonts.mjs) so a downloaded deck keeps its type offline.
+const FONTS = readFileSync(join(here, "fonts-inline.css"), "utf8");
 const sizesFile = join(here, "single-sizes.json");
 const SIZES = existsSync(sizesFile) ? JSON.parse(readFileSync(sizesFile, "utf8")) : {};
 
@@ -172,9 +174,7 @@ try {
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>${esc(DECKS[deck].title)}</title>
 <meta name="description" content="${esc(DECKS[deck].description)}">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&family=Instrument+Serif:ital@0;1&display=swap">
+<style>${FONTS}</style>
 <style>${css.replace(/<\/style/gi, "<\\/style")}</style>
 </head>
 <body>
