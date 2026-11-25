@@ -11,7 +11,7 @@ import { cn } from "@/lib/utils";
 import { Sketch, type SketchName } from "@/components/deck/vectors";
 import { GrowRule, MaskReveal } from "./fx";
 import {
-  AFTERCARE, ALTERATIONS, CLIENTS, CONTACT, CONTACTS, COVER, CREDENTIALS, EXPERIENCE, FITOUT, GROUP_IB, LOGO, MOVE, PATH, PHOTO, POOLS, POSITION, SONY, SUMITOMO, TEAM_PHOTO, WORKPLACE,
+  AFTERCARE, ALTERATIONS, CLIENTS, CONTACT, CONTACTS, COVER, CREDENTIALS, EXPERIENCE, FITOUT, GROUP_IB, LOGO, MOVE, PATH, PHOTO, POOLS, POSITION, SONY, SUMITOMO, TEAM_PHOTO, TRACK_RECORD, WORKPLACE,
   type BdContact, type CaseStudy,
 } from "./data";
 
@@ -198,6 +198,27 @@ function ExperienceStats({ page }: { page: number }) {
             <div className="flex items-center gap-4"><Dot tone={stat.tone} size={12} /><Eyebrow>{stat.eyebrow}</Eyebrow></div>
             <p className="mt-7 font-medium leading-none tracking-[-0.06em]" style={{ fontSize: 150 }}>{stat.node}</p>
             <p className={cn("mt-7 max-w-[440px] text-[22px] leading-[1.45]", BODY)}>{stat.label}</p>
+          </Reveal>
+        ))}
+      </div>
+    </Frame>
+  );
+}
+
+/** The company profile's track-record wall: one photograph per featured project, fading in one by one. Seven columns, the first tile two rows tall, fits thirteen. */
+function TrackRecord({ page }: { page: number }) {
+  return (
+    <Frame page={page} section="experience" dark>
+      <div className="absolute left-[160px] right-[160px] top-[160px] flex items-end justify-between">
+        <H size={61}>A selection from <Em color={LIME}>100+</Em> offices</H>
+        <Reveal delay={0.5}><p className={cn("pb-3 text-[22px]", BODY_DARK)}><Em>delivered since 2003</Em></p></Reveal>
+      </div>
+      <div className="absolute bottom-[150px] left-[160px] right-[160px] top-[340px] grid grid-cols-7 grid-rows-2 gap-3">
+        {TRACK_RECORD.map((tile, i) => (
+          <Reveal key={tile.name} from="fade" delay={0.4 + i * 0.06} className={cn("relative overflow-hidden rounded-[16px]", i === 0 && "row-span-2")}>
+            <Photo src={tile.photo} alt={tile.name} position={tile.position} className="absolute inset-0" />
+            <div className="absolute inset-x-0 bottom-0 h-[50%] bg-gradient-to-t from-black/70 to-transparent" />
+            <span className="absolute bottom-4 left-5 right-4 text-[17px] font-medium leading-[1.25] text-white">{tile.name}</span>
           </Reveal>
         ))}
       </div>
@@ -738,6 +759,7 @@ const defs: Def[] = [
 
   { id: "experience-divider", render: (page) => <Divider page={page} section="experience" sketch="timeline" title={<>Built on <Em>experience</Em></>} line="Designing and building offices in Singapore since 2003." /> },
   { id: "experience", render: (page) => <ExperienceStats page={page} /> },
+  { id: "track-record", dark: true, render: (page) => <TrackRecord page={page} /> },
   { id: "leadership", render: (page) => <Leadership page={page} /> },
   { id: "buddy", render: (page) => <Buddy page={page} /> },
 

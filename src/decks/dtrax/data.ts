@@ -203,9 +203,9 @@ export const FEATURED: Project[] = [
     name: "OCP Nutricrops", sector: "Agriculture / Fertilisers", location: "Springleaf Tower, 3 Anson Road", area: "2,486 sq ft", type: "Design-and-build",
     tagline: "Where agritech meets a greener way to work.",
     points: ["A workspace built to be modern, agile and sustainable", "Design that reflects the company’s focus on innovation and sustainability", "Spaces that support collaboration and productivity"],
-    photos: numbered("ocp", 6),
-    /* The only copies we have are 600 to 1,400 px wide: small tiles keep them near their real size. */
-    gallery: "mosaic",
+    /* The only copies on the drive are 600 to 1,400 px wide. Only the two that stay sharp at slide size are used
+       (hero 1288 px, pantry 1386 px); 3.jpg to 6.jpg (608 to 697 px) looked blurry and were dropped (2026-11-25). */
+    photos: photos("ocp", ["1.jpg", "2.jpg"]),
   },
   {
     name: "Edelman", sector: "Public Relations / Communications", location: "Beach Centre, 15 Beach Road", area: "5,000 sq ft", type: "Additions & Alterations",

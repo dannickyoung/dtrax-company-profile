@@ -1,5 +1,5 @@
 import { asset } from "@/lib/base-path";
-import { LOGO, OFFICE, TEAM_PHOTO } from "@/decks/dtrax/data";
+import { FOCUS, LOGO, OFFICE, TEAM_PHOTO } from "@/decks/dtrax/data";
 
 /* Copy follows "D'trax BD Deck Copy 2026" (client brief), as written.
    Photos, logos and certificates are reused from the company profile. */
@@ -115,6 +115,24 @@ export const EXPERIENCE = {
   ],
   buddy: "Every designer and project manager has a designated colleague who can step in when needed, keeping your project moving.",
 };
+
+/** "A selection from 100+ offices": each featured project's hero, in the company profile's order. Listed by file
+ *  (not via its FEATURED table, which would pull every gallery photo into this deck's single-file build). */
+export const TRACK_RECORD: { name: string; photo: string; position: string }[] = [
+  ["Singapore Pools", project("singapore-pools", "s-1.jpg")],
+  ["Traveloka", project("traveloka", "1.jpg")],
+  ["Hanwha Engine, Hanwha Ocean", project("hanwha", "h-1.jpg")],
+  ["Sumitomo Chemical Asia", project("sumitomo-chemical", "s-1.jpg")],
+  ["Embecta", project("embecta", "1.jpg")],
+  ["Mitsui Chemicals", project("mitsui-chemicals", "1.jpg")],
+  ["OMS ROC", project("oms-group", "-dsf0008.jpg")],
+  ["Group-IB (Innovis)", project("group-ib-innovis", "gi-1.jpg")],
+  ["Sony Pictures", project("sony-pictures", "1.jpg")],
+  ["Digital Edge", project("digital-edge", "d-1.jpg")],
+  ["OCP Nutricrops", project("ocp", "1.jpg")],
+  ["Edelman", project("edelman", "1.jpg")],
+  ["FIJI Water", project("fiji-water", "f-1.jpg")],
+].map(([name, photo]) => ({ name, photo, position: FOCUS[photo] ?? "50% 50%" }));
 
 export const WORKPLACE = {
   lead: "The best starting point for an office is understanding how people use it.",

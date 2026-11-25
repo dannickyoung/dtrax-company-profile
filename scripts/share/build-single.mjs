@@ -22,12 +22,15 @@ import sharp from "sharp";
 
 const here = dirname(fileURLToPath(import.meta.url));
 const root = resolve(here, "../..");
+// The track-record wall only draws these heroes as small tiles in the BD decks (the company profile shows them full
+// bleed, hence 1920 in single-sizes.json). Cover-scaled, a tile needs ~440 px; 720 leaves room for high-DPI screens.
+const BD_SIZES = Object.fromEntries(["hanwha/h-1.jpg", "oms-group/-dsf0008.jpg", "group-ib-innovis/gi-1.jpg", "edelman/1.jpg"].map((f) => [`/assets/projects/${f}`, 720]));
 const DECKS = {
   dtrax: { file: "dtrax-company-profile-2026.html", title: "D'trax Company Profile 2026", description: "D'trax Design company profile deck, 2026." },
   // The BD decks carry the intro video at near-original quality, so they're allowed up to 13 MB (user's call,
   // 2026-11-25: video quality over the 10 MB rule). Every other deck stays under 10 MB.
-  bd: { maxBytes: 13_000_000, file: "dtrax-bd-deck-2026.html", title: "D'trax BD Deck 2026", description: "D'trax Design business development deck, 2026." },
-  "bd-johnathan": { maxBytes: 13_000_000, file: "dtrax-bd-deck-johnathan-2026.html", title: "D'trax BD Deck 2026 · Johnathan Ng", description: "D'trax Design business development deck, 2026." },
+  bd: { maxBytes: 13_000_000, sizes: BD_SIZES, file: "dtrax-bd-deck-2026.html", title: "D'trax BD Deck 2026", description: "D'trax Design business development deck, 2026." },
+  "bd-johnathan": { maxBytes: 13_000_000, sizes: BD_SIZES, file: "dtrax-bd-deck-johnathan-2026.html", title: "D'trax BD Deck 2026 · Johnathan Ng", description: "D'trax Design business development deck, 2026." },
   handbook: { file: "dtrax-employee-handbook.html", title: "D'trax Employee Handbook", description: "D'trax Design employee handbook." },
 };
 const deck = process.argv[2] ?? "dtrax";
@@ -50,7 +53,7 @@ const VIDEO_CRF = Number(process.env.VIDEO_CRF ?? 23);
 // DM Sans and Instrument Serif, inlined (scripts/share/make-fonts.mjs) so a downloaded deck keeps its type offline.
 const FONTS = readFileSync(join(here, "fonts-inline.css"), "utf8");
 const sizesFile = join(here, "single-sizes.json");
-const SIZES = existsSync(sizesFile) ? JSON.parse(readFileSync(sizesFile, "utf8")) : {};
+const SIZES = { ...(existsSync(sizesFile) ? JSON.parse(readFileSync(sizesFile, "utf8")) : {}), ...DECKS[deck].sizes }; // per-deck overrides win
 
 // Helpers that only wrap asset() (e.g. `const photos = (folder, files) => files.map(...asset(...))`) must be pure
 // too, or esbuild keeps every table built with them. Found by name, repeated until no new wrapper turns up.
