@@ -43,3 +43,6 @@ node_modules
 
 # Generated media (source downloads, renders)
 /media
+
+# Claude Code personal settings
+.claude/settings.local.json
